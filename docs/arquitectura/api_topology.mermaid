@@ -1,0 +1,28 @@
+graph TD
+    subgraph "API Gateway (FastAPI)"
+        Main["app/main.py"]
+    end
+
+    subgraph "Infrastructure Layer (Cross-cutting)"
+        Health["v1/infrastructure/health.py"]
+        OTel["OpenTelemetry SDK"]
+    end
+
+    subgraph "Domain Layer (Bounded Contexts)"
+        Auth["v1/routers/auth.py"]
+        Users["v1/routers/users.py (Planned)"]
+    end
+
+    subgraph "Legacy Layer (To Migrate)"
+        Legacy["app/api/*.py"]
+    end
+
+    Main -->|include| Health
+    Main -->|include| Auth
+    Main -->|include| Legacy
+    Health -->|instumented| OTel
+    Auth -->|Domain Logic| RBAC["app/db/rbac.py"]
+    
+    style Health fill:#f9f,stroke:#333,stroke-width:2px
+    style Auth fill:#bbf,stroke:#333,stroke-width:2px
+    style OTel fill:#dfd,stroke:#333,stroke-dasharray: 5 5

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurgerMusic OS - Portfolio Presentation</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+/* 1. THE SETUP */
+* { box-sizing: border-box; }
+
+body {
+  background-color: #121212;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+  margin: 0;
+  min-height: 100vh;
+  padding: 20px 0;
+  place-items: center;
+}
+
+.slide-container {
+  align-items: flex-start;
+  background-color: #0a0a0a;
+  border-radius: 8px;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  font-family: 'Urbanist', sans-serif;
+  height: 720px;
+  justify-content: center;
+  overflow: hidden;
+  padding: 50px 60px;
+  position: relative;
+  width: 1280px;
+}
+
+/* Base structural decorative line */
+.slide-container::after {
+  background: rgba(222, 255, 154, 0.2); 
+  bottom: 50px;
+  content: '';
+  height: 1px;
+  left: 60px;
+  position: absolute;
+  right: 60px;
+}
+
+.slide-container > * { position: relative; z-index: 1; }
+
+/* 2. CONSISTENT TYPOGRAPHY */
+.slide-container h1, .slide-container h2, .slide-container h3, .slide-container th {
+  color: #f5f5f5; font-family: 'Urbanist', sans-serif; font-weight: 700; margin: 0;
+}
+
+.slide-container h1 span, .slide-container h2 span { color: #deff9a; }
+
+.slide-container p, .slide-container li, .slide-container td, .slide-container .subtitle, .slide-container .chart-summary {
+  color: #daffde; font-family: 'Urbanist', sans-serif; font-size: 18px; line-height: 1.6;
+}
+
+/* Heading Sizes */
+.slide-container h1 { font-size: 70px; line-height: 1.1; margin-bottom: 20px; }
+.slide-container .slide-title { font-size: 48px; margin-bottom: 35px; width: 100%; text-align: left; }
+.slide-container h3 { font-size: 28px; margin-bottom: 15px; color: #deff9a; }
+
+.slide-container .subtitle { font-size: 22px; margin: 20px auto 0; font-weight: 400; max-width: 900px;}
+
+/* PEDAGOGY CLASSES (New) */
+.pedagogy-note {
+    background: rgba(222, 255, 154, 0.05);
+    border-left: 3px solid #deff9a;
+    border-radius: 0 8px 8px 0;
+    color: #b3b3b3 !important;
+    font-size: 16px !important;
+    font-style: italic;
+    margin-top: 15px;
+    padding: 12px 15px;
+}
+.pedagogy-note strong { color: #deff9a; font-weight: 500; font-style: normal; }
+
+.slide-container .content-area { display: flex; flex-direction: column; flex-grow: 1; width: 100%; }
+
+/* 3. LAYOUT DEFINITIONS */
+.title-layout { text-align: center; width: 100%; align-self: center; }
+
+.section-title-layout {
+  align-items: center; display: flex; flex-direction: column;
+  height: 100%; justify-content: center; text-align: center; width: 100%;
+}
+.section-title-layout h2 { font-size: 65px; margin-bottom: 20px; color: #deff9a; }
+.section-title-layout hr { background-color: #f5f5f5; border: none; height: 3px; margin: 30px auto; width: 120px; }
+
+/* Two Column / Grids */
+.two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; width: 100%; height: 100%; }
+.two-column.tiled { align-items: stretch; }
+
+.two-column.tiled > div {
+  background-color: #1a1a1a; border-radius: 16px; border: 1px solid #333; padding: 40px; display: flex; flex-direction: column;
+}
+
+/* Images */
+.image-wrapper { border-radius: 16px; height: 400px; width: 100%; overflow: hidden; border: 1px solid #333; }
+.image-wrapper img { height: 100%; width: 100%; object-fit: contain; background: #111; }
+
+/* Styled Bullets */
+.bullet-list { max-width: 1100px; width: 100%; }
+.bullet-list ul { list-style: none; padding: 0; margin: 0; }
+.bullet-list li { margin-bottom: 30px; padding-left: 55px; position: relative; font-size: 20px; }
+.bullet-list i { color: #deff9a; font-size: 30px; position: absolute; left: 0; top: 0; }
+.bullet-list li strong { color: #fff; font-weight: 700; font-size: 24px; display: block; margin-bottom: 5px;}
+
+/* Table */
+.table-layout { width: 100%; background: #1a1a1a; border-radius: 12px; padding: 20px; border: 1px solid #333; }
+.table-layout table { border-collapse: collapse; width: 100%; }
+.table-layout th, .table-layout td { border-bottom: 1px solid #333; padding: 15px; text-align: left; }
+.table-layout th { color: #deff9a; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
+.table-layout tr:last-child td { border-bottom: none; }
+.table-layout td strong { color: #fff; }
+
+/* Bleed Image Right */
+.slide-container.bleed-image-layout {
+  align-items: start; display: grid; gap: 60px; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0;
+}
+.slide-container.bleed-image-layout > .content-container { padding: 80px 0 80px 60px; display: flex; flex-direction: column; height: 100%; justify-content: center; }
+.slide-container.bleed-image-layout .image-container { height: 100%; overflow: hidden; width: 100%; }
+.slide-container.bleed-image-layout img.bleed-image-side { border-radius: 0; display: block; height: 720px; object-fit: cover; width: 100%; }
+
+/* 4. CHARTS */
+.chart-container { display: flex; flex-direction: column; gap: 20px; width: 100%; padding: 15px 0;}
+.bar { display: flex; align-items: center; gap: 20px; }
+.bar .label { color: #f5f5f5; flex: 0 0 250px; font-weight: 500; text-align: right; font-size: 20px; }
+.bar .bar-inner { background-color: #222; border-radius: 8px; flex-grow: 1; height: 45px; overflow: hidden; }
+.bar .bar-fill {
+  align-items: center; color: #000; display: flex; font-size: 20px; font-weight: 700; height: 100%;
+  justify-content: flex-end; padding-right: 20px;
+}
+
+/* Doughnut Chart */
+.doughnut-chart-container { align-items: center; display: flex; gap: 80px; justify-content: center; width: 100%; padding: 20px 0; }
+.doughnut-chart { border-radius: 50%; height: 380px; width: 380px; border: 8px solid #0a0a0a; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+.legend { display: flex; flex-direction: column; gap: 25px; list-style: none; margin: 0; padding: 0; }
+.legend li { align-items: center; color: #f5f5f5; display: flex; font-size: 22px; font-weight: 500; }
+.legend .color-box { border-radius: 6px; height: 28px; margin-right: 20px; width: 28px; }
+
+.chart-summary { font-style: italic; margin-top: 20px; text-align: center; font-size: 18px; color: #aaa; }
+
+/* Q&A */
+.qa-layout { margin: 0 auto; text-align: center; width: 100%; align-self: center; }
+.qa-layout h2 { font-size: 90px; margin-bottom: 20px; color: #deff9a; }
+.qa-layout p { font-size: 28px; color: #f5f5f5; }
+.qa-layout .contact-info { color: #888; font-size: 20px; margin-top: 50px; letter-spacing: 2px;}
+
+/* Visual Embellishments */
+.glow-blob {
+    position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(222, 255, 154, 0.05) 0%, rgba(0,0,0,0) 70%);
+    top: -200px; right: -200px; z-index: 0; border-radius: 50%; pointer-events: none;
+}
+    </style>
+</head>
+<body>
+
+<!-- Slide 1: Title_Slide -->
+<div class="slide-container" id="slide1">
+    <div class="glow-blob"></div>
+    <div class="title-layout">
+        <h1>BurgerMusic <span>OS</span></h1>
+        <p class="subtitle" style="font-size: 28px;">Plataforma Operativa Integral para Escalabilidad</p>
+        <p class="pedagogy-note" style="display: inline-block; text-align: center; margin-top: 30px;">
+            <strong>Concepto de Negocio: Franchise-in-a-box</strong><br>
+            Entregarle a un nuevo franquiciado un sistema que ya "sabe" cómo operar el negocio, reduciendo el riesgo de fracaso por inexperiencia.
+        </p>
+        <p style="color: #888; margin-top: 40px; text-transform: uppercase; letter-spacing: 2px;">Propuesta de Valor Estratégico</p>
+    </div>
+</div>
+
+<!-- Slide 2: Section_Title -->
+<div class="slide-container" id="slide2">
+    <div class="section-title-layout">
+        <h2>1. El Ecosistema Tecnológico</h2>
+        <hr>
+        <p class="subtitle">Arquitectura diseñada para resultados de negocio, no solo funcionalidades aisladas.</p>
+    </div>
+</div>
+
+<!-- Slide 3: Two_Column_Tiled_Text -->
+<div class="slide-container" id="slide3">
+    <div class="glow-blob" style="left: -200px; top: auto; bottom: -200px;"></div>
+    <h2 class="slide-title">Módulos Core del <span>Sistema</span></h2>
+    <div class="content-area">
+        <div class="two-column tiled">
+            <div>
+                <h3><i class="fa-solid fa-coins" style="margin-right: 15px;"></i>Financial & Unit Economics</h3>
+                <p>Integración del P&L en tiempo real mediante un motor de trazabilidad transaccional <strong>ACID</strong>.</p>
+                <div class="pedagogy-note">
+                    <strong>En la práctica (ACID):</strong> Transacciones a prueba de balas. Si la caja registra la venta de un combo, el sistema garantiza matemáticamente que el dinero ingresa y el pan se descuenta. No hay "errores a medias" ni ventas fantasma.
+                </div>
+            </div>
+            <div>
+                <h3><i class="fa-solid fa-boxes-stacked" style="margin-right: 15px;"></i>Supply Chain & BOM</h3>
+                <p>Motor de despiece que ejecuta la explosión del <strong>Bill of Materials (BOM)</strong> en tiempo real.</p>
+                <div class="pedagogy-note">
+                    <strong>En la práctica (BOM):</strong> Es la "receta técnica". Si vendes 1 Hamburguesa, el sistema no descuenta "1 hamburguesa" del inventario; desglosa y descuenta 150g de carne, 1 pan, 20g de salsa y 1 envase automáticamente.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 4: Image_Right_Text_Left -->
+<div class="slide-container" id="slide4">
+    <h2 class="slide-title">MDM & Agente <span>Predictivo</span></h2>
+    <div class="content-area">
+        <div class="two-column">
+            <div style="display: flex; flex-direction: column; justify-content: center; gap: 15px;">
+                <div style="background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #deff9a;">
+                    <h3 style="font-size: 20px; margin-bottom: 5px;">Master Data Management (MDM)</h3>
+                    <p class="pedagogy-note" style="margin-top: 5px; padding: 8px;"><strong>Fuente Única de la Verdad:</strong> Se acabó tener 'Coca-Cola', 'coca' y 'Coke' en 3 excels distintos. El MDM centraliza un solo catálogo inalterable para todas las sucursales.</p>
+                </div>
+                <div style="background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #deff9a;">
+                    <h3 style="font-size: 20px; margin-bottom: 5px;">Agente Predictivo basado en "Burn Rate"</h3>
+                    <p class="pedagogy-note" style="margin-top: 5px; padding: 8px;"><strong>Burn Rate:</strong> Es la velocidad diaria de consumo. La IA calcula que si gastas 5kg de tomate al día y te quedan 10kg, debes comprar hoy. Opera con <em>Human-in-the-Loop</em> (La IA propone la orden de compra, el humano solo aprueba).</p>
+                </div>
+                <div style="background: #1a1a1a; padding: 20px; border-radius: 12px; border-left: 4px solid #deff9a;">
+                    <h3 style="font-size: 20px; margin-bottom: 5px;">C-Level Observability</h3>
+                    <p style="font-size: 15px; margin: 0; color: #b3b3b3;">Paneles de control con indicadores de rentabilidad intradía. Visibilidad total sin esperar a fin de mes.</p>
+                </div>
+            </div>
+            <div>
+                <div class="image-wrapper">
+                    <img src="http://googleusercontent.com/image_collection/image_retrieval/6659830549774755133" alt="Dashboard moderno y de alta tecnología para gestión operativa">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 5: Section_Title -->
+<div class="slide-container" id="slide5">
+    <div class="section-title-layout">
+        <h2>2. Diferencia Operativa</h2>
+        <hr>
+        <p class="subtitle">Abandonando las hojas de cálculo para adoptar automatización sistémica.</p>
+    </div>
+</div>
+
+<!-- Slide 6: Table -->
+<div class="slide-container" id="slide6">
+    <h2 class="slide-title">Flujo Actual vs. <span>BurgerMusic OS</span></h2>
+    <div class="content-area">
+        <div class="table-layout">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Proceso</th>
+                        <th style="width: 30%;">Hoy (Fragmentado)</th>
+                        <th style="width: 35%;">BurgerMusic OS (Futuro)</th>
+                        <th style="width: 15%; color: #fff;">Eficiencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Ingesta Ventas</strong></td>
+                        <td>Copiar/pegar archivos Excel.</td>
+                        <td>Ingesta por API con protocolo <strong>Zero-Trust</strong> <br><span style="font-size:14px; color:#aaa;">(El sistema asume que el archivo externo tiene errores y lo valida matemáticamente antes de ingresarlo).</span></td>
+                        <td><strong style="color: #deff9a;">+ 90%</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Inventario</strong></td>
+                        <td>Conteo visual a final del turno.</td>
+                        <td>Descuento exacto por venta en tiempo real.</td>
+                        <td><strong style="color: #deff9a;">+ 85%</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Compras</strong></td>
+                        <td>Reactivas (comprar cuando falta).</td>
+                        <td>Predictivas basadas en consumo histórico.</td>
+                        <td><strong style="color: #deff9a;">+ 75%</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 7: Bar_Chart_For_Comparisons -->
+<div class="slide-container" id="slide7">
+    <div class="glow-blob" style="top: auto; bottom: -200px; left: -200px;"></div>
+    <h2 class="slide-title">Erradicando el <span>Coste de Retraso (CoD)</span></h2>
+    <div class="content-area">
+        <div class="chart-container">
+            <div class="bar">
+                <div class="label">Cierre Financiero</div>
+                <div class="bar-inner"><div class="bar-fill" style="width: 95%; background: linear-gradient(90deg, #84cc16, #deff9a);">+ 95% Velocidad</div></div>
+            </div>
+            <div class="bar">
+                <div class="label">Reporte de Mermas</div>
+                <div class="bar-inner"><div class="bar-fill" style="width: 90%; background: linear-gradient(90deg, #65a30d, #bef264);">+ 90% Velocidad</div></div>
+            </div>
+        </div>
+        <div class="pedagogy-note" style="margin-top: 30px;">
+            <strong>¿Qué es el Coste de Retraso (Cost of Delay)?</strong><br>
+            Es el impacto económico negativo de esperar. Si tardamos 15 días en descubrir que un proveedor nos subió el precio del queso, pasamos 15 días vendiendo hamburguesas perdiendo margen de ganancia. Esta plataforma elimina esa ceguera temporal.
+        </div>
+    </div>
+</div>
+
+<!-- Slide 8: Section_Title -->
+<div class="slide-container" id="slide8">
+    <div class="section-title-layout">
+        <h2>3. Impacto Financiero y Gobernanza</h2>
+        <hr>
+        <p class="subtitle">Proteger los márgenes es tan importante como aumentar las ventas.</p>
+    </div>
+</div>
+
+<!-- Slide 9: Styled_Bullet_Points-->
+<div class="slide-container" id="slide10">
+    <div class="glow-blob"></div>
+    <h2 class="slide-title">Criterios de Éxito <span>(KPIs Técnicos y Humanos)</span></h2>
+    <div class="content-area">
+        <div class="bullet-list">
+            <ul>
+                <li>
+                    <i class="fa-solid fa-filter"></i>
+                    <strong>0% de Drop Rate en pipelines ETL</strong>
+                    <div class="pedagogy-note" style="margin-top: 5px; margin-bottom: 10px;"><em>En simple:</em> Las "tuberías de datos" (ETL) que conectan la caja registradora con contabilidad no pueden perder ni un solo ticket en el camino (Drop Rate). Toda venta se contabiliza.</div>
+                </li>
+                <li>
+                    <i class="fa-solid fa-road-barrier"></i>
+                    <strong>Activación de Railguards Operativos</strong>
+                    <div class="pedagogy-note" style="margin-top: 5px; margin-bottom: 10px;"><em>En simple:</em> "Guardarraíles". Límites en el software que impiden que un empleado o franquiciado cometa un error grave (ej. no te deja comprar pan a $1000 si el máximo autorizado es $200). Protege la marca.</div>
+                </li>
+                <li>
+                    <i class="fa-solid fa-users"></i>
+                    <strong>Adopción WIIFM (What's In It For Me?)</strong>
+                    <div class="pedagogy-note" style="margin-top: 5px;"><em>En simple:</em> "Qué gano yo con esto". Nuestro éxito depende de que el equipo operativo prefiera usar el sistema. El objetivo es que dejen de ser "cargadores de datos en excel" para ser analistas del negocio.</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Slide 10: Bleed_Image_Right -->
+<div class="slide-container bleed-image-layout" id="slide11">
+    <div class="content-container">
+        <h2 class="slide-title" style="margin-bottom: 20px;">Visión Final:<br><span>Escalar con Control</span></h2>
+        <div class="content-area" style="justify-content: flex-start; padding-top: 20px;">
+            <div style="margin-bottom: 30px;">
+                <h3 style="font-size: 24px; color: #fff;">El Sistema como Barrera de Entrada</h3>
+                <p>El OS no es un gasto en software; es un activo patrimonial. Al empaquetar nuestro conocimiento en algoritmos (compras predictivas, recetas estandarizadas, alertas financieras), garantizamos que cualquier sucursal, propia o franquiciada, opere bajo nuestra excelencia.</p>
+            </div>
+            <div class="pedagogy-note">
+                <strong>El Valor Estratégico Total (TSV):</strong> No vendemos hamburguesas; operamos un sistema altamente eficiente de distribución de alimentos. BurgerMusic OS es el "cerebro" que hace que esa afirmación sea real frente a posibles inversores.
+            </div>
+        </div>
+    </div>
+    <div class="image-container">
+        <img class="bleed-image-side" src="http://googleusercontent.com/image_collection/image_retrieval/18247205100142093187" alt="Expansión global de negocios mediante red de nodos tecnológicos">
+    </div>
+</div>
+
+<!-- Slide 11: Q&A -->
+<div class="slide-container" id="slide12">
+    <div class="qa-layout">
+        <h2>Alineación & Siguientes Pasos</h2>
+        <p>¿Tienen consultas sobre la arquitectura o el despliegue?</p>
+        <div class="contact-info">
+            Hólos | Head of Product Portfolio | Implementación Estratégica
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

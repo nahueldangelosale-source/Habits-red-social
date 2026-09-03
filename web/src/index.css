@@ -1,0 +1,947 @@
+/* ═══════════════════════════════════════════════════════════════════════════════
+   HYBRID CORE 2.0 - ULTRA PREMIUM VISUAL SYSTEM
+   "Silent Luxury" (Clinical) ⟷ "Adrenaline Mode" (Training)
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* 1. CORE IMPORTS */
+@import "tailwindcss";
+
+/* Enforce class-based dark mode in Tailwind v4 */
+@custom-variant dark (&:is(.dark, .dark *));
+
+/* 2. TYPOGRAPHY ASSETS — loaded via <link> in index.html for parallel fetch */
+
+/* 3. DESIGN TOKENS */
+@theme {
+  /* 🎨 1. PRIMITIVES (Base Palette in OKLCH & HEX) */
+  --color-primitive-zinc-950: #09090b;
+  --color-primitive-zinc-900: #18181b;
+  --color-primitive-zinc-800: #27272a;
+  --color-primitive-zinc-500: #71717a;
+  --color-primitive-zinc-400: #a1a1aa;
+  --color-primitive-zinc-100: #f4f4f5;
+  --color-primitive-white: #ffffff;
+  --color-primitive-black: #000000;
+  
+  --color-primitive-neon: oklch(0.92 0.23 130);
+  --color-primitive-emerald: oklch(0.7 0.1 130);
+  --color-primitive-red: #ef4444;
+  --color-primitive-amber: #f59e0b;
+
+  /* 🏛️ 2. SEMANTICS (Role-based assignments) */
+  
+  /* ⚖️ DICHOTOMY: CLINICAL MODE (B2B/Nutritionist/Coach) - "Silent Luxury" */
+  --color-clinical-bg: oklch(0.98 0.005 250); /* Elevated Neutral (Anti-fatigue) */
+  --color-clinical-surface: oklch(1 0 0); /* Pure White for elevated Bento Cards */
+  
+  /* ⚖️ DICHOTOMY: ADRENALINE MODE (B2C/Athlete) - "Night Training" */
+  --color-adrenaline-bg: oklch(0.10 0.01 250); /* Deep Charcoal (OLED Efficiency & Anti Black Smearing) */
+  --color-adrenaline-surface: oklch(0.15 0.01 250); /* Elevated Charcoal */
+
+  --color-clinical-slate: #1e293b; /* Azul Pizarra para acentos */
+
+  --color-background-base: var(--color-primitive-zinc-950);
+  --color-surface-elevated: var(--color-primitive-zinc-900);
+  --color-surface-highlight: var(--color-primitive-zinc-800);
+  
+  --color-text-primary: var(--color-primitive-white);
+  --color-text-secondary: var(--color-primitive-zinc-400);
+  --color-text-muted: var(--color-primitive-zinc-500);
+  
+  --color-action-primary: var(--color-primitive-neon);
+  --color-action-secondary: var(--color-primitive-white);
+  
+  --color-signal-error: var(--color-primitive-red);
+  --color-signal-warning: var(--color-primitive-amber);
+  --color-signal-success: var(--color-primitive-emerald);
+
+  /* Legacy mappings (To ensure backward compatibility while migrating) */
+  --color-primary: var(--color-primitive-zinc-950);
+  --color-primary-foreground: var(--color-primitive-white);
+  --color-secondary: var(--color-primitive-neon);
+  --color-secondary-foreground: var(--color-primitive-black);
+  --color-neon-primary: var(--color-primitive-neon);
+  --color-accent: var(--color-primitive-emerald);
+  --color-muted: var(--color-primitive-zinc-500);
+  --color-background: var(--color-primitive-zinc-100);
+  --color-surface: var(--color-primitive-white);
+
+  /* 🌊 UTOPIA FLUID TYPOGRAPHY & SPACING 🌊 */
+
+  /* Golden Ratio (1.618) Scale for Adrenaline Mode (B2C) */
+  --text-adrenaline-base: clamp(1rem, 0.9565rem + 0.2174vw, 1.125rem);
+  --text-adrenaline-lg: clamp(1.618rem, 1.45rem + 0.84vw, 2.1rem);
+  --text-adrenaline-xl: clamp(2.618rem, 2.22rem + 1.99vw, 3.76rem);
+  --text-adrenaline-2xl: clamp(4.236rem, 3.5rem + 3.68vw, 6.35rem);
+
+  /* Perfect Fifth (1.500) Scale for Clinical Mode (B2B) */
+  --text-clinical-base: clamp(1rem, 0.9565rem + 0.2174vw, 1.125rem);
+  --text-clinical-lg: clamp(1.5rem, 1.35rem + 0.75vw, 1.93rem);
+  --text-clinical-xl: clamp(2.25rem, 1.95rem + 1.5vw, 3.11rem);
+  --text-clinical-2xl: clamp(3.375rem, 2.8rem + 2.8vw, 4.98rem);
+
+  /* Fluid Spacing */
+  --spacing-fluid-sm: clamp(0.75rem, 0.65rem + 0.5vw, 1rem);
+  --spacing-fluid-md: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --spacing-fluid-lg: clamp(2.25rem, 1.9rem + 1.75vw, 3.5rem);
+  --spacing-fluid-xl: clamp(3rem, 2.5rem + 2.5vw, 5rem);
+
+  /* 📐 3. COMPONENTS & SPATIAL TOKENS (Radii & Spacing for Bento Grid) */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;       /* 16px */
+  --radius-xl: 1.5rem;     /* 24px - Bento Default */
+  --radius-2xl: 2rem;      /* 32px */
+  
+  --spacing-bento-gap: 1.5rem; /* 24px */
+
+  /* TYPOGRAPHY */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-heading: "Montserrat", sans-serif;
+  --font-body: "Lato", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* DEPTH & GLASS */
+  --shadow-apple: 0 4px 24px -1px rgba(136, 176, 75, 0.08), 0 2px 8px -1px rgba(136, 176, 75, 0.04);
+  --shadow-float: 0 20px 40px -4px rgba(206, 255, 0, 0.15);
+  --shadow-neon: 0 0 20px rgba(206, 255, 0, 0.4);
+  --shadow-glow-lime: 0 0 20px oklch(0.92 0.23 130 / 0.3);
+  --shadow-glow-lime-strong: 0 0 30px oklch(0.92 0.23 130 / 0.2);
+  --shadow-bento-card: 0 20px 40px -4px rgba(30, 41, 59, 0.08), 0 10px 20px -2px rgba(30, 41, 59, 0.04);
+  --shadow-clinical-card: 0 20px 40px -4px rgba(30, 41, 59, 0.08), 0 10px 20px -2px rgba(30, 41, 59, 0.04);
+
+  --blur-glass-sm: 8px;
+  --blur-glass-md: 16px;
+  --blur-glass-lg: 24px;
+}
+
+/* 4. UTILITIES & COMPONENT LAYERS */
+
+/* Base Reset */
+html,
+body,
+#root {
+  margin: 0 !important;
+  padding: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  min-height: 100vh !important;
+  overflow-x: hidden !important;
+  font-family: var(--font-sans) !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
+}
+
+body.mode-adrenaline,
+body.mode-adrenaline #root,
+html.dark {
+  background-color: var(--color-adrenaline-bg) !important;
+  color: #fff !important;
+}
+
+body.mode-clinical,
+body.mode-clinical #root {
+  background-color: var(--color-clinical-bg) !important;
+  color: var(--color-primitive-zinc-900) !important;
+  font-family: var(--font-body) !important; /* Lato */
+}
+
+body.mode-clinical h1, 
+body.mode-clinical h2, 
+body.mode-clinical h3, 
+body.mode-clinical h4, 
+body.mode-clinical h5, 
+body.mode-clinical h6, 
+body.mode-clinical .font-heading {
+  font-family: var(--font-heading) !important; /* Montserrat */
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Aura de Cristal - Mesh Gradient */
+.bg-clinical-mesh {
+    background: radial-gradient(circle at 15% 50%, rgba(206, 212, 237, 0.4), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(253, 224, 217, 0.4), transparent 40%),
+                radial-gradient(circle at 50% 80%, rgba(215, 240, 229, 0.4), transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(200, 220, 245, 0.4), transparent 40%);
+    background-color: #f8fafc;
+    background-size: 120% 120%;
+    animation: meshShift 15s ease-in-out infinite alternate;
+    will-change: transform, background-position;
+    transform: translateZ(0); /* Hardware acceleration */
+}
+
+@keyframes meshShift {
+    0% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+    100% { background-position: 0% 100%; }
+}
+
+/* Stateful Glow (Pure Component Styling) */
+.stateful-glow-orb {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+    will-change: transform, opacity, background-color;
+    transform: translateZ(0); /* GPU acceleration */
+    transition: background-color 1.5s ease-out, transform 2s ease-out;
+}
+
+#preact-border-shadow-host {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 
+   PREMIUM BACKGROUNDS 
+   Context-aware backgrounds for different modes
+*/
+@layer base {
+
+  /* 1. ENFORCE RENDERING ENGINE */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    @apply text-zinc-900 dark:text-zinc-100;
+    /* High contrast default */
+  }
+
+  /* 2. FONT UNIFICATION (Theme Reactive) */
+  body.mode-adrenaline {
+    --theme-font: "Space Grotesk", sans-serif;
+  }
+  body.mode-clinical {
+    --theme-font: var(--font-body);
+  }
+  body {
+    font-family: var(--theme-font, var(--font-sans));
+  }
+
+  body.mode-clinical h1,
+  body.mode-clinical h2,
+  body.mode-clinical h3,
+  body.mode-clinical h4,
+  body.mode-clinical h5,
+  body.mode-clinical h6 {
+    font-family: var(--font-heading) !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--theme-font, var(--font-sans)) !important;
+    @apply tracking-tight text-zinc-900 dark:text-white;
+  }
+
+  p,
+  span,
+  div,
+  li,
+  a,
+  button,
+  input,
+  textarea {
+    font-family: var(--theme-font, var(--font-sans));
+  }
+
+  p {
+    @apply leading-relaxed tracking-wide text-zinc-600 dark:text-zinc-300;
+  }
+
+  td {
+    @apply py-4;
+  }
+
+  /* NEURO-LEGIBLE TYPOGRAPHY (Clinical Mode) */
+  .CLINICAL p {
+    line-height: 1.625;
+    /* leading-relaxed */
+  }
+
+  /* 3. DATA READABILITY (The "Rolex" Standard) */
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    /* Align numbers perfectly */
+    letter-spacing: -0.05em;
+    /* Tighten numbers like a clock */
+  }
+}
+
+@layer utilities {
+  /* Retaining utility layer for future needs if any */
+}
+
+.glass-panel,
+.bento-card {
+  @apply bg-white/70 dark:bg-zinc-900/70 backdrop-blur-xl border border-white/60 dark:border-white/10 shadow-sm rounded-2xl transition-all duration-300;
+  box-shadow: var(--shadow-apple);
+}
+
+.glass-panel:hover,
+.bento-card:hover {
+  @apply bg-white/85 dark:bg-zinc-900/85 hover:-translate-y-0.5;
+  box-shadow: var(--shadow-float);
+}
+
+/* 
+   TYPOGRAPHY SYSTEM 
+   Restoring the "Silent Luxury" identity
+*/
+.text-hero,
+.arena-title {
+  font-family: var(--font-sans);
+  font-size: 2.5rem;
+  line-height: 1.1;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  color: var(--color-primary);
+  opacity: 0;
+  animation: fade-in 0.8s ease-out forwards;
+}
+
+.text-label,
+.card-title {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--color-muted);
+}
+
+.text-data-huge {
+  font-family: var(--font-mono);
+  font-size: 3.5rem;
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: -0.05em;
+  color: var(--color-primary);
+  /* Gradient text for Adrenaline mode feels */
+  background: linear-gradient(135deg, var(--color-primary) 0%, #4a4a4a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* 
+   LAYOUT STRUCTURE 
+*/
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding-top: 5rem;
+}
+
+.main-content {
+  flex: 1;
+}
+
+/* 
+   GLOBAL NAVIGATION (Command Bar) 
+   Floating dock aesthetic
+*/
+.command-bar {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+
+  background: rgba(29, 29, 31, 0.85);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.2);
+}
+
+.command-icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #8E8E93;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+}
+
+.command-icon:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  transform: scale(1.1);
+}
+
+.command-icon.active {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: scale(1.15);
+}
+
+/* 
+   BENTO GRID SYSTEM (Dashboard) 
+*/
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: minmax(180px, auto);
+  gap: 1.5rem;
+}
+
+.bento-card {
+  /* Defined above with .glass-panel */
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Specific Grid Areas */
+.bento-brief {
+  grid-column: span 4;
+}
+
+.bento-revenue {
+  grid-column: span 5;
+}
+
+.bento-clients {
+  grid-column: span 3;
+}
+
+/* Mobile Response */
+@media (max-width: 1024px) {
+
+  .bento-brief,
+  .bento-revenue,
+  .bento-clients {
+    grid-column: span 12;
+  }
+}
+
+/* 🏥 CLINICAL MODE (Light) - "Silent Luxury" */
+.bg-premium-clinical {
+  background-color: #F8FAFC;
+  /* Slate 50 */
+  background-image:
+    radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%),
+    /* Indigo hint */
+    radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.04) 0px, transparent 50%),
+    /* Emerald hint */
+    radial-gradient(at 100% 100%, rgba(241, 245, 249, 1) 0px, transparent 50%);
+  /* Slate 100 */
+}
+
+.glass-card-clinical {
+  @apply bg-white/80 backdrop-blur-xl border border-slate-200/50 shadow-sm transition-all duration-300;
+}
+
+.glass-card-clinical-hover {
+  @apply hover:bg-white/90 hover:border-emerald-100/50 hover:-translate-y-0.5;
+}
+
+/* ⚡ ADRENALINE MODE (Dark) - "Night Training" */
+.bg-premium-adrenaline {
+  background-color: var(--color-adrenaline-bg);
+  /* Zinc 950 */
+  background-image:
+    radial-gradient(at 0% 0%, rgba(206, 255, 0, 0.05) 0px, transparent 50%),
+    /* Volt hint */
+    radial-gradient(at 100% 0%, rgba(206, 255, 0, 0.02) 0px, transparent 50%);
+}
+
+.glass-card-adrenaline {
+  @apply bg-zinc-900/60 backdrop-blur-xl border border-white/5 shadow-2xl transition-all duration-300;
+}
+
+/* 📏 TYPOGRAPHY SCALE (The Hierarchy Fix) */
+/* Nivel 1: Títulos de Página (Ej. "Command Center") */
+.text-hero-title {
+  @apply font-sans text-3xl md:text-4xl font-black tracking-tight text-zinc-900 dark:text-white;
+}
+
+/* Nivel 2: Títulos de Tarjeta (Ej. "Injury Radar") */
+.text-card-header {
+  @apply font-sans text-lg font-semibold tracking-wide text-zinc-700 dark:text-zinc-200;
+}
+
+/* Nivel 3: Etiquetas de Datos (Ej. "LAST WEEK VOL") */
+.text-meta-label {
+  @apply font-sans text-[11px] uppercase tracking-[0.15em] font-bold text-zinc-500 dark:text-zinc-400;
+}
+
+/* Nivel 4: Datos Numéricos (Ej. "140 KG") */
+.text-data-value {
+  @apply font-mono text-3xl md:text-4xl font-medium tracking-tighter tabular-nums text-zinc-900 dark:text-white;
+}
+
+/* Card Internals */
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  /* Defined above with .text-label */
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 
+   THE ARENA SPECIFIC STYLES 
+*/
+.arena-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.5), transparent);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.arena-title {
+  /* Defined above with .text-hero */
+  font-size: 3rem;
+}
+
+/* Glass Notification (Watercolor Sidebar matching) */
+.toast-glass {
+    background: linear-gradient(135deg, rgba(251, 194, 235, 0.4) 0%, rgba(166, 193, 238, 0.4) 25%, rgba(255, 255, 255, 0.8) 50%, rgba(253, 160, 133, 0.3) 100%) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(255,255,255,0.9) !important;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.4) inset !important;
+    color: #0f172a !important;
+}
+
+.arena-logo-box {
+  width: 64px;
+  height: 64px;
+  background: var(--color-primary);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+}
+
+.arena-tabs {
+  display: flex;
+  gap: 1rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 999px;
+  width: fit-content;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.arena-tab {
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  transition: all 0.2s ease;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.arena-tab.active {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.wagers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+}
+
+/* 
+   MICRO-INTERACTIONS & BUTTONS 
+*/
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+.new-challenge-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  margin-bottom: 2rem;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.new-challenge-btn:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: scale(1.01);
+  box-shadow: var(--shadow-apple);
+}
+
+/* 
+   ANIMATIONS 
+*/
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(0.98);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.ease-spring {
+  transition-timing-function: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.ease-smooth {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-extreme {
+  @apply backdrop-blur-2xl bg-zinc-900/40 border border-white/5 shadow-2xl;
+}
+
+@keyframes pulse-neon {
+  0% {
+    box-shadow: 0 0 0 0 rgba(206, 255, 0, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(206, 255, 0, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(206, 255, 0, 0);
+  }
+}
+
+.animate-pulse-neon {
+  animation: pulse-neon 2s infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   5. DESIGN SYSTEM PRIMITIVES
+   Semantic utility classes extracted from repetitive Tailwind patterns.
+   Use these in React components instead of raw utility strings.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* ──── BUTTONS ──── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  white-space: nowrap;
+  outline: none;
+  border: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.375rem 0.75rem;
+}
+
+.btn-md {
+  font-size: 0.875rem;
+  padding: 0.625rem 1.25rem;
+}
+
+.btn-lg {
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-primary {
+  background: var(--color-secondary);
+  color: #000;
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  transform: scale(1.02);
+  @apply animate-pulse;
+
+}
+
+.btn-secondary {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-muted);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-primary-foreground);
+}
+
+.btn-destructive {
+  background: var(--color-signal-red);
+  color: #fff;
+}
+
+.btn-destructive:hover:not(:disabled) {
+  filter: brightness(1.15);
+  transform: scale(1.02);
+}
+
+/* ──── CARDS ──── */
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-apple);
+  transition: all 0.3s ease;
+}
+
+.card-glass:hover {
+  background: rgba(255, 255, 255, 0.85);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
+
+.card-glass-dark {
+  background: rgba(24, 24, 27, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.card-glass-dark:hover {
+  background: rgba(24, 24, 27, 0.85);
+  transform: translateY(-2px);
+  border-color: rgba(206, 255, 0, 0.15);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-footer {
+  padding-top: 1rem;
+  margin-top: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* ──── DIALOG / MODAL ──── */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dialog-panel {
+  background: var(--color-surface);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  max-width: 500px;
+  width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 2rem;
+}
+
+/* ──── SKELETON LOADING ──── */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+      rgba(255, 255, 255, 0.06) 25%,
+      rgba(255, 255, 255, 0.12) 50%,
+      rgba(255, 255, 255, 0.06) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+.skeleton-text {
+  height: 0.875rem;
+  width: 60%;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+  height: 1.5rem;
+  width: 40%;
+  margin-bottom: 1rem;
+}
+
+.skeleton-card {
+  height: 12rem;
+  border-radius: var(--radius-xl);
+  margin-bottom: 1rem;
+}
+
+.skeleton-row {
+  display: flex;
+  gap: 1rem;
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* ──── TYPOGRAPHY UTILS ──── */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+
+/* ──── ULTRA-PREMIUM MINIMALIST SCROLLBAR ──── */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.45);
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+}
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.5);
+}
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+}
+.dark .custom-scrollbar {
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}

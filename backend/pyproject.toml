@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "bienestar-backend"
+version = "0.1.0"
+description = "Backend para Bienestar APP"
+authors = ["Equipo <equipo@bienestar.app>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "*"
+uvicorn = "*"
+sqlalchemy = "*"
+pydantic = "*"
+opentelemetry-api = "^1.24.0"
+opentelemetry-sdk = "^1.24.0"
+opentelemetry-instrumentation-fastapi = "^0.45b0"
+opentelemetry-instrumentation-celery = "^0.45b0"
+opentelemetry-instrumentation-sqlalchemy = "^0.45b0"
+opentelemetry-exporter-otlp = "^1.24.0"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.3.0"
+black = "^24.2.0"
+mypy = "^1.8.0"
+pytest = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+ignore_missing_imports = true

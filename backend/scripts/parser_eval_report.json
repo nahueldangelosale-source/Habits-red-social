@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "description": "Formato Horizontal Clásico (Lunes/Miércoles/Viernes)",
+    "status": "PASS",
+    "accuracy": 1.0,
+    "days_detected": 1,
+    "exercises_detected": 4,
+    "expected_exercises": 4,
+    "error": null
+  },
+  {
+    "id": 2,
+    "description": "Formato Super-sets & Abreviaturas (Push/Pull)",
+    "status": "PASS",
+    "accuracy": 1.0,
+    "days_detected": 1,
+    "exercises_detected": 4,
+    "expected_exercises": 4,
+    "error": null
+  },
+  {
+    "id": 3,
+    "description": "Formato Tabular Complejo con RPE/Tempo",
+    "status": "PASS",
+    "accuracy": 1.0,
+    "days_detected": 1,
+    "exercises_detected": 4,
+    "expected_exercises": 4,
+    "error": null
+  }
+]

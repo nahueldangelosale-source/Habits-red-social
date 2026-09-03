@@ -1,0 +1,42 @@
+# Bienestar APP - Backend Dependencies (Fixed for Python 3.13)
+# FastAPI Async Stack for AI/ML Wellness Platform
+
+# Core Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart
+
+# Database
+sqlalchemy[asyncio]>=2.0.35
+asyncpg>=0.30.0
+pgvector
+alembic
+
+# Validation & Settings
+pydantic>=2.9.0
+pydantic-settings>=2.4.0
+
+# AI/ML
+openai
+langchain
+langchain-openai
+
+# Audio Processing
+pydub
+
+# HTTP Client
+httpx
+
+# Security
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Payments
+mercadopago
+
+# Utilities
+python-dotenv
+structlog
+
+# Rate Limiting
+slowapi

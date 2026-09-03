@@ -1,0 +1,32 @@
+/* Streak Ring Styling Override */
+.streak-ring-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.streak-ring-avatar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+}
+
+/* Specific fix for specific sizes if needed */
+.streak-ring-avatar.size-lg {
+    width: 60px;
+    height: 60px;
+    font-size: 1.25rem;
+}
+
+.streak-ring-avatar.size-md {
+    width: 48px;
+    height: 48px;
+    font-size: 1rem;
+}

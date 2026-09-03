@@ -1,0 +1,37 @@
+{
+  "rules": [
+    {
+      "id": "ml_ozempic_fasting",
+      "name": "Bloqueo Ayuno Prolongado (GLP-1)",
+      "trigger": {
+        "field": "medications",
+        "operator": "contains_any",
+        "values": ["Ozempic", "Wegovy", "Semaglutide", "Mounjaro", "Tirzepatide"]
+      },
+      "action": {
+        "type": "inject_prompt_veto",
+        "payload_override": {
+          "allow_fasting": false
+        },
+        "system_instruction": "El paciente se encuentra bajo medicación GLP-1/GIP. Existe un riesgo clínico severo de hipoglucemia. Queda ESTRICTAMENTE PROHIBIDO prescribir esquemas de ayuno intermitente o prolongado. Ajusta la ventana de alimentación a esquemas fraccionados regulares."
+      }
+    },
+    {
+      "id": "ml_hypertension_heavy_lifting",
+      "name": "Bloqueo Esfuerzo Máximo (HTA)",
+      "trigger": {
+        "field": "pathologies",
+        "operator": "contains_any",
+        "values": ["Hipertensión", "HTA", "Presión Alta"]
+      },
+      "action": {
+        "type": "inject_prompt_veto",
+        "payload_override": {
+          "allow_1rm": false,
+          "valsalva_maneuver": false
+        },
+        "system_instruction": "El paciente presenta Hipertensión. Queda ESTRICTAMENTE PROHIBIDO prescribir pruebas de 1RM (Repetición Máxima) o ejercicios que incentiven la Maniobra de Valsalva debido al riesgo de pico de presión arterial. Priorizar rangos de hipertrofia moderada y respiración continua."
+      }
+    }
+  ]
+}

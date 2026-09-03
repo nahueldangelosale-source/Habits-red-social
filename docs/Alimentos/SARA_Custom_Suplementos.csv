@@ -1,0 +1,51 @@
+ID_CUSTOM,Alimento,ENERC_KCAL,PROTCNT,FAT,CHOAVLDF,FIBTG,Sodiomg
+CUST_001,Whey Protein Truemade - ENA Sport,416.1,80.6,7.7,6.1,0.0,177.4
+CUST_002,Whey Protein Premium - Star Nutrition,405.0,83.3,5.0,6.7,0.0,183.3
+CUST_003,Whey Protein Max - SPX Nutrition,369.7,76.7,3.3,8.3,0.0,216.7
+CUST_004,Whey Protein Premium - Gentech,379.9,75.0,4.7,9.4,0.0,190.6
+CUST_005,Creatina Monohidratada - ENA Sport,0.0,0.0,0.0,0.0,0.0,0.0
+CUST_006,Creatina Monohidratada - Star Nutrition,0.0,0.0,0.0,0.0,0.0,0.0
+CUST_007,Creatina Monohidratada - Gentech,0.0,0.0,0.0,0.0,0.0,0.0
+CUST_008,Pre-entreno C4 Original - Cellucor,0.0,0.0,0.0,0.0,0.0,153.8
+CUST_009,Pre-entreno Pump 3D Ripped - Star Nutrition,314.4,50.0,0.0,28.6,0.0,1000.0
+CUST_010,Pre-entreno Pump - ENA Sport,300.0,50.0,0.0,25.0,0.0,500.0
+CUST_011,Ganador de Peso Mutant Mass - Star Nutrition,404.4,25.6,4.4,65.6,1.7,166.7
+CUST_012,Ganador de Peso Monster Gainer - ENA Sport,378.0,25.0,2.0,65.0,1.5,180.0
+CUST_013,Yogur Ser Firme Frutilla - Danone,40.9,3.5,0.1,6.5,0.0,45.8
+CUST_014,Yogur Ser Firme Vainilla - Danone,40.9,3.5,0.1,6.5,0.0,45.8
+CUST_015,Yogur Ser Bebible Frutilla - Danone,30.9,3.0,0.1,4.5,0.0,42.1
+CUST_016,Yogur Ser Bebible Vainilla - Danone,30.9,3.0,0.1,4.5,0.0,42.1
+CUST_017,Yogur Ser Pro Mas Frutilla - Danone,70.2,7.9,1.0,7.4,0.0,74.7
+CUST_018,Leche Entera Clásica 3% - La Serenísima,57.0,3.0,3.0,4.5,0.0,49.0
+CUST_019,Leche Descremada Clásica 0% - La Serenísima,31.2,3.1,0.0,4.7,0.0,53.0
+CUST_020,Leche Descremada Protein - La Serenísima,36.8,4.6,0.0,4.6,0.0,53.0
+CUST_021,Queso Casancrem Clásico - La Serenísima,221.3,6.0,19.7,5.0,0.0,203.3
+CUST_022,Queso Casancrem Light - La Serenísima,128.6,8.7,7.0,7.7,0.0,146.7
+CUST_023,Queso Casancrem Light Sin Sal - La Serenísima,137.4,9.3,7.0,9.3,0.0,96.7
+CUST_024,Galletitas Chocolinas Original - Bagley,453.5,9.1,16.7,66.7,3.9,272.7
+CUST_025,Galletitas Oreo Original - Kraft,483.1,5.2,20.7,69.0,1.7,448.3
+CUST_026,Alfajor de Maicena - Cachafaz,388.0,6.0,12.0,64.0,2.0,130.0
+CUST_027,Alfajor de Chocolate Negro - Cachafaz,377.3,6.7,14.5,55.0,1.7,73.3
+CUST_028,Alfajor de Chocolate Blanco - Cachafaz,395.1,8.5,12.7,61.7,3.0,120.0
+CUST_029,Turrón de Maní Original - Arcor,398.4,8.8,8.0,72.8,1.6,52.0
+CUST_030,Turrón de Maní con Chocolate - Arcor,398.4,8.8,8.0,72.8,1.6,52.0
+CUST_031,Barrita Cereal Mix Clásica - Arcor,403.8,6.5,13.0,65.2,3.5,160.9
+CUST_032,Barrita Cereal Mix Chocolate y Almendras - Arcor,418.4,6.1,14.8,65.2,3.5,169.6
+CUST_033,Barrita Cereal Mix Frutilla - Arcor,385.6,6.1,10.0,67.8,3.9,160.9
+CUST_034,Barrita Cereal Mix Light Manzana - Arcor,315.4,3.0,2.6,70.0,13.9,95.7
+CUST_035,Gatorade Sabor Manzana,24.0,0.0,0.0,6.0,0.0,45.7
+CUST_036,Gatorade Sabor Naranja,24.0,0.0,0.0,6.0,0.0,45.0
+CUST_037,Gatorade Cool Blue,24.0,0.0,0.0,6.0,0.0,45.0
+CUST_038,Powerade Mountain Blast,24.0,0.0,0.0,6.0,0.0,45.0
+CUST_039,Powerade Sabor Manzana,24.0,0.0,0.0,6.0,0.0,45.0
+CUST_040,Monster Energy Original,48.0,0.0,0.0,12.0,0.0,79.0
+CUST_041,Monster Energy Zero Ultra,3.6,0.0,0.0,0.9,0.0,80.0
+CUST_042,Monster Energy Mango Loco,48.0,0.0,0.0,12.0,0.0,16.0
+CUST_043,Coca-Cola Sabor Original,30.0,0.0,0.0,7.5,0.0,6.0
+CUST_044,Coca-Cola Sin Azúcar,0.0,0.0,0.0,0.0,0.0,14.0
+CUST_045,Pan Lactal Blanco - Fargo,251.0,8.0,3.0,48.0,2.0,480.0
+CUST_046,Pan Lactal Integral - Fargo,231.0,9.0,3.0,42.0,6.0,440.0
+CUST_047,Pan Lactal de Salvado - Fargo,220.6,8.4,3.0,40.0,8.0,420.0
+CUST_048,Rapiditas Clásicas - Bimbo,311.0,8.8,6.2,55.0,2.5,475.0
+CUST_049,Rapiditas Integrales - Bimbo,280.6,8.9,6.2,47.3,6.9,262.5
+CUST_050,Rapiditas Light - Bimbo,264.0,9.0,4.0,48.0,5.0,320.0

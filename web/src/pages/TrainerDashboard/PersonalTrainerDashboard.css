@@ -1,0 +1,930 @@
+/**
+ * PersonalTrainerDashboard - Styles
+ * Performance & Tonnage theme for PT B2B dashboard
+ */
+
+.personal-trainer-dashboard {
+    padding: 24px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, transparent 50%);
+}
+
+/* =============================================================================
+   HEADER
+   ============================================================================= */
+
+.pt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.pt-header .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.pt-header .header-icon {
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    border-radius: 14px;
+    color: white;
+}
+
+.pt-header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #fff);
+    margin: 0;
+}
+
+.pt-header .subtitle {
+    font-size: 0.875rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.tonnage-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    border-radius: 14px;
+    color: white;
+}
+
+.tonnage-badge svg {
+    color: #F59E0B;
+}
+
+.tonnage-badge span:first-of-type {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.tonnage-badge .tonnage-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+/* =============================================================================
+   KPI SECTION
+   ============================================================================= */
+
+.kpi-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.pt-kpi-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.kpi-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+}
+
+.kpi-icon.pulse {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.kpi-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #fff);
+}
+
+.kpi-label {
+    font-size: 0.813rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.alert-dot {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 10px;
+    height: 10px;
+    background: #EF4444;
+    border-radius: 50%;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* =============================================================================
+   DASHBOARD GRID
+   ============================================================================= */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.dashboard-grid.secondary {
+    grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 1024px) {
+
+    .dashboard-grid,
+    .dashboard-grid.secondary {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* =============================================================================
+   SECTIONS
+   ============================================================================= */
+
+.injury-radar-section,
+.video-review-section,
+.churn-risk-section,
+.wagers-section,
+.clients-section {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 20px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: var(--text-primary, #fff);
+}
+
+.section-header h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.section-header .badge {
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: white;
+}
+
+.section-header .subtitle {
+    font-size: 0.75rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+}
+
+/* =============================================================================
+   INJURY RADAR
+   ============================================================================= */
+
+.injury-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.injury-risk-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.injury-risk-row.high {
+    border-left: 3px solid #EF4444;
+}
+
+.injury-risk-row.medium {
+    border-left: 3px solid #F59E0B;
+}
+
+.risk-indicator {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+}
+
+.risk-indicator.high {
+    background: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
+}
+
+.risk-indicator.medium {
+    background: rgba(245, 158, 11, 0.15);
+    color: #F59E0B;
+}
+
+.risk-info {
+    flex: 1;
+}
+
+.risk-info .client-name {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+}
+
+.risk-info .exercise-name {
+    font-size: 0.75rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.load-increase {
+    font-weight: 700;
+    color: #EF4444;
+}
+
+.chevron {
+    color: var(--text-secondary, rgba(255, 255, 255, 0.4));
+}
+
+/* =============================================================================
+   VIDEO REVIEW
+   ============================================================================= */
+
+.video-queue {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.video-review-card {
+    display: flex;
+    gap: 16px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.video-preview {
+    position: relative;
+    width: 120px;
+    height: 80px;
+    border-radius: 10px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.video-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.play-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.4);
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.play-overlay:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.video-duration {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    padding: 2px 6px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 4px;
+    font-size: 0.65rem;
+    color: white;
+}
+
+.video-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.video-info .client-name {
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+}
+
+.video-info .exercise-name {
+    font-size: 0.875rem;
+    color: #8B5CF6;
+}
+
+.video-info .upload-time {
+    font-size: 0.75rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+}
+
+.video-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: auto;
+}
+
+.approve-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: linear-gradient(135deg, #10B981, #059669);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 0.813rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.feedback-btn {
+    padding: 8px 10px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 8px;
+    color: #A78BFA;
+    cursor: pointer;
+}
+
+/* =============================================================================
+   CHURN RISK
+   ============================================================================= */
+
+.churn-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.churn-risk-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+}
+
+.churn-indicator {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.15);
+    color: #F59E0B;
+    border-radius: 10px;
+}
+
+.churn-info {
+    flex: 1;
+}
+
+.churn-info .client-name {
+    display: block;
+    font-weight: 500;
+    color: var(--text-primary, #fff);
+}
+
+.churn-info .days-inactive {
+    font-size: 0.75rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+}
+
+.nudge-btn {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    font-size: 0.813rem;
+    cursor: pointer;
+}
+
+/* =============================================================================
+   WAGERS
+   ============================================================================= */
+
+.wagers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.wager-card {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 12px;
+}
+
+.wager-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.wager-icon {
+    color: #F59E0B;
+}
+
+.wager-client {
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    flex: 1;
+}
+
+.wager-points {
+    padding: 4px 10px;
+    background: linear-gradient(135deg, #F59E0B, #D97706);
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+}
+
+.wager-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    margin: 0 0 12px 0;
+    font-style: italic;
+}
+
+.wager-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.validate-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.813rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.validate-btn.approve {
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: white;
+}
+
+.validate-btn.reject {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #EF4444;
+}
+
+/* =============================================================================
+   CLIENTS LIST
+   ============================================================================= */
+
+.clients-section {
+    margin-top: 24px;
+}
+
+.clients-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.client-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.client-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366F1, #8B5CF6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.client-avatar.large {
+    width: 72px;
+    height: 72px;
+    font-size: 1.5rem;
+    border-radius: 18px;
+}
+
+.client-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.client-info .client-name {
+    display: block;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    margin-bottom: 4px;
+}
+
+.pain-areas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.pain-tag {
+    font-size: 0.688rem;
+    color: #FCA5A5;
+}
+
+.no-pain {
+    font-size: 0.688rem;
+    color: #10B981;
+}
+
+.client-1rm {
+    text-align: center;
+}
+
+.rm-label {
+    display: block;
+    font-size: 0.688rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+    margin-bottom: 4px;
+}
+
+.rm-values {
+    display: flex;
+    gap: 8px;
+    font-size: 0.75rem;
+    color: var(--text-primary, #fff);
+}
+
+.client-volume {
+    text-align: center;
+}
+
+.volume-value {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #6366F1;
+}
+
+.volume-label {
+    font-size: 0.688rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+}
+
+.client-streak {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 8px;
+    color: #F59E0B;
+    font-weight: 600;
+}
+
+/* =============================================================================
+   CLIENT MODAL
+   ============================================================================= */
+
+.client-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.client-modal {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(20, 20, 30, 0.98));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.close-modal {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 10px;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.6));
+    cursor: pointer;
+}
+
+.modal-header {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 28px;
+}
+
+.modal-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary, #fff);
+    margin: 0 0 8px 0;
+}
+
+.streak-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(245, 158, 11, 0.15);
+    border-radius: 8px;
+    color: #F59E0B;
+    font-size: 0.875rem;
+}
+
+/* 1RM Chart */
+.rm-chart {
+    margin-bottom: 24px;
+}
+
+.rm-chart h3 {
+    font-size: 0.875rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    margin: 0 0 16px 0;
+}
+
+.rm-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.rm-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rm-bar .rm-label {
+    width: 90px;
+    font-size: 0.813rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.bar-container {
+    flex: 1;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    border-radius: 6px;
+}
+
+.bar.squat {
+    background: linear-gradient(90deg, #10B981, #34D399);
+}
+
+.bar.deadlift {
+    background: linear-gradient(90deg, #6366F1, #818CF8);
+}
+
+.bar.bench {
+    background: linear-gradient(90deg, #F59E0B, #FBBF24);
+}
+
+.rm-bar .rm-value {
+    width: 60px;
+    font-weight: 600;
+    color: var(--text-primary, #fff);
+    text-align: right;
+}
+
+/* Pain Map */
+.pain-map {
+    margin-bottom: 24px;
+}
+
+.pain-map h3 {
+    font-size: 0.875rem;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.7));
+    margin: 0 0 12px 0;
+}
+
+.pain-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.pain-area-tag {
+    padding: 6px 12px;
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    font-size: 0.813rem;
+    color: #FCA5A5;
+}
+
+/* Modal Actions */
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.primary-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: linear-gradient(135deg, #EF4444, #DC2626);
+    border: none;
+    border-radius: 14px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.secondary-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    color: var(--text-primary, #fff);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Empty states */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--text-secondary, rgba(255, 255, 255, 0.5));
+    gap: 12px;
+}
+
+.empty-state svg {
+    color: #10B981;
+}
+
+/* LIGHT MODE OVERRIDES - Clinical Theme (Shared with Nutritionist) */
+.clinical .personal-trainer-dashboard h1,
+.clinical .personal-trainer-dashboard h2,
+.clinical .personal-trainer-dashboard h3,
+.clinical .personal-trainer-dashboard .kpi-value,
+.clinical .personal-trainer-dashboard .section-header h2,
+.clinical .personal-trainer-dashboard .athlete-name,
+.clinical .personal-trainer-dashboard .video-info .athlete-name,
+.clinical .personal-trainer-dashboard .stat-value,
+.clinical .personal-trainer-dashboard .action-title {
+    color: #111827 !important;
+    /* Force dark text */
+}
+
+.clinical .personal-trainer-dashboard .subtitle,
+.clinical .personal-trainer-dashboard .kpi-label,
+.clinical .personal-trainer-dashboard .section-header .subtitle,
+.clinical .personal-trainer-dashboard .video-info .timestamp,
+.clinical .personal-trainer-dashboard .exercise-name,
+.clinical .personal-trainer-dashboard .stat-label,
+.clinical .personal-trainer-dashboard .action-desc {
+    color: #6B7280 !important;
+    /* Force medium gray text */
+}
+
+/* Light Mode Backgrounds for Cards */
+.clinical .pt-kpi-card,
+.clinical .injury-radar-section,
+.clinical .video-review-section,
+.clinical .churn-risk-section,
+.clinical .wagers-section,
+.clinical .clients-section,
+.clinical .injury-risk-row,
+.clinical .video-review-card,
+.clinical .churn-risk-row,
+.clinical .wager-card,
+.clinical .client-row {
+    background: #FFFFFF !important;
+    border-color: #E5E7EB !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Specific fix for Video Card in Clinical Mode */
+.clinical .video-review-card {
+    background: #FFFFFF !important;
+}
+
+.clinical .video-review-card:hover {
+    background: #F9FAFB !important;
+}
+
+/* Adjust secondary buttons */
+.clinical .video-actions .approve-btn {
+    background: #10B981 !important;
+    color: white !important;
+}
+
+.clinical .video-actions .reject-btn {
+    background: #FEE2E2 !important;
+    color: #EF4444 !important;
+    border-color: #FECACA !important;
+}

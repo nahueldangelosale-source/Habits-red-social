@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: bienestar-backend-staging
+    env: docker
+    region: ohio
+    plan: starter
+    branch: main
+    repo: https://github.com/organization/bienestar-app # Replace with real repo
+    dockerCommand: "sh -c 'uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 2 --proxy-headers'"
+    envVars:
+      - key: ENVIRONMENT
+        value: staging
+      - key: DEBUG
+        value: "false"
+      - key: CORS_ORIGINS
+        value: "https://bienestar-staging.vercel.app"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false # Must be set manually in Render Dashboard (e.g., Neon.tech URI)
+      - key: SENTRY_DSN
+        sync: false # Must be set manually in Render Dashboard

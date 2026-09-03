@@ -1,0 +1,69 @@
+ID_Tag,Categoria,Texto_Boton_UI,Backend_Value,Impacto_Algoritmo,Target_Usuario
+TAG_OBJ_01,Objetivo_Principal,📉 Quiero perder grasa y definir mi cuerpo,fat_loss,Pondera entrenadores de recomposición corporal; habilita módulos de déficit calórico.,B2C_Atleta
+TAG_OBJ_02,Objetivo_Principal,💪 Busco ganar masa muscular y tamaño,hypertrophy,Incrementa ponderación de volumen de entrenamiento (series semanales) en el Swap Engine.,B2C_Atleta
+TAG_OBJ_03,Objetivo_Principal,🏋️‍♂️ Quiero ser más fuerte y levantar pesado,strength_gain,Prioriza ejercicios compuestos multiarticulares y rangos de 1-5 repeticiones.,B2C_Atleta
+TAG_OBJ_04,Objetivo_Principal,🏃‍♂️ Mejorar mi rendimiento deportivo general,athletic_performance,"Habilita ejercicios de potencia, pliometría y entrenadores de fuerza y acondicionamiento.",B2C_Atleta
+TAG_OBJ_05,Objetivo_Principal,🍑 Quiero enfocarme en desarrollar mis glúteos,glute_specialization,Sobreescribe el algoritmo para aumentar la frecuencia de patrones de abducción y extensión de cadera.,B2C_Atleta
+TAG_OBJ_06,Objetivo_Principal,"❤️ Recuperar mi salud, movilidad y longevidad",general_health,Limita la intensidad absoluta máxima (RPE alto); prioriza entrenadores holísticos.,B2C_Atleta
+TAG_OBJ_07,Objetivo_Principal,🩹 Readaptarme tras una lesión o cirugía,rehabilitation,Activa restricciones duras de seguridad; empareja solo con especialistas clínicos.,B2C_Atleta
+TAG_EXP_01,Nivel_Experiencia,"🌱 Soy totalmente nuevo, nunca he pisado un gym",exp_total_beginner,Filtra ejercicios de alta complejidad neurológica (ej. levantamientos olímpicos); asigna tutoriales obligatorios.,B2C_Atleta
+TAG_EXP_02,Nivel_Experiencia,"🥉 Conozco lo básico, entreno de forma intermitente",exp_novice,Habilita progresiones lineales estándar y volumen moderado.,B2C_Atleta
+TAG_EXP_03,Nivel_Experiencia,"🥈 Llevo tiempo entrenando, pero busco estructura",exp_intermediate,Desbloquea periodización ondulante diaria y técnicas de intensificación.,B2C_Atleta
+TAG_EXP_04,Nivel_Experiencia,"🥇 Soy avanzado, necesito romper estancamientos",exp_advanced,Permite el acceso a todo el catálogo de ejercicios y programación concurrente compleja.,B2C_Atleta
+TAG_EXP_05,Nivel_Experiencia,🏆 Soy atleta competitivo o profesional,exp_elite,Empareja exclusivamente con coaches de nivel élite que manejan métricas de velocidad y potencia.,B2C_Atleta
+TAG_DIS_01,Disponibilidad_Dias,⏱️ Tengo poco tiempo (1 a 2 días por semana),freq_very_low,Configura el motor de rutinas para generar divisiones de cuerpo completo (Full Body).,B2C_Atleta
+TAG_DIS_02,Disponibilidad_Dias,📅 Puedo organizarme para 3 días a la semana,freq_low,Configura divisiones Full Body o empuje/tracción híbridas.,B2C_Atleta
+TAG_DIS_03,Disponibilidad_Dias,🗓️ Entrenaré 4 días a la semana sin falta,freq_medium,Configura divisiones Torso/Pierna estándar.,B2C_Atleta
+TAG_DIS_04,Disponibilidad_Dias,🔥 Me comprometo a 5 o 6 días por semana,freq_high,Configura divisiones analíticas (Push/Pull/Legs o Body Part Split) gestionando solapamiento de fatiga.,B2C_Atleta
+TAG_TIM_01,Tiempo_Sesion,⚡ Solo tengo 30 minutos o menos por sesión,time_under_30,"Activa circuitos, superseries antagonistas y descansos de alta densidad temporal.",B2C_Atleta
+TAG_TIM_02,Tiempo_Sesion,⏳ Dispongo de 45 a 60 minutos,time_standard,Configura estructuras de series rectas con tiempos de descanso fisiológicos normales (90-120s).,B2C_Atleta
+TAG_TIM_03,Tiempo_Sesion,"🕰️ No tengo prisa, más de 75 minutos",time_extended,Permite descanso completo del sistema nervioso (3-5 mins) para fuerza máxima.,B2C_Atleta
+TAG_EQ_01,Equipamiento_Local,🏢 Entreno en un gimnasio comercial bien equipado,eq_full_commercial,"Habilita todo el catálogo: máquinas selectorizadas, poleas, barras y mancuernas.",B2C_Atleta
+TAG_EQ_02,Equipamiento_Local,"🏠 Tengo un Home Gym con rack, barra y discos",eq_home_barbell,Excluye máquinas y poleas complejas; mantiene barras olímpicas y peso libre pesado.,B2C_Atleta
+TAG_EQ_03,Equipamiento_Local,🏋️ Solo tengo unas mancuernas ajustables/fijas,eq_dumbbells_only,Ejecuta sustitución masiva: reemplaza todo ejercicio de barra/máquina por variante con mancuerna.,B2C_Atleta
+TAG_EQ_04,Equipamiento_Local,🪢 Cuento con bandas de resistencia elásticas,eq_bands_only,Filtra el catálogo a ejercicios de tensión acomodada y anclajes caseros.,B2C_Atleta
+TAG_EQ_05,Equipamiento_Local,"🤸‍♂️ Cero equipo, solo usaré mi peso corporal",eq_bodyweight_only,Elimina carga externa; activa el árbol de progresiones de calistenia y pliometría básica.,B2C_Atleta
+TAG_EQ_06,Equipamiento_Local,🛎️ Uso el gimnasio de mi edificio/hotel (limitado),eq_hotel_gym,Restringe el catálogo a mancuernas ligeras (hasta 25kg) y máquinas cardiovasculares.,B2C_Atleta
+TAG_EQ_07,Equipamiento_Local,💣 Solo tengo una pesa rusa (Kettlebell),eq_kettlebell_only,"Prioriza patrones balísticos (swings, snatches) y trabajo unilateral dinámico.",B2C_Atleta
+TAG_INJ_01,Lesiones_Molestias,🤕 Me duele la espalda baja frecuentemente,inj_lower_back,"Excluye cargas axiales pesadas (sentadillas traseras, peso muerto convencional).",B2C_Atleta
+TAG_INJ_02,Lesiones_Molestias,🦵 Tengo las rodillas sensibles o con dolor,inj_knees,Restringe el rango de movimiento profundo bajo carga y elimina pliometría de alto impacto.,B2C_Atleta
+TAG_INJ_03,Lesiones_Molestias,🦾 Mis hombros sufren al levantar los brazos,inj_shoulders,Sustituye empujes verticales (Press Militar) por empujes horizontales o en el plano escapular.,B2C_Atleta
+TAG_INJ_04,Lesiones_Molestias,🦒 Sufro de tensión en el cuello/cervicales,inj_cervical,Elimina soporte de barra alta y ejercicios directos de trapecio superior.,B2C_Atleta
+TAG_INJ_05,Lesiones_Molestias,🖐️ Me molestan las muñecas al apoyar el peso,inj_wrists,Filtra agarres pronos fijos; fuerza el uso de agarres neutros o máquinas acolchadas.,B2C_Atleta
+TAG_INJ_06,Lesiones_Molestias,🦴 Tuve problemas previos en la cadera o ingle,inj_hip_flexors,Modifica patrones de sentadilla amplia y elevaciones de pierna directas.,B2C_Atleta
+TAG_INJ_07,Lesiones_Molestias,🦶 Dolores en los tobillos o fascitis plantar,inj_ankles,Excluye trabajo de pantorrilla pesado y saltos articulares reactivos.,B2C_Atleta
+TAG_INJ_08,Lesiones_Molestias,"✅ Estoy sano, no tengo dolores corporales",inj_none,Desactiva los filtros de exclusión médica; habilita catálogo completo.,B2C_Atleta
+TAG_STR_01,Nivel_Estres,🧘 Mi vida es equilibrada y duermo bien,stress_low,Permite la prescripción del 100% del Volumen Máximo Recuperable (MRV).,B2C_Atleta
+TAG_STR_02,Nivel_Estres,"⚖️ Tengo algo de presión, pero es manejable",stress_moderate,Establece el volumen de entrenamiento en el Volumen Mínimo Efectivo (MEV) + 20%.,B2C_Atleta
+TAG_STR_03,Nivel_Estres,"🌪️ Estoy exhausto, con mucho estrés laboral/personal",stress_high_chronic,Reduce el volumen prescripto un 30%; prioriza entrenamientos sub-máximos y movilidad.,B2C_Atleta
+TAG_SLP_01,Calidad_Sueno,😴 Duermo de 7 a 8 horas profundamente,sleep_optimal,No impone penalizaciones de recuperación al motor de programación.,B2C_Atleta
+TAG_SLP_02,Calidad_Sueno,🥱 Me cuesta dormir o descanso menos de 6 horas,sleep_deprived,Aumenta los días de descanso requeridos entre estímulos del mismo grupo muscular.,B2C_Atleta
+TAG_COA_01,Estilo_Coaching,📣 Necesito disciplina estricta y presión constante,style_drill_sergeant,Pondera entrenadores con comunicación firme y seguimiento riguroso de métricas.,B2C_Atleta
+TAG_COA_02,Estilo_Coaching,"🤝 Busco apoyo empático, educación y flexibilidad",style_empathetic,Empareja con coaches enfocados en el cambio de hábitos gradual y la psicología.,B2C_Atleta
+TAG_COA_03,Estilo_Coaching,📊 Prefiero un enfoque 100% basado en datos y ciencia,style_data_driven,Prioriza profesionales técnicos que utilizan modelos de autorregulación y RPE detallado.,B2C_Atleta
+TAG_COA_04,Estilo_Coaching,"📱 Solo dame la rutina, soy muy independiente",style_hands_off,Dirige al usuario hacia servicios B2B asíncronos y plantillas estáticas automatizadas.,B2C_Atleta
+TAG_DIET_01,Preferencia_Dieta,🥩 Como de todo (Omnívoro / Sin restricciones),diet_omnivore,Habilita el espectro completo de recomendaciones nutricionales.,B2C_Atleta
+TAG_DIET_02,Preferencia_Dieta,🥦 Sigo una dieta basada 100% en plantas (Vegano),diet_vegan,Filtra macros; prioriza el emparejamiento con nutricionistas especializados en dietas vegetales.,B2C_Atleta
+TAG_DIET_03,Preferencia_Dieta,🥚 Soy Vegetariano (Incluye lácteos/huevos),diet_vegetarian,Modifica fuentes de proteína sugeridas en el módulo de nutrición.,B2C_Atleta
+TAG_DIET_04,Preferencia_Dieta,🥑 Hago dieta Keto o muy baja en carbohidratos,diet_keto,Altera la distribución de macronutrientes asignando >60% a grasas saludables.,B2C_Atleta
+TAG_DIET_05,Preferencia_Dieta,🚫 Tengo intolerancias (Lactosa / Gluten),diet_intolerant,Activa filtros de seguridad en las integraciones de bases de datos de alimentos.,B2C_Atleta
+TAG_PRO_01,Especialidad_Principal,Recomposición Corporal y Estética (Culturismo),spec_bodybuilding,Coincidencia principal (Match) con TAG_OBJ_01 y TAG_OBJ_02.,B2B_Coach
+TAG_PRO_02,Especialidad_Principal,"Fuerza Máxima, Powerlifting y Halterofilia",spec_strength_sports,Coincidencia principal con TAG_OBJ_03 y TAG_EXP_04.,B2B_Coach
+TAG_PRO_03,Especialidad_Principal,Readaptación de Lesiones y Fisioterapia Deportiva,spec_injury_rehab,Identificador clínico: Máxima ponderación si el usuario selecciona múltiples TAG_INJ_XX.,B2B_Coach
+TAG_PRO_04,Especialidad_Principal,Entrenamiento Pre y Post-Parto,spec_prenatal,Activa visibilidad prioritaria en embudos demográficos específicos femeninos.,B2B_Coach
+TAG_PRO_05,Especialidad_Principal,"Salud General, Movilidad y Longevidad",spec_longevity,Coincidencia principal con TAG_OBJ_06 y usuarios con etiquetas de alto estrés (stress_high_chronic).,B2B_Coach
+TAG_PRO_06,Especialidad_Principal,Pérdida de Peso Clínica y Manejo de la Obesidad,spec_obesity_management,Prioriza el emparejamiento con perfiles de usuarios con IMC elevado que requieren contención psicológica.,B2B_Coach
+TAG_PRO_07,Especialidad_Principal,Entrenamiento para Deportes Específicos (S&C),spec_sports_conditioning,Coincidencia principal con TAG_OBJ_04 (Atletas de campo y pista).,B2B_Coach
+TAG_ACC_01,Nivel_Atleta_Aceptado,"Acepto a cualquier persona, sin importar su nivel",accept_all_levels,Mantiene el perfil visible para toda la base de datos B2C.,B2B_Coach
+TAG_ACC_02,Nivel_Atleta_Aceptado,Trabajo muy bien guiando a principiantes totales,accept_beginners_focus,Otorga un multiplicador de relevancia en búsquedas de usuarios con TAG_EXP_01.,B2B_Coach
+TAG_ACC_03,Nivel_Atleta_Aceptado,Solo entreno a atletas intermedios y avanzados,accept_advanced_only,Restricción dura: Oculta el perfil a usuarios con TAG_EXP_01 y TAG_EXP_02.,B2B_Coach
+TAG_ACC_04,Nivel_Atleta_Aceptado,Preparo exclusivamente a competidores élite,accept_competitors_only,Restricción dura: Solo visible para usuarios que declaran TAG_EXP_05.,B2B_Coach
+TAG_SRV_01,Servicios_Incluidos,Asesoría 1:1 VIP con revisión de videos técnicos,serv_full_vip_review,Clasifica el servicio en el tier de mayor costo; activa módulos de carga de video en la app.,B2B_Coach
+TAG_SRV_02,Servicios_Incluidos,Solo programación de rutinas (Asincrónico),serv_async_program,Coincidencia directa con TAG_COA_04; servicio de menor costo y alta escalabilidad.,B2B_Coach
+TAG_SRV_03,Servicios_Incluidos,Incluye pautas nutricionales y cálculo de Macros,serv_nutrition_included,Desbloquea la interfaz de registro de alimentos y macros en el dashboard del cliente.,B2B_Coach
+TAG_SRV_04,Servicios_Incluidos,Coaching enfocado en hábitos diarios y mentalidad,serv_habit_tracking,Activa notificaciones push diarias y seguimiento de tareas (estilo Noom).,B2B_Coach
+TAG_COM_01,Estilo_Comunicacion,"Soy directo, estricto y exijo el máximo esfuerzo",comm_strict_accountability,Emparejamiento psicológico directo con TAG_COA_01.,B2B_Coach
+TAG_COM_02,Estilo_Comunicacion,Soy un educador paciente; me enfoco en el proceso,comm_patient_educator,Emparejamiento psicológico directo con TAG_COA_02.,B2B_Coach
+TAG_COM_03,Estilo_Comunicacion,Mi comunicación es puramente técnica y objetiva,comm_analytical_data,Emparejamiento psicológico directo con TAG_COA_03.,B2B_Coach
+TAG_CHK_01,Frecuencia_Contacto,Hago videollamadas de Check-in todas las semanas,checkin_weekly_call,Establece recordatorios automáticos de agenda en los calendarios de ambas partes.,B2B_Coach
+TAG_CHK_02,Frecuencia_Contacto,Revisiones mensuales mediante formulario escrito,checkin_monthly_form,Activa flujos automatizados de recolección de métricas al final del mes.,B2B_Coach

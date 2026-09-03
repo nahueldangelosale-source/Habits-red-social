@@ -1,0 +1,223 @@
+/* The Arena - Gamified Styles */
+
+.the-arena {
+    padding: 24px;
+    color: var(--text-primary);
+}
+
+/* Header */
+.arena-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.arena-logo-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #EF4444, #F97316);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.arena-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin: 0;
+    background: linear-gradient(to right, #ffffff, #cbd5e1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.clinical .arena-title {
+    background: none;
+    -webkit-text-fill-color: #111827;
+}
+
+.arena-balance {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1), rgba(245, 158, 11, 0.1));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.balance-amount {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #F59E0B;
+}
+
+/* Tabs */
+.arena-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.arena-tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.arena-tab:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.arena-tab.active {
+    background: #6366f1;
+    color: black;
+    box-shadow: 0 0 15px rgba(206, 255, 0, 0.3);
+}
+
+.clinical .arena-tab.active {
+    background: #88B04B;
+    color: white;
+    box-shadow: none;
+}
+
+.tab-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.2);
+    color: inherit;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.arena-tab:not(.active) .tab-badge {
+    background: #EF4444;
+    color: white;
+}
+
+/* New Challenge Button */
+.new-challenge-btn {
+    width: 100%;
+    padding: 24px;
+    border-radius: 16px;
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    transition: all 0.2s;
+}
+
+.new-challenge-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+.clinical .new-challenge-btn {
+    border-color: #E5E7EB;
+    background: #F9FAFB;
+    color: #6B7280;
+}
+
+/* Cards Grid */
+.wagers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 24px;
+}
+
+.wager-modal {
+    background: #111827;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.clinical .wager-modal {
+    background: #FFFFFF;
+    border: 1px solid #E5E7EB;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Selection Grids */
+.opponents-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.option-card {
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.clinical .option-card {
+    border-color: #E5E7EB;
+}
+
+.option-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.option-card.selected {
+    border-color: #6366f1;
+    background: rgba(206, 255, 0, 0.1);
+}
+
+.clinical .option-card.selected {
+    border-color: #88B04B;
+    background: rgba(136, 176, 75, 0.1);
+}
+
+.option-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.option-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}

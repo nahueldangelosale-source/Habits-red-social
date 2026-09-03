@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BurgerMusic OS - Modelo de Impacto Financiero</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;600;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-card: #141414;
+            --text-main: #f5f5f5;
+            --text-muted: #a3a3a3;
+            --accent-primary: #deff9a;
+            --accent-secondary: #a3e635;
+            --accent-danger: #ef4444;
+            --border-color: #262626;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Urbanist', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .report-container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        /* HEADER */
+        .header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header-title h1 {
+            font-size: 42px;
+            margin: 0 0 10px 0;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -1px;
+        }
+
+        .header-title h1 span { color: var(--accent-primary); }
+        
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 18px;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .header-meta {
+            text-align: right;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        /* MACRO IMPACT */
+        .macro-impact {
+            background: linear-gradient(145deg, #1a1f10 0%, var(--bg-card) 100%);
+            border: 1px solid #2d3718;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .macro-impact-text { max-width: 60%; }
+        .macro-impact-text h2 {
+            font-size: 32px; margin: 0 0 15px 0; color: var(--accent-primary);
+        }
+        .macro-impact-text p { font-size: 18px; line-height: 1.6; color: #d4d4d4; margin: 0; }
+
+        .macro-number {
+            text-align: right;
+        }
+        .macro-number .big-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 72px;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+            text-shadow: 0 0 20px rgba(222, 255, 154, 0.3);
+        }
+        .macro-number .sub-number {
+            color: var(--accent-primary);
+            font-size: 18px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* GRID BREAKDOWN */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: var(--accent-primary);
+            opacity: 0.5;
+        }
+
+        .card-icon {
+            font-size: 30px;
+            color: var(--accent-primary);
+            margin-bottom: 20px;
+        }
+
+        .card h3 {
+            font-size: 22px;
+            margin: 0 0 10px 0;
+            color: #fff;
+        }
+
+        .card .metric {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin: 15px 0;
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+        
+        .card .metric span {
+            font-size: 16px;
+            font-family: 'Urbanist', sans-serif;
+            color: var(--text-muted);
+            font-weight: 400;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .card-note {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px dashed #333;
+            font-size: 14px;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* COST OF DELAY SECTION */
+        .cod-section {
+            background-color: #1a1010;
+            border: 1px solid #371818;
+            border-radius: 12px;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .cod-icon {
+            font-size: 50px;
+            color: var(--accent-danger);
+            flex-shrink: 0;
+        }
+
+        .cod-content h3 {
+            color: var(--accent-danger);
+            font-size: 24px;
+            margin: 0 0 10px 0;
+        }
+
+        .cod-content p {
+            color: #d4d4d4;
+            font-size: 16px;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .pedagogy {
+            background: rgba(255,255,255,0.03);
+            border-left: 3px solid var(--text-muted);
+            padding: 15px;
+            margin-top: 30px;
+            border-radius: 0 8px 8px 0;
+            font-size: 15px;
+            color: #bbb;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="report-container">
+    
+    <!-- HEADER -->
+    <div class="header">
+        <div class="header-title">
+            <p>Proyección Financiera y P&L</p>
+            <h1>BurgerMusic OS <span>Unit Economics</span></h1>
+        </div>
+        <div class="header-meta">
+            Preparado por: Hólos (Head of Product Portfolio)<br>
+            Métrica Principal: Incremento de Margen EBITDA
+        </div>
+    </div>
+
+    <!-- MACRO IMPACT -->
+    <div class="macro-impact">
+        <div class="macro-impact-text">
+            <h2>+250 a +400 BPS en el Margen EBITDA</h2>
+            <p>El sistema no es solo una herramienta de "ahorro de tiempo". Actúa como un mecanismo de defensa contra la fuga de capital en los tres rubros más pesados de la industria gastronómica: <strong>Costo de Mercadería Vendida (COGS), Gastos Administrativos (SG&A) y Fuga de Ingresos.</strong></p>
+        </div>
+        <div class="macro-number">
+            <div class="big-number">2.5% - 4%</div>
+            <div class="sub-number">Aumento Absoluto de Rentabilidad<br>sobre Ventas Brutas Totales</div>
+        </div>
+    </div>
+
+    <!-- 3 PILLARS GRID -->
+    <div class="grid-3">
+        <!-- Pillar 1 -->
+        <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-burger"></i></div>
+            <h3>1. Costo de Mercadería (COGS)</h3>
+            <div class="metric">2% - 3% <span>Reducción de Food Cost</span></div>
+            <p>Al tener el BOM (Bill of Materials) en tiempo real y el inventario hiper-conciliado, reducimos el "Sobre-porcionamiento" (empleados sirviendo de más) y mermas por vencimiento, ya que el Agente Predictivo pide solo lo necesario.</p>
+            <div class="card-note">
+                Si el Food Cost actual es del 32% sobre las ventas, el sistema lo estabiliza sistémicamente entre el 29% y 30%.
+            </div>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            <h3>2. OPEX / Back-office (SG&A)</h3>
+            <div class="metric">30% - 40% <span>Ahorro en horas adm.</span></div>
+            <p>Erradicación del <em>data-entry</em> manual. La conciliación de caja, el conteo en Excel y la generación de órdenes de compra se automatizan en un 90%. Esto permite congelar contrataciones administrativas mientras se abren nuevas sucursales.</p>
+            <div class="card-note">
+                El crecimiento de la franquicia se desacopla del crecimiento de la nómina administrativa (Escalabilidad real).
+            </div>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="card">
+            <div class="card-icon"><i class="fa-solid fa-shield-cat"></i></div>
+            <h3>3. Fuga de Ingresos (Leakage)</h3>
+            <div class="metric">1% - 1.5% <span>Recupero de Ventas Brutas</span></div>
+            <p>La trazabilidad transaccional ACID asegura que cada gramo de inventario descontado esté atado a un ticket cobrado. Esto detecta y neutraliza instantáneamente robos de inventario, ventas "en negro" no registradas o errores de caja.</p>
+            <div class="card-note">
+                Efecto Panóptico: Solo con instalar la trazabilidad, la fuga interna se reduce por disuasión.
+            </div>
+        </div>
+    </div>
+
+    <!-- COST OF DELAY -->
+    <div class="cod-section">
+        <div class="cod-icon"><i class="fa-solid fa-stopwatch"></i></div>
+        <div class="cod-content">
+            <h3>El Coste de Retraso (Cost of Delay - CoD)</h3>
+            <p>Si una sucursal promedio factura <strong>$100,000 USD al mes</strong>, un incremento conservador del 3% en el EBITDA significa <strong>$3,000 USD adicionales de ganancia neta pura mensual por sucursal</strong>. <br><br>Si tenemos 10 sucursales y tardamos 6 meses en tomar la decisión de implementar BurgerMusic OS, <strong>el Coste de Retraso (dinero dejado en la mesa y perdido para siempre) asciende a $180,000 USD.</strong> Esto financia la construcción entera del software.</p>
+        </div>
+    </div>
+
+    <!-- PEDAGOGY -->
+    <div class="pedagogy">
+        <strong>💡 Traducción al Negocio (BPS):</strong> "BPS" significa Basis Points (Puntos Básicos). 100 BPS equivalen a 1%. En la industria gastronómica de franquicias, donde los márgenes netos suelen ser finos (entre 10% y 15%), un aumento de 300 BPS (3%) es monumental. Significa que, sin vender ni una hamburguesa extra, la empresa se lleva un 3% más de dinero limpio al bolsillo.
+    </div>
+
+</div>
+
+</body>
+</html>
