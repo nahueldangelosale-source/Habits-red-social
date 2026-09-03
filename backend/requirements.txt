@@ -64,14 +64,14 @@ jsonpointer==3.0.0
 jsonschema==4.26.0
 jsonschema-specifications==2025.9.1
 kombu==5.6.2
-langchain==0.3.17
-langchain-core==0.3.83
-langchain-openai==0.3.17
+langchain==1.2.10
+langchain-core==1.2.10
+langchain-openai==1.1.8
 langchain-text-splitters==0.3.11
 langsmith==0.3.45
 libsql-client==0.3.1
 limits==5.8.0
-litellm==1.82.2
+litellm==1.82.0
 Mako==1.3.10
 markdown-it-py==4.0.0
 MarkupSafe==3.0.3
@@ -81,7 +81,7 @@ mercadopago==2.2.0
 multidict==6.7.1
 numpy==2.4.3
 nvidia-ml-py==13.590.48
-openai==1.109.1
+openai==2.19.0
 opentelemetry-api==1.40.0
 opentelemetry-exporter-otlp==1.40.0
 opentelemetry-exporter-otlp-proto-common==1.40.0
