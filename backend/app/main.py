@@ -196,6 +196,7 @@ setup_telemetry(app)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins_list,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True, # Crucial para el intercambio de tokens de sesión
     allow_methods=["*"],
     allow_headers=["*"],

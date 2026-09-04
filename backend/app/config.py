@@ -132,7 +132,8 @@ def validate_production_config():
             errors.append("SECRET_KEY is required")
         if settings.debug:
             errors.append("DEBUG must be False in production")
-        if "*" in settings.cors_origins:
+        cors_list = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+        if "*" in cors_list:
             errors.append("CORS_ORIGINS cannot be '*' in production")
         if not settings.database_url or "localhost" in settings.database_url:
             errors.append("DATABASE_URL must point to production database")
