@@ -123,9 +123,13 @@ export const LoginPage = () => {
 
                 toast.dismiss(toastId);
                 toast.success(lang === 'es' ? '¡Bienvenido/a a Habits!' : 'Welcome to Habits!');
-                login(data.access_token, data.user);
+                const userToSave = {
+                    ...(data.user || {}),
+                    role: isUser ? 'CLIENT_FITNESS' : (data.user?.role || 'ADMIN')
+                };
+                login(data.access_token, userToSave);
 
-                if (targetRole === 'CLIENT_FITNESS' || data.user?.role === 'CLIENT_FITNESS' || data.user?.role === 'ATHLETE') {
+                if (isUser || userToSave.role === 'CLIENT_FITNESS' || userToSave.role === 'ATHLETE') {
                     navigate('/athlete', { replace: true });
                 } else {
                     navigate('/dashboard', { replace: true });
@@ -206,8 +210,12 @@ export const LoginPage = () => {
                                     }
                                     toast.dismiss(toastId);
                                     toast.success(lang === 'es' ? '¡Bienvenido/a a Habits!' : 'Welcome to Habits!');
-                                    login(data.access_token, data.user);
-                                    if (targetRole === 'CLIENT_FITNESS' || data.user?.role === 'CLIENT_FITNESS' || data.user?.role === 'ATHLETE') {
+                                    const userToSave = {
+                                        ...(data.user || {}),
+                                        role: isUser ? 'CLIENT_FITNESS' : (data.user?.role || 'ADMIN')
+                                    };
+                                    login(data.access_token, userToSave);
+                                    if (isUser || userToSave.role === 'CLIENT_FITNESS' || userToSave.role === 'ATHLETE') {
                                         navigate('/athlete', { replace: true });
                                     } else {
                                         navigate('/dashboard', { replace: true });
@@ -325,9 +333,14 @@ export const LoginPage = () => {
                 }
 
                 const userRole = data.user?.role;
-                const isAthlete = userRole === 'CLIENT_FITNESS' || userRole === 'ATHLETE' || userRole === 'PATIENT' || (role === 'USER' && userRole !== 'ADMIN');
+                const isAthlete = role === 'USER' || userRole === 'CLIENT_FITNESS' || userRole === 'ATHLETE' || userRole === 'PATIENT';
+                const finalRole = role === 'USER' ? 'CLIENT_FITNESS' : (userRole || 'ADMIN');
 
-                login(data.access_token, data.user || { email: email.trim(), role: isAthlete ? 'CLIENT_FITNESS' : 'ADMIN' });
+                login(data.access_token, {
+                    ...(data.user || {}),
+                    email: email.trim(),
+                    role: finalRole
+                });
                 toast.success(lang === 'es' ? '¡Bienvenido/a a Habits!' : 'Welcome back!');
 
                 if (isAthlete) {
@@ -375,7 +388,11 @@ export const LoginPage = () => {
                         if (loginRes.ok) {
                             const loginData = await loginRes.json();
                             if (loginData.access_token) {
-                                login(loginData.access_token, loginData.user || { email: email.trim(), role: 'CLIENT_FITNESS' });
+                                login(loginData.access_token, {
+                                    ...(loginData.user || {}),
+                                    email: email.trim(),
+                                    role: 'CLIENT_FITNESS'
+                                });
                                 toast.success(lang === 'es' ? '¡Sesión iniciada con éxito!' : 'Logged in successfully!');
                                 navigate('/athlete', { replace: true });
                                 return;
@@ -399,7 +416,11 @@ export const LoginPage = () => {
                         throw new Error(lang === 'es' ? "Cuenta creada pero ocurrió un fallo al iniciar sesión." : "Account created but login failed.");
                     }
 
-                    login(data.access_token, data.user || { email: email.trim(), role: 'CLIENT_FITNESS' });
+                    login(data.access_token, {
+                        ...(data.user || {}),
+                        email: email.trim(),
+                        role: 'CLIENT_FITNESS'
+                    });
                     toast.success(lang === 'es' ? '¡Cuenta de Usuario creada! Bienvenido/a a Habits.' : 'Account created! Welcome to Habits.');
                     navigate('/athlete', { replace: true });
                 } else {

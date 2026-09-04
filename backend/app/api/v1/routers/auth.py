@@ -446,14 +446,54 @@ async def google_auth(
     user = user_res.scalars().first()
 
     if user:
-        # Existing user: get active role and tenant
+        # Existing user: get active roles
         role_res = await db.execute(
             select(UserRole).where(UserRole.user_id == user.id, UserRole.is_active == True)
         )
-        user_role = role_res.scalars().first()
+        user_roles = role_res.scalars().all()
         
+        target_role = body.role or "CLIENT_FITNESS"
+        matching_role = None
+        for ur in user_roles:
+            ur_val = ur.role.value if hasattr(ur.role, 'value') else str(ur.role)
+            if ur_val == target_role:
+                matching_role = ur
+                break
+
+        if not matching_role and target_role == "CLIENT_FITNESS":
+            # Auto-enroll in global B2C pool
+            b2c_res = await db.execute(select(Tenant).where(Tenant.slug == "comunidad-bienestar"))
+            b2c_tenant = b2c_res.scalars().first()
+            if not b2c_tenant:
+                b2c_tenant = Tenant(name="Comunidad Bienestar", slug="comunidad-bienestar", settings={"type": "global_b2c_pool"})
+                db.add(b2c_tenant)
+                await db.flush()
+
+            # Create Client record if not exists
+            cli_res = await db.execute(select(Client).where(Client.email == email))
+            if not cli_res.scalars().first():
+                client = Client(
+                    tenant_id=b2c_tenant.id,
+                    first_name=user.first_name,
+                    last_name=user.last_name,
+                    email=user.email,
+                    extra_data={"registered_via": "google_oauth_b2c"}
+                )
+                db.add(client)
+
+            new_role = UserRole(
+                user_id=user.id,
+                tenant_id=b2c_tenant.id,
+                role=Role.CLIENT_FITNESS,
+                is_active=True
+            )
+            db.add(new_role)
+            await db.commit()
+            matching_role = new_role
+
+        user_role = matching_role or (user_roles[0] if user_roles else None)
         tenant_id = user_role.tenant_id if user_role else user.id
-        role_str = user_role.role.value if user_role and hasattr(user_role.role, 'value') else (str(user_role.role) if user_role else "ADMIN")
+        role_str = user_role.role.value if user_role and hasattr(user_role.role, 'value') else (str(user_role.role) if user_role else target_role)
 
         access_token = create_access_token(
             user_id=user.id,

@@ -92,6 +92,20 @@ import { TenantBrandingProvider } from './context/TenantBrandingProvider';
 import { ShatteringGlassAnimation } from './features/gamification/ShatteringGlassAnimation';
 import { IntroPresentationOverlay } from './components/common/IntroPresentationOverlay';
 
+function RootRedirect() {
+  const { isAuthenticated, user, isLoading } = useAuth();
+  if (isLoading) {
+    return <div className="min-h-screen bg-slate-900 flex items-center justify-center text-indigo-400 font-mono">Iniciando sistema...</div>;
+  }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  if (user?.role === 'CLIENT_FITNESS' || user?.role === 'ATHLETE' || user?.role === 'PATIENT' || user?.role === 'USER') {
+    return <Navigate to="/athlete" replace />;
+  }
+  return <Navigate to="/dashboard" replace />;
+}
+
 export default function App() {
   const location = useLocation();
   const isB2CRoute = location.pathname.startsWith('/atleta/') ||
@@ -237,7 +251,7 @@ export default function App() {
             <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route element={<AppLayout />}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<RootRedirect />} />
             <Route path="/dashboard" element={<CommandCenter />} />
             <Route path="/trainer" element={<CommandCenter />} />
             <Route path="/trainer/athlete/:id" element={<CommandCenter />} />

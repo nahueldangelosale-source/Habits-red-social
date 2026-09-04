@@ -4,7 +4,7 @@ from sqlalchemy import select, func
 from typing import Any
 
 from app.db.database import get_db
-from app.db.models import Client
+from app.db.models import Client, Tenant
 from app.middleware.auth import get_current_user, TokenData
 
 router = APIRouter()
@@ -18,17 +18,44 @@ async def get_dashboard_metrics(
     Get dashboard KPI metrics.
     Returns the shape expected by the frontend trainer.ts getDashboard().
     """
+    # Athletes/Clients should not see coach KPIs
+    if current_user.role in ["CLIENT_FITNESS", "ATHLETE", "PATIENT"]:
+        return {
+            "tenant_name": "Bienestar APP",
+            "kpis": {
+                "active_clients": 0,
+                "videos_pending_review": 0,
+                "retention_rate": 0,
+                "monthly_revenue": 0
+            },
+            "revenue": {
+                "mrr": 0,
+                "growth_rate": 0
+            }
+        }
+
     tenant_id = current_user.tenant_id
     
-    # Count active clients
-    result = await db.execute(
-        select(func.count(Client.id))
-        .where(Client.tenant_id == tenant_id)
-    )
-    active_clients = result.scalar() or 0
+    tenant_res = await db.execute(select(Tenant).where(Tenant.id == tenant_id))
+    tenant = tenant_res.scalars().first()
+    
+    # Global B2C pool is not a coach tenant
+    if tenant and tenant.slug == "comunidad-bienestar":
+        active_clients = 0
+    else:
+        # Count active clients belonging to this coach, excluding test accounts
+        result = await db.execute(
+            select(func.count(Client.id))
+            .where(
+                Client.tenant_id == tenant_id,
+                ~Client.email.like("test_%"),
+                ~Client.email.like("atleta_libre_%")
+            )
+        )
+        active_clients = result.scalar() or 0
     
     return {
-        "tenant_name": "Bienestar APP B2B",
+        "tenant_name": tenant.name if tenant else "Bienestar APP B2B",
         "kpis": {
             "active_clients": active_clients,
             "videos_pending_review": 0,
@@ -50,13 +77,26 @@ async def get_dashboard_triage(
     Get lightweight DTO for Clinical Triage.
     Avoids fetching full extra_data for performance.
     """
+    # 1. Athletes/Clients should never receive coach triage
+    if current_user.role in ["CLIENT_FITNESS", "ATHLETE", "PATIENT"]:
+        return {"items": []}
+
     tenant_id = current_user.tenant_id
     
-    # In a real high-performance scenario, we could use JSONB querying here 
-    # to filter only clients with critical tags.
+    # 2. Comunidad Bienestar is the global unassigned B2C pool, not a coach roster
+    tenant_res = await db.execute(select(Tenant).where(Tenant.id == tenant_id))
+    tenant = tenant_res.scalars().first()
+    if tenant and tenant.slug == "comunidad-bienestar":
+        return {"items": []}
+
+    # 3. Filter only legitimate clients of this specific coach tenant
     result = await db.execute(
         select(Client.id, Client.first_name, Client.last_name, Client.extra_data)
-        .where(Client.tenant_id == tenant_id)
+        .where(
+            Client.tenant_id == tenant_id,
+            ~Client.email.like("test_%"),
+            ~Client.email.like("atleta_libre_%")
+        )
         .order_by(Client.created_at.desc())
         .limit(100)
     )

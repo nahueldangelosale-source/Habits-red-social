@@ -1,6 +1,6 @@
 import React, { useState, Suspense, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LoginPage } from '../LoginPage';
 import { Sidebar } from '../Sidebar';
@@ -72,6 +72,11 @@ export const AppLayout: React.FC = () => {
 
     if (!isAuthenticated) {
         return <LoginPage />;
+    }
+
+    const isAthleteUser = user?.role === 'CLIENT_FITNESS' || user?.role === 'ATHLETE' || user?.role === 'PATIENT' || user?.role === 'USER';
+    if (isAthleteUser) {
+        return <Navigate to="/athlete" replace />;
     }
 
     return (
