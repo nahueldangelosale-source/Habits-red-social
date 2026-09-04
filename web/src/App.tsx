@@ -90,6 +90,7 @@ import { AppLayout } from './components/layout/AppLayout';
 import { RouteGuard } from './components/auth/RouteGuard';
 import { TenantBrandingProvider } from './context/TenantBrandingProvider';
 import { ShatteringGlassAnimation } from './features/gamification/ShatteringGlassAnimation';
+import { IntroPresentationOverlay } from './components/common/IntroPresentationOverlay';
 
 export default function App() {
   const location = useLocation();
@@ -122,6 +123,8 @@ export default function App() {
       <TenantBrandingProvider>
       <EntropyVAKProvider>
         <AuthProvider>
+          {/* Presentación Intro Pantalla Completa (Video Acelerado al abrir la app) */}
+          <IntroPresentationOverlay />
           {isB2CRoute ? (
             <>
               <ShatteringGlassAnimation />

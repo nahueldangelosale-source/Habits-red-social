@@ -105,6 +105,18 @@ export const ProfessionalAgenda: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'CALENDAR' | 'TASKS' | 'SCHEDULE'>('CALENDAR');
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'CYCLE' | 'MANUAL'>('ALL');
   
+  // Selector de día para vista móvil optimizada
+  const [selectedMobileDay, setSelectedMobileDay] = useState<string>(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const found = WEEK_DAYS.find(d => d.fullDate === todayStr);
+    return found ? found.key : WEEK_DAYS[0]?.key || 'mon';
+  });
+  const [showFullWeeklyGridMobile, setShowFullWeeklyGridMobile] = useState(false);
+
+  const selectedDayObj = useMemo(() => {
+    return WEEK_DAYS.find(d => d.key === selectedMobileDay) || WEEK_DAYS[0];
+  }, [selectedMobileDay]);
+  
   // Modals
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
@@ -325,25 +337,9 @@ export const ProfessionalAgenda: React.FC = () => {
           </p>
         </div>
 
-        {/* Acciones Rápidas */}
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-end">
-          <button
-            onClick={() => setIsCycleConfigModalOpen(true)}
-            className="py-2 px-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-xs font-bold font-montserrat flex items-center gap-1.5 transition-all shadow-2xs hover:bg-amber-100 dark:hover:bg-amber-900"
-            title="Configurar recordatorios de fin de mesociclo"
-          >
-            <BellRing size={14} className="text-amber-500" />
-            <span>Avisos de Ciclo (7d)</span>
-          </button>
-
-          <button
-            onClick={() => setIsTaskModalOpen(true)}
-            className="py-2 px-3.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold font-montserrat flex items-center gap-1.5 transition-all shadow-2xs active:scale-95"
-          >
-            <CheckSquare size={14} className="text-emerald-500" />
-            <span>+ Nueva Tarea</span>
-          </button>
-
+        {/* Acciones Rápidas Simétricas */}
+        <div className="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+          {/* Botón Principal: Agendar Turno */}
           <button
             onClick={() => {
               setNewApt({
@@ -360,28 +356,48 @@ export const ProfessionalAgenda: React.FC = () => {
               setIsCreatingCustomService(false);
               setIsAppointmentModalOpen(true);
             }}
-            className="py-2 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold font-montserrat flex items-center gap-2 shadow-sm transition-all active:scale-95"
+            className="py-2.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-black font-montserrat flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
           >
             <Plus size={15} />
             <span>+ Agendar Turno</span>
           </button>
+
+          {/* Fila secundaria simétrica en móvil */}
+          <div className="grid grid-cols-2 sm:flex items-center gap-2">
+            <button
+              onClick={() => setIsCycleConfigModalOpen(true)}
+              className="py-2 px-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-[11px] font-bold font-montserrat flex items-center justify-center gap-1.5 transition-all shadow-2xs hover:bg-amber-100 dark:hover:bg-amber-900 active:scale-95 truncate cursor-pointer"
+              title="Configurar recordatorios de fin de mesociclo"
+            >
+              <BellRing size={13} className="text-amber-500 shrink-0" />
+              <span className="truncate">Avisos Ciclo</span>
+            </button>
+
+            <button
+              onClick={() => setIsTaskModalOpen(true)}
+              className="py-2 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-[11px] font-bold font-montserrat flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-95 truncate cursor-pointer"
+            >
+              <CheckSquare size={13} className="text-emerald-500 shrink-0" />
+              <span className="truncate">+ Tarea</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 🌟 2. TARJETAS DE RESUMEN (PEDAGOGÍA VISUAL) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* 🌟 2. TARJETAS DE RESUMEN (PEDAGOGÍA VISUAL SIMÉTRICA) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
         {/* Card 1: Turnos Hoy */}
         <div 
           onClick={() => setActiveTab('SCHEDULE')}
-          className="p-4 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-indigo-400 transition-all"
+          className="h-full min-h-[76px] p-3.5 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-indigo-400 transition-all active:scale-98"
         >
           <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
             <CalendarDays size={18} />
           </div>
-          <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Turnos de Hoy</span>
-            <span className="text-lg font-black text-slate-900 dark:text-white font-montserrat">
-              {stats.todayAptsCount} Citas
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Turnos de Hoy</span>
+            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.todayAptsCount} {stats.todayAptsCount === 1 ? 'Cita' : 'Citas'}
             </span>
           </div>
         </div>
@@ -392,15 +408,15 @@ export const ProfessionalAgenda: React.FC = () => {
             setActiveTab('TASKS');
             setTaskFilter('CYCLE');
           }}
-          className="p-4 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-amber-400 transition-all"
+          className="h-full min-h-[76px] p-3.5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-amber-400 transition-all active:scale-98"
         >
           <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
-            <Hourglass size={18} className="animate-pulse" />
+            <Hourglass size={18} className={stats.expiringCyclesCount > 0 ? "animate-pulse" : ""} />
           </div>
-          <div>
-            <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block">Planes por Vencer</span>
-            <span className="text-lg font-black text-slate-900 dark:text-white font-montserrat">
-              {stats.expiringCyclesCount} Atletas (&lt; 7d)
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block truncate">Por Vencer</span>
+            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.expiringCyclesCount} {stats.expiringCyclesCount === 1 ? 'Ciclo' : 'Ciclos'}
             </span>
           </div>
         </div>
@@ -411,28 +427,28 @@ export const ProfessionalAgenda: React.FC = () => {
             setActiveTab('TASKS');
             setTaskFilter('ALL');
           }}
-          className="p-4 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-blue-400 transition-all"
+          className="h-full min-h-[76px] p-3.5 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-blue-400 transition-all active:scale-98"
         >
           <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
             <ListTodo size={18} />
           </div>
-          <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tareas por Hacer</span>
-            <span className="text-lg font-black text-slate-900 dark:text-white font-montserrat">
-              {stats.pendingTasksCount} Pendientes
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Por Hacer</span>
+            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.pendingTasksCount} {stats.pendingTasksCount === 1 ? 'Tarea' : 'Tareas'}
             </span>
           </div>
         </div>
 
         {/* Card 4: Tareas Listas */}
-        <div className="p-4 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3">
+        <div className="h-full min-h-[76px] p-3.5 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0">
             <CheckCircle2 size={18} />
           </div>
-          <div>
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tareas Listas</span>
-            <span className="text-lg font-black text-slate-900 dark:text-white font-montserrat">
-              {stats.completedTasksCount} Completadas
+          <div className="min-w-0 flex-1">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Tareas Listas</span>
+            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.completedTasksCount} {stats.completedTasksCount === 1 ? 'Hecha' : 'Hechas'}
             </span>
           </div>
         </div>
@@ -522,8 +538,108 @@ export const ProfessionalAgenda: React.FC = () => {
             </div>
           </div>
 
-          {/* Cuadrícula Semanal con Scroll Horizontal Seguro para Móviles */}
-          <div className="bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl overflow-x-auto shadow-xs">
+          {/* MÓVIL: Selector de Día Horizontal + Lista de Horas (< md) */}
+          <div className="md:hidden space-y-3">
+            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+              {WEEK_DAYS.map((day) => {
+                const isSelected = day.key === selectedMobileDay;
+                const todayStr = new Date().toISOString().split('T')[0];
+                const isToday = day.fullDate === todayStr;
+                const dayAptsCount = appointments.filter(a => (a.date === day.fullDate || a.date === day.dateStr) && a.status !== 'CANCELLED').length;
+
+                return (
+                  <button
+                    key={day.key}
+                    onClick={() => setSelectedMobileDay(day.key)}
+                    className={`flex-1 min-w-[46px] py-2 px-1 rounded-2xl border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer ${
+                      isSelected 
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' 
+                        : (isToday 
+                            ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' 
+                            : 'bg-white dark:bg-[#0a0d16] text-slate-700 dark:text-zinc-300 border-slate-200/80 dark:border-zinc-800')
+                    }`}
+                  >
+                    <span className="text-[9px] uppercase font-bold tracking-wider opacity-75">{day.name.slice(0, 3)}</span>
+                    <span className="text-xs font-black font-montserrat mt-0.5">{day.dateStr.split(' ')[0]}</span>
+                    {dayAptsCount > 0 && (
+                      <span className={`text-[8px] font-black px-1.5 py-0.2 rounded-full mt-0.5 ${
+                        isSelected ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300'
+                      }`}>
+                        {dayAptsCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Panel de Horarios del Día Seleccionado en Móvil */}
+            <div className="bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 pb-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                  <span className="text-xs font-black font-montserrat text-slate-900 dark:text-white">
+                    {selectedDayObj.name} {selectedDayObj.dateStr}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setShowFullWeeklyGridMobile(prev => !prev)}
+                  className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <CalendarDays size={12} />
+                  <span>{showFullWeeklyGridMobile ? 'Ocultar Cuadrícula' : 'Ver Cuadrícula 7D'}</span>
+                </button>
+              </div>
+
+              {/* Horarios del Día */}
+              <div className="divide-y divide-slate-100 dark:divide-zinc-900/80 max-h-[420px] overflow-y-auto pr-1">
+                {TIME_SLOTS.map((time) => {
+                  const slotHour = parseInt(time.split(':')[0], 10);
+                  const matchingApt = appointments.find(a => {
+                    const aptHour = parseInt(a.timeStart.split(':')[0], 10);
+                    return (a.date === selectedDayObj.fullDate || a.date === selectedDayObj.dateStr) && aptHour === slotHour;
+                  });
+
+                  if (matchingApt) {
+                    const service = serviceTypes.find(s => s.id === matchingApt.type);
+                    return (
+                      <div key={time} className="py-2.5 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="w-11 text-xs font-mono font-bold text-slate-400 shrink-0">{time}</span>
+                          <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-xs min-w-0">
+                            <span className="text-xs font-black font-montserrat block truncate">{matchingApt.athleteName}</span>
+                            <span className="text-[10px] text-indigo-100 block truncate">{service ? `${service.emoji} ${service.defaultTitle}` : matchingApt.title}</span>
+                          </div>
+                        </div>
+                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
+                          Ocupado
+                        </span>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div key={time} className="py-2 flex items-center justify-between gap-2 group">
+                      <div className="flex items-center gap-2.5">
+                        <span className="w-11 text-xs font-mono font-bold text-slate-400">{time}</span>
+                        <span className="text-xs font-medium text-slate-400 italic">Libre</span>
+                      </div>
+                      <button
+                        onClick={() => handleQuickBookSlot(selectedDayObj.fullDate, time)}
+                        className="py-1 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                      >
+                        <Plus size={12} />
+                        <span>Agendar</span>
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Cuadrícula Semanal con Scroll Horizontal Seguro (Visible en Desktop o al expandir en Móvil) */}
+          <div className={`${showFullWeeklyGridMobile ? 'block' : 'hidden md:block'} bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl overflow-x-auto shadow-xs`}>
             <div className="min-w-[700px]">
             
             {/* Cabecera de Días */}

@@ -68,7 +68,9 @@ export const ActiveClassesWidget: React.FC<ActiveClassesWidgetProps> = ({ isClin
               </span>
             </div>
             <p className={`text-xs ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>
-              {isCollapsed ? `${totalAtletas} alumnos asignados • Toca para desplegar horarios` : 'Horarios, alumnos y retos en curso'}
+              {classesList.length === 0 
+                ? 'Comienza creando tu primera clase o grupo de entrenamiento'
+                : (isCollapsed ? `${totalAtletas} alumnos asignados • Toca para desplegar horarios` : 'Horarios, alumnos y retos en curso')}
             </p>
           </div>
         </div>
@@ -119,8 +121,20 @@ export const ActiveClassesWidget: React.FC<ActiveClassesWidgetProps> = ({ isClin
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className={`overflow-hidden border-t ${isClinical ? 'border-slate-100 bg-slate-50/30' : 'border-zinc-800 bg-zinc-950/30'}`}
           >
-            <div className="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {classesList.map((cls) => (
+            <div className="p-4 sm:p-5">
+              {classesList.length === 0 ? (
+                <div className="py-6 px-4 text-center flex flex-col items-center justify-center space-y-2">
+                  <p className="text-xs text-slate-400">No tienes clases creadas aún.</p>
+                  <button
+                    onClick={() => setIsCreateOpen(true)}
+                    className="py-2 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold font-montserrat shadow-xs transition-all active:scale-95"
+                  >
+                    + Crear Primera Clase
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {classesList.map((cls) => (
                 <motion.div
                   key={cls.id}
                   onClick={() => handleOpenDetail(cls)}
@@ -155,6 +169,8 @@ export const ActiveClassesWidget: React.FC<ActiveClassesWidgetProps> = ({ isClin
                   <ChevronRight size={16} className={`shrink-0 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 transition-all ${isClinical ? 'text-slate-600' : 'text-white'}`} />
                 </motion.div>
               ))}
+                </div>
+              )}
             </div>
           </motion.div>
         )}

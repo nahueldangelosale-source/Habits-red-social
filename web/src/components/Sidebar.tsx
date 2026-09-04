@@ -542,39 +542,45 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
     return (
         <>
-            {/* BARRA LATERAL ESCRITORIO (>= md) */}
-            <motion.aside
-                className={`hidden md:flex flex-col h-screen z-50 fixed left-0 top-0 overflow-x-hidden select-none transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${sidebarBaseClass} ${isCollapsed ? 'w-20' : 'w-72'}`}
-                initial={false}
-            >
-                {renderBody(false)}
-            </motion.aside>
+            {/* BARRA LATERAL ESCRITORIO (EXCLUSIVO >= md, NUNCA VISIBLE EN MÓVIL) */}
+            <div className="hidden md:block select-none">
+                <motion.aside
+                    className={`flex flex-col h-screen z-50 fixed left-0 top-0 overflow-x-hidden transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${sidebarBaseClass} ${isCollapsed ? 'w-20' : 'w-72'}`}
+                    initial={false}
+                >
+                    {renderBody(false)}
+                </motion.aside>
+            </div>
 
             {/* DRAWER MODAL MÓVIL (< md) CON PORTAL GLOBAL FUERA DE APP-CONTAINER */}
             {typeof document !== 'undefined' && createPortal(
                 <AnimatePresence>
                     {isMobileOpen && (
-                        <div className="fixed inset-0 z-[9999] md:hidden">
+                        <div className="fixed inset-0 z-[99999] md:hidden">
                             {/* Fondo oscuro traslúcido */}
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 onClick={onCloseMobile}
-                                className="fixed inset-0 bg-black/70 backdrop-blur-xs cursor-pointer z-[9998]"
+                                className="fixed inset-0 bg-black/80 backdrop-blur-sm cursor-pointer z-[99998]"
                             />
 
-                            {/* Panel deslizable 100% OPACO para evitar superposiciones */}
+                            {/* Panel deslizable 100% OPACO - CERO TRANSPARENCIA */}
                             <motion.aside
                                 initial={{ x: '-100%' }}
                                 animate={{ x: 0 }}
                                 exit={{ x: '-100%' }}
-                                transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                                className={`fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] h-[100dvh] flex flex-col z-[9999] shadow-2xl overflow-hidden select-none ${
+                                transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+                                className={`fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] h-[100dvh] flex flex-col z-[99999] shadow-2xl overflow-hidden select-none ${
                                     isClinicalTheme 
-                                        ? 'bg-white text-slate-900 border-r border-slate-200' 
-                                        : 'bg-[#0c101d] text-white border-r border-white/10'
+                                        ? '!bg-white text-slate-900 border-r border-slate-200' 
+                                        : '!bg-[#0c101d] text-white border-r border-white/10'
                                 }`}
+                                style={{
+                                    backgroundColor: isClinicalTheme ? '#ffffff' : '#0c101d',
+                                    opacity: 1
+                                }}
                             >
                                 {renderBody(true)}
                             </motion.aside>
