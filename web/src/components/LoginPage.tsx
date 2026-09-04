@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, ArrowUpRight, Sparkles, UserPlus } from 'lucide-react';
+import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, ArrowUpRight, Sparkles, UserPlus, User, Dumbbell } from 'lucide-react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { API_BASE_URL } from '../api/client';
 import toast from 'react-hot-toast';
@@ -43,16 +43,33 @@ export const LoginPage = () => {
     const navigate = useNavigate();
     const { login, isAuthenticated } = useAuth();
     const { lang, setLang } = useLanguage();
+    
+    // Selector principal: 'USER' (Soy Usuario) vs 'COACH' (Soy Coach)
+    const [role, setRole] = useState<'USER' | 'COACH'>('USER');
+    const roleRef = useRef<'USER' | 'COACH'>('USER');
+
+    useEffect(() => {
+        roleRef.current = role;
+    }, [role]);
+
+    // Sub-modo: 'login' (Iniciar Sesión) vs 'register' (Crear Cuenta)
     const [mode, setMode] = useState<'login' | 'register'>('login');
     
     // Auto-redirección si ya está autenticado
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/dashboard', { replace: true });
+            const savedUserStr = localStorage.getItem('user');
+            const savedUser = savedUserStr ? JSON.parse(savedUserStr) : null;
+            if (savedUser?.role === 'CLIENT_FITNESS' || savedUser?.role === 'ATHLETE' || savedUser?.role === 'PATIENT') {
+                navigate('/athlete', { replace: true });
+            } else {
+                navigate('/dashboard', { replace: true });
+            }
         }
     }, [isAuthenticated, navigate]);
 
-    // Progressive Profiling: Solo Email + Password en pantalla de acceso
+    // Form inputs
+    const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -75,12 +92,14 @@ export const LoginPage = () => {
             const toastId = toast.loading(lang === 'es' ? 'Validando con Google...' : 'Verifying with Google...');
 
             try {
+                const isUser = roleRef.current === 'USER';
+                const targetRole = isUser ? 'CLIENT_FITNESS' : 'ADMIN';
                 const res = await fetch(`${API_URL}/api/v1/auth/google`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         credential: response.credential,
-                        role: 'ADMIN',
+                        role: targetRole,
                         specialty: 'PERSONAL_TRAINER'
                     })
                 });
@@ -98,15 +117,19 @@ export const LoginPage = () => {
                     throw new Error("No se recibió clave de acceso válida.");
                 }
 
-                // If new user, reset wizard completion so the progressive wizard opens
-                if (data.user?.is_new_user) {
+                if (data.user?.is_new_user && targetRole === 'ADMIN') {
                     localStorage.removeItem('coach_wizard_completed');
                 }
 
                 toast.dismiss(toastId);
                 toast.success(lang === 'es' ? '¡Bienvenido/a a Habits!' : 'Welcome to Habits!');
                 login(data.access_token, data.user);
-                navigate('/dashboard', { replace: true });
+
+                if (targetRole === 'CLIENT_FITNESS' || data.user?.role === 'CLIENT_FITNESS' || data.user?.role === 'ATHLETE') {
+                    navigate('/athlete', { replace: true });
+                } else {
+                    navigate('/dashboard', { replace: true });
+                }
             } catch (err: any) {
                 toast.dismiss(toastId);
                 console.error("Google Auth Error:", err);
@@ -156,9 +179,13 @@ export const LoginPage = () => {
                         }
 
                         if (tokenResponse?.access_token) {
+                            const isUser = roleRef.current === 'USER';
+                            const targetRole = isUser ? 'CLIENT_FITNESS' : 'ADMIN';
                             const toastId = toast.loading(
                                 mode === 'register'
-                                    ? (lang === 'es' ? 'Creando tu espacio de Coach...' : 'Setting up your Coach space...')
+                                    ? (isUser
+                                        ? (lang === 'es' ? 'Creando tu cuenta de Usuario...' : 'Setting up your User profile...')
+                                        : (lang === 'es' ? 'Creando tu espacio de Coach...' : 'Setting up your Coach space...'))
                                     : (lang === 'es' ? 'Iniciando sesión con Google...' : 'Signing in with Google...')
                             );
                             try {
@@ -167,20 +194,24 @@ export const LoginPage = () => {
                                     headers: { 'Content-Type': 'application/json' },
                                     body: JSON.stringify({
                                         credential: tokenResponse.access_token,
-                                        role: 'ADMIN',
+                                        role: targetRole,
                                         specialty: 'PERSONAL_TRAINER'
                                     })
                                 });
 
                                 if (res.ok) {
                                     const data = await res.json();
-                                    if (data.user?.is_new_user) {
+                                    if (data.user?.is_new_user && targetRole === 'ADMIN') {
                                         localStorage.removeItem('coach_wizard_completed');
                                     }
                                     toast.dismiss(toastId);
                                     toast.success(lang === 'es' ? '¡Bienvenido/a a Habits!' : 'Welcome to Habits!');
                                     login(data.access_token, data.user);
-                                    navigate('/dashboard', { replace: true });
+                                    if (targetRole === 'CLIENT_FITNESS' || data.user?.role === 'CLIENT_FITNESS' || data.user?.role === 'ATHLETE') {
+                                        navigate('/athlete', { replace: true });
+                                    } else {
+                                        navigate('/dashboard', { replace: true });
+                                    }
                                 } else {
                                     const errorData = await res.json().catch(() => ({}));
                                     let msg = lang === 'es' ? 'Fallo al autenticar con Google en el servidor.' : 'Failed to authenticate.';
@@ -264,6 +295,10 @@ export const LoginPage = () => {
 
         try {
             if (mode === 'login') {
+                if (!email.trim() || !password) {
+                    throw new Error(lang === 'es' ? 'Por favor completá tu correo y contraseña.' : 'Please enter your email and password.');
+                }
+
                 const formData = new FormData();
                 formData.append('username', email.trim());
                 formData.append('password', password);
@@ -275,7 +310,9 @@ export const LoginPage = () => {
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
-                    let msg = 'Credenciales inválidas. Verificá tu correo y contraseña.';
+                    let msg = lang === 'es' 
+                        ? 'Credenciales inválidas. Verificá tu correo y contraseña.'
+                        : 'Invalid credentials. Please verify your email and password.';
                     if (typeof errorData.detail === 'string') msg = errorData.detail;
                     else if (Array.isArray(errorData.detail)) msg = errorData.detail.map((d: any) => d.msg || d.message).join(', ');
                     throw new Error(msg);
@@ -284,14 +321,22 @@ export const LoginPage = () => {
                 const data = await response.json();
 
                 if (!data.access_token) {
-                    throw new Error("El servidor no devolvió una clave de acceso válida.");
+                    throw new Error(lang === 'es' ? "El servidor no devolvió una clave de acceso válida." : "Invalid access token received.");
                 }
 
-                login(data.access_token, data.user || { email, role: 'ADMIN' });
+                const userRole = data.user?.role;
+                const isAthlete = userRole === 'CLIENT_FITNESS' || userRole === 'ATHLETE' || userRole === 'PATIENT' || (role === 'USER' && userRole !== 'ADMIN');
+
+                login(data.access_token, data.user || { email: email.trim(), role: isAthlete ? 'CLIENT_FITNESS' : 'ADMIN' });
                 toast.success(lang === 'es' ? '¡Bienvenido/a a Habits!' : 'Welcome back!');
-                navigate('/dashboard', { replace: true });
+
+                if (isAthlete) {
+                    navigate('/athlete', { replace: true });
+                } else {
+                    navigate('/dashboard', { replace: true });
+                }
             } else {
-                // Progressive Registration: Registro de Nuevo Coach
+                // Modo 'register' (Crear Cuenta / Registrarse con correo)
                 if (!email.trim() || !password) {
                     throw new Error(lang === 'es' ? 'Por favor completá tu correo electrónico y contraseña.' : 'Please enter your email and password.');
                 }
@@ -299,62 +344,123 @@ export const LoginPage = () => {
                     throw new Error(lang === 'es' ? 'La contraseña debe tener al menos 6 caracteres.' : 'Password must be at least 6 characters.');
                 }
 
-                const response = await fetch(`${API_URL}/api/v1/auth/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: email.trim(),
-                        password,
-                        first_name: 'Coach',
-                        last_name: '',
-                        specialty: 'PERSONAL_TRAINER'
-                    })
-                });
+                const parts = fullName.trim().split(/\s+/);
+                const firstName = parts[0] || (role === 'USER' ? 'Usuario' : 'Coach');
+                const lastName = parts.slice(1).join(' ') || (role === 'USER' ? 'Habits' : '');
 
-                if (response.status === 409) {
-                    // Auto-login instantáneo si ya fue creado con esa clave
-                    const loginFormData = new FormData();
-                    loginFormData.append('username', email.trim());
-                    loginFormData.append('password', password);
-
-                    const loginRes = await fetch(`${API_URL}/token`, {
+                if (role === 'USER') {
+                    // REGISTRO DE USUARIO STANDALONE (B2C)
+                    const response = await fetch(`${API_URL}/api/v1/auth/register-b2c`, {
                         method: 'POST',
-                        body: loginFormData
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: email.trim(),
+                            password,
+                            first_name: firstName,
+                            last_name: lastName
+                        })
                     });
 
-                    if (loginRes.ok) {
-                        const loginData = await loginRes.json();
-                        if (loginData.access_token) {
-                            login(loginData.access_token, loginData.user || { email: email.trim(), role: 'ADMIN' });
-                            toast.success(lang === 'es' ? '¡Sesión iniciada con éxito!' : 'Logged in successfully!');
-                            navigate('/dashboard', { replace: true });
-                            return;
+                    if (response.status === 409) {
+                        // Auto-login instantáneo si ya fue creado con esa clave
+                        const loginFormData = new FormData();
+                        loginFormData.append('username', email.trim());
+                        loginFormData.append('password', password);
+
+                        const loginRes = await fetch(`${API_URL}/token`, {
+                            method: 'POST',
+                            body: loginFormData
+                        });
+
+                        if (loginRes.ok) {
+                            const loginData = await loginRes.json();
+                            if (loginData.access_token) {
+                                login(loginData.access_token, loginData.user || { email: email.trim(), role: 'CLIENT_FITNESS' });
+                                toast.success(lang === 'es' ? '¡Sesión iniciada con éxito!' : 'Logged in successfully!');
+                                navigate('/athlete', { replace: true });
+                                return;
+                            }
                         }
+
+                        setIsEmailAlreadyRegistered(true);
+                        throw new Error(lang === 'es' ? 'Este correo ya está registrado. Ingresá tu contraseña para iniciar sesión.' : 'This email is already registered. Please sign in.');
                     }
 
-                    setIsEmailAlreadyRegistered(true);
-                    throw new Error(lang === 'es' ? 'Este correo ya está registrado. Ingresá tu contraseña para iniciar sesión.' : 'This email is already registered. Please sign in.');
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        let msg = lang === 'es' ? 'Error al registrar la cuenta de Usuario' : 'Error registering user account';
+                        if (typeof errorData.detail === 'string') msg = errorData.detail;
+                        else if (Array.isArray(errorData.detail)) msg = errorData.detail.map((d: any) => d.msg || d.message).join(', ');
+                        throw new Error(msg);
+                    }
+
+                    const data = await response.json();
+                    if (!data.access_token) {
+                        throw new Error(lang === 'es' ? "Cuenta creada pero ocurrió un fallo al iniciar sesión." : "Account created but login failed.");
+                    }
+
+                    login(data.access_token, data.user || { email: email.trim(), role: 'CLIENT_FITNESS' });
+                    toast.success(lang === 'es' ? '¡Cuenta de Usuario creada! Bienvenido/a a Habits.' : 'Account created! Welcome to Habits.');
+                    navigate('/athlete', { replace: true });
+                } else {
+                    // REGISTRO DE COACH MULTI-TENANT (B2B)
+                    const response = await fetch(`${API_URL}/api/v1/auth/register`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: email.trim(),
+                            password,
+                            first_name: firstName,
+                            last_name: lastName,
+                            specialty: 'PERSONAL_TRAINER'
+                        })
+                    });
+
+                    if (response.status === 409) {
+                        // Auto-login instantáneo si ya fue creado con esa clave
+                        const loginFormData = new FormData();
+                        loginFormData.append('username', email.trim());
+                        loginFormData.append('password', password);
+
+                        const loginRes = await fetch(`${API_URL}/token`, {
+                            method: 'POST',
+                            body: loginFormData
+                        });
+
+                        if (loginRes.ok) {
+                            const loginData = await loginRes.json();
+                            if (loginData.access_token) {
+                                login(loginData.access_token, loginData.user || { email: email.trim(), role: 'ADMIN' });
+                                toast.success(lang === 'es' ? '¡Sesión iniciada con éxito!' : 'Logged in successfully!');
+                                navigate('/dashboard', { replace: true });
+                                return;
+                            }
+                        }
+
+                        setIsEmailAlreadyRegistered(true);
+                        throw new Error(lang === 'es' ? 'Este correo ya está registrado como Coach. Ingresá tu contraseña para iniciar sesión.' : 'This email is already registered. Please sign in.');
+                    }
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        let msg = lang === 'es' ? 'Error al registrar la cuenta de Coach' : 'Error registering coach account';
+                        if (typeof errorData.detail === 'string') msg = errorData.detail;
+                        else if (Array.isArray(errorData.detail)) msg = errorData.detail.map((d: any) => d.msg || d.message).join(', ');
+                        throw new Error(msg);
+                    }
+
+                    const data = await response.json();
+
+                    if (!data.access_token) {
+                        throw new Error(lang === 'es' ? "Cuenta creada pero ocurrió un fallo en sesión." : "Account created but login failed.");
+                    }
+
+                    // Reset coach wizard flag so the new coach sees the Progressive Onboarding Tour immediately
+                    localStorage.removeItem('coach_wizard_completed');
+                    login(data.access_token, data.user || { email: email.trim(), role: 'ADMIN' });
+                    toast.success(lang === 'es' ? '¡Cuenta creada! Personalicemos tu espacio...' : 'Account created! Let\'s setup your space...');
+                    navigate('/dashboard', { replace: true });
                 }
-
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}));
-                    let msg = 'Error al registrar la cuenta';
-                    if (typeof errorData.detail === 'string') msg = errorData.detail;
-                    else if (Array.isArray(errorData.detail)) msg = errorData.detail.map((d: any) => d.msg || d.message).join(', ');
-                    throw new Error(msg);
-                }
-
-                const data = await response.json();
-
-                if (!data.access_token) {
-                    throw new Error("Cuenta creada pero fallo en sesión.");
-                }
-
-                // Reset coach wizard flag so the new coach sees the Progressive Onboarding Tour immediately
-                localStorage.removeItem('coach_wizard_completed');
-                login(data.access_token, data.user || { email: email.trim(), role: 'ADMIN' });
-                toast.success(lang === 'es' ? '¡Cuenta creada! Personalicemos tu espacio...' : 'Account created! Let\'s setup your space...');
-                navigate('/dashboard', { replace: true });
             }
         } catch (error: any) {
             console.error("Fallo de Autenticación:", error);
@@ -459,14 +565,50 @@ export const LoginPage = () => {
                         </p>
                     </div>
 
-                    {/* SELECTOR DE MODO: INICIAR SESIÓN / CREAR CUENTA NUEVA */}
-                    <div className="flex bg-slate-100/80 p-1 rounded-2xl border border-slate-200/70 mb-3 text-xs font-black">
+                    {/* SELECTOR PRINCIPAL: SOY USUARIO / SOY COACH */}
+                    <div className="grid grid-cols-2 bg-slate-100/90 p-1 rounded-2xl border border-slate-200/80 mb-2.5 text-xs font-black shadow-2xs">
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setRole('USER');
+                                setError(null);
+                                setIsEmailAlreadyRegistered(false);
+                            }}
+                            className={`flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all cursor-pointer ${
+                                role === 'USER'
+                                    ? 'bg-white text-emerald-600 shadow-xs scale-[1.02] font-black'
+                                    : 'text-slate-500 hover:text-slate-800'
+                            }`}
+                        >
+                            <User size={14} className={role === 'USER' ? 'text-emerald-500' : 'text-slate-400'} />
+                            <span>{lang === 'en' ? 'I am a User' : 'Soy Usuario'}</span>
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setRole('COACH');
+                                setError(null);
+                                setIsEmailAlreadyRegistered(false);
+                            }}
+                            className={`flex items-center justify-center gap-1.5 py-2 rounded-xl transition-all cursor-pointer ${
+                                role === 'COACH'
+                                    ? 'bg-white text-indigo-600 shadow-xs scale-[1.02] font-black'
+                                    : 'text-slate-500 hover:text-slate-800'
+                            }`}
+                        >
+                            <Dumbbell size={14} className={role === 'COACH' ? 'text-indigo-600' : 'text-slate-400'} />
+                            <span>{lang === 'en' ? 'I am a Coach' : 'Soy Coach'}</span>
+                        </button>
+                    </div>
+
+                    {/* SUB-SELECTOR: INICIAR SESIÓN / CREAR CUENTA */}
+                    <div className="flex bg-slate-100/70 p-0.5 rounded-xl border border-slate-200/60 mb-3 text-[11px] font-bold">
                         <button
                             type="button"
                             onClick={handleSwitchToLogin}
-                            className={`flex-1 py-1.5 rounded-xl transition-all cursor-pointer ${
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer ${
                                 mode === 'login'
-                                    ? 'bg-white text-slate-900 shadow-xs'
+                                    ? 'bg-white text-slate-900 shadow-2xs font-black'
                                     : 'text-slate-500 hover:text-slate-700'
                             }`}
                         >
@@ -475,13 +617,13 @@ export const LoginPage = () => {
                         <button
                             type="button"
                             onClick={handleSwitchToRegister}
-                            className={`flex-1 py-1.5 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                            className={`flex-1 py-1 rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1 ${
                                 mode === 'register'
-                                    ? 'bg-white text-indigo-600 shadow-xs'
+                                    ? 'bg-white text-slate-900 shadow-2xs font-black'
                                     : 'text-slate-500 hover:text-slate-700'
                             }`}
                         >
-                            <UserPlus size={13} />
+                            <UserPlus size={12} />
                             <span>{lang === 'en' ? 'Create Account' : 'Crear Cuenta'}</span>
                         </button>
                     </div>
@@ -520,7 +662,7 @@ export const LoginPage = () => {
                     )}
 
                     {/* ═══════════════════════════════════════════════════════════════
-                        BOTÓN OFICIAL RESILIENTE DE GOOGLE SIGN-IN
+                        BOTÓN OFICIAL DE GOOGLE (CONTINUAR / REGISTRARSE)
                        ═══════════════════════════════════════════════════════════════ */}
                     <div className="mb-3">
                         <button
@@ -544,19 +686,47 @@ export const LoginPage = () => {
                     <div className="relative flex items-center justify-center my-3">
                         <div className="border-t border-slate-200/80 w-full" />
                         <span className="bg-white px-2.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 absolute">
-                            {lang === 'es' ? 'o con tu correo' : 'or with email'}
+                            {mode === 'login'
+                                ? (lang === 'es' ? 'o con usuario y contraseña' : 'or with email & password')
+                                : (lang === 'es' ? 'o registrarse con correo' : 'or register with email')}
                         </span>
                     </div>
 
                     {/* ═══════════════════════════════════════════════════════════════
-                        FORMULARIO CON BURBUJAS DE ACCESO / REGISTRO
+                        FORMULARIO CON CAMPOS DINÁMICOS
                        ═══════════════════════════════════════════════════════════════ */}
                     <form onSubmit={handleSubmit} className="space-y-2.5" noValidate>
+                        {mode === 'register' && (
+                            <motion.div 
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                className="space-y-1"
+                            >
+                                <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 block">
+                                    {role === 'USER'
+                                        ? (lang === 'en' ? 'FULL NAME' : 'NOMBRE Y APELLIDO')
+                                        : (lang === 'en' ? 'NAME OR BRAND' : 'NOMBRE O MARCA DE COACH')}
+                                </label>
+                                <div className="relative group">
+                                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                                    <input
+                                        type="text"
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        className="w-full bg-slate-50/90 focus:bg-white border border-slate-200/90 focus:border-indigo-500 rounded-xl py-2 pl-9 pr-3 text-xs font-bold text-slate-900 placeholder:text-slate-400 focus:outline-none transition-all shadow-2xs"
+                                        placeholder={role === 'USER' ? (lang === 'en' ? 'e.g. Alex Smith' : 'Ej. Juan Pérez') : (lang === 'en' ? 'e.g. Coach Alex' : 'Ej. Coach Marcos')}
+                                        required={mode === 'register'}
+                                        autoComplete="name"
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+
                         <div className="space-y-1">
                             <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 block">
                                 {mode === 'register' 
-                                    ? (lang === 'en' ? 'NEW EMAIL ADDRESS' : 'NUEVO CORREO ELECTRÓNICO')
-                                    : (lang === 'en' ? 'OPERATING ID (EMAIL)' : 'CORREO ELECTRÓNICO')}
+                                    ? (lang === 'en' ? 'EMAIL ADDRESS' : 'CORREO ELECTRÓNICO')
+                                    : (lang === 'en' ? 'USERNAME (EMAIL)' : 'USUARIO (CORREO ELECTRÓNICO)')}
                             </label>
                             <div className="relative group">
                                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
@@ -575,7 +745,7 @@ export const LoginPage = () => {
                         <div className="space-y-1">
                             <label className="text-[9px] font-black uppercase tracking-wider text-slate-500 block">
                                 {mode === 'register' 
-                                    ? (lang === 'en' ? 'CHOOSE PASSWORD' : 'CREAR CONTRASEÑA')
+                                    ? (lang === 'en' ? 'CHOOSE PASSWORD (MIN 6 CHARACTERS)' : 'CREAR CONTRASEÑA (MÍNIMO 6 CARACTERES)')
                                     : (lang === 'en' ? 'PASSWORD' : 'CONTRASEÑA')}
                             </label>
                             <div className="relative group">
@@ -597,8 +767,16 @@ export const LoginPage = () => {
                             disabled={isLoading}
                             className="w-full relative group overflow-hidden rounded-2xl p-[1px] shadow-sm hover:shadow-md transition-all active:scale-[0.99] disabled:opacity-70 mt-2 cursor-pointer"
                         >
-                            <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600 rounded-2xl group-hover:scale-105 transition-transform duration-500" />
-                            <div className="relative bg-gradient-to-r from-indigo-600 to-purple-600 rounded-[15px] px-4 py-2.5 flex items-center justify-center gap-2">
+                            <div className={`absolute inset-0 rounded-2xl group-hover:scale-105 transition-transform duration-500 ${
+                                role === 'USER'
+                                    ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600'
+                                    : 'bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-600'
+                            }`} />
+                            <div className={`relative rounded-[15px] px-4 py-2.5 flex items-center justify-center gap-2 ${
+                                role === 'USER'
+                                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600'
+                                    : 'bg-gradient-to-r from-indigo-600 to-purple-600'
+                            }`}>
                                 <span className="font-montserrat font-black text-white text-xs uppercase tracking-wider">
                                     {isLoading ? (
                                         <span className="flex items-center gap-2">
@@ -607,13 +785,44 @@ export const LoginPage = () => {
                                         </span>
                                     ) : (
                                         mode === 'login' 
-                                            ? (lang === 'en' ? 'ENTER PLATFORM' : 'INICIAR SESIÓN')
-                                            : (lang === 'en' ? 'CREATE COACH ACCOUNT' : 'CREAR CUENTA DE COACH')
+                                            ? (role === 'USER'
+                                                ? (lang === 'en' ? 'SIGN IN AS USER' : 'INICIAR SESIÓN COMO USUARIO')
+                                                : (lang === 'en' ? 'SIGN IN AS COACH' : 'INICIAR SESIÓN COMO COACH'))
+                                            : (role === 'USER'
+                                                ? (lang === 'en' ? 'CREATE USER ACCOUNT' : 'CREAR CUENTA DE USUARIO')
+                                                : (lang === 'en' ? 'CREATE COACH ACCOUNT' : 'CREAR CUENTA DE COACH'))
                                     )}
                                 </span>
                                 {!isLoading && <ArrowRight className="w-3.5 h-3.5 text-white/80 group-hover:translate-x-1 transition-transform" />}
                             </div>
                         </button>
+
+                        {/* ENLACE RÁPIDO PARA CAMBIAR ENTRE INICIAR SESIÓN Y REGISTRO */}
+                        <div className="text-center pt-1">
+                            {mode === 'login' ? (
+                                <button
+                                    type="button"
+                                    onClick={handleSwitchToRegister}
+                                    className="text-[11px] text-slate-500 hover:text-slate-800 font-bold transition-colors cursor-pointer"
+                                >
+                                    {lang === 'en' ? 'Don\'t have an account yet? ' : '¿No tienes cuenta aún? '}
+                                    <span className={role === 'USER' ? 'text-emerald-600 font-black underline' : 'text-indigo-600 font-black underline'}>
+                                        {lang === 'en' ? 'Register with email' : 'Registrarse con correo'}
+                                    </span>
+                                </button>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={handleSwitchToLogin}
+                                    className="text-[11px] text-slate-500 hover:text-slate-800 font-bold transition-colors cursor-pointer"
+                                >
+                                    {lang === 'en' ? 'Already have an account? ' : '¿Ya tienes una cuenta? '}
+                                    <span className={role === 'USER' ? 'text-emerald-600 font-black underline' : 'text-indigo-600 font-black underline'}>
+                                        {lang === 'en' ? 'Sign in with email' : 'Iniciar Sesión'}
+                                    </span>
+                                </button>
+                            )}
+                        </div>
                     </form>
 
                     <div className="mt-3.5 pt-2.5 border-t border-slate-200/60 text-center">
