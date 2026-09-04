@@ -1869,3 +1869,24 @@ Se construyó el sistema completo de creacin y edicin de bloques cronometrados (
 - **Sidebar Dinámico:** Avatar, iniciales, nombre y rol resueltos reactivamente desde `useAuth`.
 - **Plataforma Virgen:** Stores vacíos en primer inicio y activación automática del `CoachWelcomeWizardModal`.
 
+## Control de Calidad Operativo - Fase 192: Presentación Global Ágil de Intro, Overlay Sólido Móvil, Agenda Simétrica y Erradicación de Fuga de Estado en Clases
+- **Presentación e Intro Global (`IntroPage.tsx` & `App.tsx`):**
+  - Implementación de fallback estético autónomo con imagotipo mandala geométrico, partículas de luz ambiental y botón de avance rápido *"Comenzar Ahora"*, resolviendo la ausencia de video físico sin bloquear al usuario.
+- **Blindaje Visual de Sidebar Móvil (`Sidebar.tsx` & `MobileNavbar.tsx`):**
+  - Erradicación definitiva de superposición y solapamiento tipográfico al abrir el menú lateral en dispositivos móviles mediante overlay opaco `bg-slate-900/98 backdrop-blur-2xl z-50` con aislamiento de capas y captura de eventos.
+- **Agenda Semanal Simétrica y Depurada (`SmartCalendarPage.tsx` & `CalendarDayView.tsx`):**
+  - Refactorización de proporciones y paddings para móvil eliminando desbordes horizontales, con depuración de datos residuales o hardcodeados.
+- **Erradicación de Fuga de Estado en Clases & Grupos (`useAgendaStore.ts`):**
+  - Inicialización limpia de colecciones evitando el parpadeo de datos mock previos antes del renderizado de estado vacío (*Empty State*).
+
+## Control de Calidad Operativo - Fase 193: Selector Dual "Soy Usuario" / "Soy Coach" & Autenticación Contextual con Google y Correo
+- **Selector de Rol de Primer Nivel (`LoginPage.tsx`):**
+  - Sustitución de pestañas genéricas por el selector de intención directa: `[ 👤 Soy Usuario ]` (Atleta / Alumno / B2C) y `[ ⚡ Soy Coach ]` (Entrenador / Nutricionista / Profesional B2B).
+- **Sub-Flujos de Acceso & Creación de Cuenta:**
+  - **Iniciar Sesión:** Botón *"Continuar con Google"* o campos de *"Usuario (Correo Electrónico)"* y *"Contraseña"*, con redirección contextual automática (`/athlete` para Atletas, `/dashboard` para Coaches).
+  - **Crear Cuenta:** Botón *"Registrarse con Google"* o *"Registrarse con correo"* con campo dinámico de Nombre y Apellido (o Nombre/Marca de Coach) despachando a `POST /api/v1/auth/register-b2c` o `POST /api/v1/auth/register`.
+- **Resiliencia & Auto-Login en Conflicto (HTTP 409):**
+  - Detección de correo existente con intento de login automático o botón de acción directa *"Ir a Iniciar Sesión"*.
+- **Liquid Glass & Ergonomía Móvil:**
+  - Adaptabilidad edge-to-edge en pantallas móviles y card centrada flotante con física 3D en escritorio.
+

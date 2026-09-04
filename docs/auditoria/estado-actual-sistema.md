@@ -981,3 +981,29 @@ graph TD
 - **Verificación de Compilación Integral:**
   - Frontend: `npx tsc --noEmit` $\rightarrow$ **0 errores (Exit code 0)**.
   - HMR de Vite y backend FastAPI funcionando sincronizadamente.
+
+## 111. Presentación Global Ágil de Intro, Overlay Sólido Móvil, Agenda Simétrica y Erradicación de Fuga de Estado en Clases (Fase 192)
+- **Presentación e Intro Global:**
+  - Fallback visual en `IntroPage.tsx` con mandala sagrado interactivo, orbes luminosos y botón *"Comenzar Ahora"*, asegurando que la falta de archivo físico de video no interrumpa la bienvenida.
+- **Blindaje Visual de Menú Lateral en Móvil:**
+  - En `Sidebar.tsx` y `MobileNavbar.tsx`, incorporación de telón de fondo sólido opaco (`bg-slate-900/98 backdrop-blur-2xl z-50`), eliminando solapamiento de tipografías con el contenido posterior.
+- **Agenda Semanal Móvil Simétrica:**
+  - Optimización de layout en `SmartCalendarPage.tsx` y `CalendarDayView.tsx` con tarjetas estilizadas, bordes armónicos y limpieza de datos residuales.
+- **Erradicación de Fuga de Estado en Clases:**
+  - `useAgendaStore.ts` con estado inicial limpio, eliminando el parpadeo de datos residuales previo al estado vacío (*Empty State*).
+
+## 112. Selector Dual "Soy Usuario" / "Soy Coach" & Autenticación Contextual con Google y Correo (Fase 193)
+- **Selector de Rol Primario:**
+  - `[ 👤 Soy Usuario ]` (Atleta / Alumno / B2C) y `[ ⚡ Soy Coach ]` (Entrenador / Nutricionista / Profesional B2B) en `LoginPage.tsx`.
+- **Sub-Modos Intuitivos para Cada Perfil:**
+  - **Iniciar Sesión:**
+    - *"Continuar con Google"* o Usuario (correo) y Contraseña.
+    - Redirección reactiva: Atletas a `/athlete`, Coaches a `/dashboard`.
+  - **Crear Cuenta:**
+    - *"Registrarse con Google"* o *"Registrarse con correo"*.
+    - Campos dinámicos con Nombre y Apellido (o Nombre/Marca de Coach), Correo y Contraseña.
+    - Conexión con `POST /api/v1/auth/register-b2c` y `POST /api/v1/auth/register`.
+- **Manejo de Errores & Resiliencia (HTTP 409):**
+  - Auto-login automático o enlace rápido hacia inicio de sesión si el correo ya está registrado.
+- **Validación de Compilación:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.

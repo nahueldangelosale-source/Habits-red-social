@@ -1340,4 +1340,70 @@ Este roadmap estratégico traza la ruta crítica para llevar los Flujos de Valor
   - Generación inmediata del link de invitación para alumnos vía WhatsApp.
 
 
+## FASE 187: MARCO CIENTÍFICO DE HIPERTROFIA & BIOMECÁNICA AVANZADA (COMPLETADA ✅)
+- **Corpus Científico de ~50 Papers:**
+  - Síntesis e integración de la evidencia más sólida en hipertrofia y fuerza (Schoenfeld, Helms, Israetel, Beardsley, Zourdos, Henselmans).
+  - Stretch-Mediated Hypertrophy (SMH): priorización de variantes en máximo estiramiento sarcomérico para mayor hipertrofia distal.
+  - Control de Carga Axial: umbral de $\le 15$ puntos acumulados para evitar sobrecarga en columna baja (L4-S1).
+  - Landmarks de Volumen Fraccional: MEV, MAV, MRV con ratio 1.0 a agonistas y 0.5 a sinergistas.
+  - Presets de periodización con base científica: DUP 3d, GBR 4d, PPL 6d, PHAT 5d.
+
+
+## FASE 188: SUPRESIÓN DE ALERTA MOLESTA DE SOBREENTRENAMIENTO (COMPLETADA ✅)
+- **Eliminación de Fricción Cognitiva:**
+  - Erradicación definitiva de banners y modales intrusivos de "Riesgo de Sobreentrenamiento" que bloqueaban la interacción del usuario al superar hitos temporales.
+  - Transformación a monitoreo silencioso y constructivo en la barra de series por grupo muscular.
+
+
+## FASE 189: CORTAFUEGOS CLÍNICO LUMBAR, HOMBRO Y RODILLA EN GENERADOR (COMPLETADA ✅)
+- **Blindaje Clínico en Generación Automática:**
+  - Detección de lesiones y limitaciones del atleta (`injuries_or_limitations`: 'lumbar', 'shoulder', 'knee').
+  - Sustituciones automáticas seguras en `routineGeneratorEngine.ts`: sentadillas/peso muerto con barra $\rightarrow$ Prensa 45°, Belt Squat, Hip Thrust, RDL con mancuernas; press militar $\rightarrow$ Scaption 30° con mancuernas, Floor Press; sentadilla clásica $\rightarrow$ Spanish Squat o Prensa con pies altos.
+
+
+## FASE 190: MOTOR CANÓNICO WEIDER CLÁSICO DE 3 DÍAS (COMPLETADA ✅)
+- **Rutina Clásica Canónica (`generate3DayClassicWeider`):**
+  - Día 1: Pecho / Tríceps + Calentamiento RAMP específico + Core 360° + Vuelta a la calma.
+  - Día 2: Espalda / Bíceps + RAMP específico + Core 360° + Vuelta a la calma.
+  - Día 3: Piernas / Hombros + RAMP específico + Core 360° + Vuelta a la calma.
+  - Distribución por tiers: Compuestos pesados T1, Secundarios T2, Accesorios de aislamiento / SMH T3, Core y estiramientos.
+  - Compatibilidad 100% con el cortafuegos clínico.
+
+
+## FASE 191: REDISEÑO UX DE "DISTRIBUCIÓN SEMANAL" & SINCRONIZACIÓN CON ONBOARDING (COMPLETADA ✅)
+- **Higiene Semántica & Pedagogía Visual:**
+  - Reemplazo absoluto del término "Split" por "Distribución Semanal".
+  - Explicación pedagógica visual: regla de oro de 48 horas de recuperación muscular.
+  - Botones con etiquetas diferenciadas y limpias (`Clásica (3d)`, `Full Body (3d)`, `Torso / Pierna (4d)`, `Híbrido (5d)`, `PPL x 2 (6d)`).
+- **Sincronización Reactiva con Onboarding:**
+  - Detección de `training.days_per_week` de `useOnboardingPTStore`. Preselección automática al abrir el constructor de rutinas.
+  - Insignia interactiva: `🎯 Preferencia del cliente: X días/semana` y badge `🎯 Onboarding` en el botón correspondiente.
+- **Ergonomía Superior de Acciones:**
+  - Reubicación de `[ 📅 Diseñar Ciclo a Medida (Librería) ]` y `[ 🎓 Ver Guía de Periodización ]` en la cabecera superior.
+  - Panel desplegable de Guía de Periodización en la parte superior sin provocar scroll forzado.
+
+
+## FASE 192: PRESENTACIÓN GLOBAL ÁGIL DE INTRO, OVERLAY SÓLIDO MÓVIL, AGENDA SIMÉTRICA Y ERRADICACIÓN DE FUGA DE ESTADO EN CLASES (COMPLETADA ✅)
+- **Presentación e Intro Global (`IntroPage.tsx` & `App.tsx`):**
+  - Fallback estético con imagotipo mandala geométrico, partículas de luz ambiental y botón de avance rápido *"Comenzar Ahora"*, asegurando que la falta de archivo físico de video no interrumpa la bienvenida.
+- **Blindaje Visual de Sidebar Móvil (`Sidebar.tsx` & `MobileNavbar.tsx`):**
+  - Erradicación definitiva de superposición y solapamiento tipográfico al abrir el menú lateral en dispositivos móviles mediante overlay opaco `bg-slate-900/98 backdrop-blur-2xl z-50` con aislamiento de capas y captura de eventos.
+- **Agenda Semanal Simétrica y Depurada (`SmartCalendarPage.tsx` & `CalendarDayView.tsx`):**
+  - Refactorización de proporciones y paddings para móvil eliminando desbordes horizontales, con depuración de datos residuales o hardcodeados.
+- **Erradicación de Fuga de Estado en Clases & Grupos (`useAgendaStore.ts`):**
+  - Inicialización limpia de colecciones evitando el parpadeo de datos mock previos antes del renderizado de estado vacío (*Empty State*).
+
+
+## FASE 193: SELECTOR DUAL "SOY USUARIO" / "SOY COACH" & AUTENTICACIÓN CONTEXTUAL CON GOOGLE Y CORREO (COMPLETADA ✅)
+- **Selector de Rol de Primer Nivel (`LoginPage.tsx`):**
+  - Sustitución de pestañas genéricas por el selector de intención directa: `[ 👤 Soy Usuario ]` (Atleta / Alumno / B2C) y `[ ⚡ Soy Coach ]` (Entrenador / Nutricionista / Profesional B2B).
+- **Sub-Flujos de Acceso & Creación de Cuenta:**
+  - **Iniciar Sesión:** Botón *"Continuar con Google"* o campos de *"Usuario (Correo Electrónico)"* y *"Contraseña"*, con redirección contextual automática (`/athlete` para Atletas, `/dashboard` para Coaches).
+  - **Crear Cuenta:** Botón *"Registrarse con Google"* o *"Registrarse con correo"* con campo dinámico de Nombre y Apellido (o Nombre/Marca de Coach) despachando a `POST /api/v1/auth/register-b2c` o `POST /api/v1/auth/register`.
+- **Resiliencia & Auto-Login en Conflicto (HTTP 409):**
+  - Detección de correo existente con intento de login automático o botón de acción directa *"Ir a Iniciar Sesión"*.
+- **Liquid Glass & Ergonomía Móvil:**
+  - Adaptabilidad edge-to-edge en pantallas móviles y card centrada flotante con física 3D en escritorio.
+
+
 
