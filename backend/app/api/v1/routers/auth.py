@@ -397,19 +397,43 @@ async def google_auth(
     if not credential:
         raise HTTPException(status_code=400, detail="Token de Google requerido")
 
-    # 1. Verify token with Google's tokeninfo endpoint
+    # 1. Verify token with Google (supports both JWT ID Token and OAuth2 Access Token)
+    google_data = None
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={credential}")
-            if resp.status_code != 200:
+            if credential.count(".") == 2:
+                # JWT ID Token (e.g. from Google 1-Tap)
+                resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?id_token={credential}")
+                if resp.status_code == 200:
+                    google_data = resp.json()
+            else:
+                # OAuth2 Access Token (from Google Identity Services initTokenClient popup)
+                resp = await client.get(
+                    "https://www.googleapis.com/oauth2/v3/userinfo",
+                    headers={"Authorization": f"Bearer {credential}"}
+                )
+                if resp.status_code == 200:
+                    google_data = resp.json()
+                    # Also fetch tokeninfo to verify aud/azp
+                    t_resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?access_token={credential}")
+                    if t_resp.status_code == 200:
+                        t_data = t_resp.json()
+                        google_data["aud"] = t_data.get("aud") or t_data.get("azp")
+                else:
+                    # Fallback to tokeninfo with access_token
+                    t_resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?access_token={credential}")
+                    if t_resp.status_code == 200:
+                        google_data = t_resp.json()
+
+            if not google_data:
                 raise HTTPException(status_code=401, detail="Token de Google inválido o expirado")
-            google_data = resp.json()
     except httpx.RequestError as e:
         raise HTTPException(status_code=503, detail=f"Error al conectar con Google: {str(e)}")
 
-    # Validate audience claim — reject tokens issued for other applications
-    expected_client_id = get_settings().google_client_id
-    if expected_client_id and google_data.get("aud") != expected_client_id:
+    # Validate audience claim if present — reject tokens issued for other applications
+    expected_client_id = get_settings().google_client_id.strip().strip('"').strip("'") if get_settings().google_client_id else ""
+    token_aud = google_data.get("aud")
+    if expected_client_id and token_aud and token_aud != expected_client_id:
         raise HTTPException(
             status_code=401,
             detail="Token de Google no autorizado para esta aplicación"

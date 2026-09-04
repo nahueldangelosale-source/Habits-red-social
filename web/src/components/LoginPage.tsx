@@ -183,8 +183,12 @@ export const LoginPage = () => {
                                     login(data.access_token, data.user);
                                     navigate('/dashboard', { replace: true });
                                 } else {
+                                    const errorData = await res.json().catch(() => ({}));
+                                    let msg = lang === 'es' ? 'Fallo al autenticar con Google en el servidor.' : 'Failed to authenticate.';
+                                    if (typeof errorData.detail === 'string') msg = errorData.detail;
                                     toast.dismiss(toastId);
-                                    toast.error(lang === 'es' ? 'Fallo al autenticar con Google en el servidor.' : 'Failed to authenticate.');
+                                    toast.error(msg);
+                                    setError(msg);
                                 }
                             } catch (e: any) {
                                 toast.dismiss(toastId);
