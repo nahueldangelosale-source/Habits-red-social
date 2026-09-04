@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, ArrowUpRight, Sparkles, UserPlus } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { API_BASE_URL } from '../api/client';
 import toast from 'react-hot-toast';
 
@@ -56,6 +56,16 @@ export const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
+    // Presentación Intro Pantalla Completa (video intro-habits.mp4 acelerado)
+    const [showIntroPresentation, setShowIntroPresentation] = useState(true);
+    const introVideoRef = useRef<HTMLVideoElement>(null);
+
+    useEffect(() => {
+        if (showIntroPresentation && introVideoRef.current) {
+            introVideoRef.current.playbackRate = 1.35;
+        }
+    }, [showIntroPresentation]);
+
     const [isLoading, setIsLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -367,18 +377,92 @@ export const LoginPage = () => {
     return (
         <div className="min-h-[100dvh] w-full flex items-center justify-center p-0 sm:p-4 font-sans relative overflow-y-auto bg-gradient-to-b from-[#F3F5FA] via-[#F8FAFD] to-[#EDF2FA] text-slate-900 select-none">
             
-            {/* VIDEO BACKGROUND / PRESENTATION */}
-            <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-multiply"
-                src="/intro-habits.mp4"
-                onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                }}
-            />
+            {/* 🌟 OVERLAY PRESENTACIÓN INTRO VIDEO (APENAS CARGA LA WEB ANTES DEL LOGIN) */}
+            <AnimatePresence>
+                {showIntroPresentation && (
+                    <motion.div
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0, scale: 1.03 }}
+                        transition={{ duration: 0.45, ease: 'easeInOut' }}
+                        className="fixed inset-0 z-50 bg-black flex flex-col justify-between p-6 sm:p-10 select-none overflow-hidden"
+                    >
+                        {/* Video de Fondo con Reproducción Acelerada */}
+                        <video
+                            ref={introVideoRef}
+                            autoPlay
+                            muted
+                            playsInline
+                            onEnded={() => setShowIntroPresentation(false)}
+                            onError={() => setShowIntroPresentation(false)}
+                            className="absolute inset-0 w-full h-full object-cover"
+                            src="/intro-habits.mp4"
+                        />
+
+                        {/* Capa de contraste y gradiente ambiental */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-black/70 pointer-events-none" />
+
+                        {/* Header con Branding y Botón Saltar */}
+                        <div className="relative z-10 w-full max-w-4xl mx-auto flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                                <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-md p-1.5 border border-white/20 shadow-lg flex items-center justify-center">
+                                    <img 
+                                        src="/logo-habits-transparent.png" 
+                                        alt="Habits" 
+                                        className="w-full h-full object-contain"
+                                        onError={(e) => { e.currentTarget.src = '/logo.png'; }}
+                                    />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="font-heading font-black text-xl text-white tracking-tight flex items-baseline leading-none">
+                                        Habits
+                                        <span className="text-transparent bg-clip-text bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-500 text-2xl ml-0.5 font-black">
+                                            .
+                                        </span>
+                                    </span>
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-white/80">
+                                        Tu Red Social Saludable
+                                    </span>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setShowIntroPresentation(false)}
+                                className="py-2 px-4 rounded-full bg-white/15 hover:bg-white/25 backdrop-blur-md border border-white/25 text-white text-xs font-black font-montserrat tracking-wide transition-all active:scale-95 cursor-pointer shadow-lg"
+                            >
+                                Saltar Intro ✕
+                            </button>
+                        </div>
+
+                        {/* Titular y CTA de Entrada Instantánea */}
+                        <div className="relative z-10 w-full max-w-md mx-auto text-center flex flex-col items-center space-y-4">
+                            <motion.div
+                                initial={{ opacity: 0, y: 15 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 }}
+                                className="space-y-1"
+                            >
+                                <span className="inline-block py-1 px-3 rounded-full bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 text-[10px] font-black tracking-widest uppercase backdrop-blur-md">
+                                    Plataforma Integral de Salud & Fitness
+                                </span>
+                                <h2 className="text-2xl sm:text-3xl font-black font-heading text-white tracking-tight drop-shadow-md">
+                                    Bienvenido a Habits
+                                </h2>
+                            </motion.div>
+
+                            <motion.button
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: 0.4 }}
+                                onClick={() => setShowIntroPresentation(false)}
+                                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-rose-600 hover:from-indigo-500 hover:to-rose-500 text-white font-montserrat font-black text-sm tracking-wide shadow-[0_0_35px_rgba(99,102,241,0.6)] flex items-center justify-center gap-2 group transition-all active:scale-95 cursor-pointer"
+                            >
+                                <span>Ingresar a la Plataforma</span>
+                                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                            </motion.button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* MALLA AMBIENTAL CLÍNICA SOFT */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">

@@ -6,17 +6,19 @@ import {
     CalendarDays, 
     Users, 
     MessageSquare, 
-    Menu 
+    Menu,
+    X
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useValidationsStore } from '../../stores/coach/useValidationsStore';
 import { useCoachCommunicationStore } from '../../stores/useCoachCommunicationStore';
 
 interface CoachBottomNavProps {
-    onOpenMenu: () => void;
+    isOpen?: boolean;
+    onToggleMenu: () => void;
 }
 
-export const CoachBottomNav: React.FC<CoachBottomNavProps> = ({ onOpenMenu }) => {
+export const CoachBottomNav: React.FC<CoachBottomNavProps> = ({ isOpen = false, onToggleMenu }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const { mode } = useTheme();
@@ -60,11 +62,11 @@ export const CoachBottomNav: React.FC<CoachBottomNavProps> = ({ onOpenMenu }) =>
         },
         {
             id: 'menu',
-            label: 'Menú',
-            icon: Menu,
+            label: isOpen ? 'Cerrar' : 'Menú',
+            icon: isOpen ? X : Menu,
             path: null,
-            isActive: false,
-            onClick: onOpenMenu,
+            isActive: isOpen,
+            onClick: onToggleMenu,
         }
     ];
 

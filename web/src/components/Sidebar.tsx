@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -355,10 +356,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <button
                             onClick={onCloseMobile}
                             aria-label="Cerrar menú"
-                            className={`p-2 rounded-xl transition-colors shrink-0 ${
+                            className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all active:scale-90 shrink-0 ${
                                 isClinicalTheme 
-                                    ? 'text-slate-400 hover:bg-slate-100 hover:text-slate-700' 
-                                    : 'text-zinc-400 hover:bg-white/10 hover:text-white'
+                                    ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' 
+                                    : 'bg-white/10 hover:bg-white/20 text-white'
                             }`}
                         >
                             <X size={20} />
@@ -549,32 +550,39 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {renderBody(false)}
             </motion.aside>
 
-            {/* DRAWER MODAL MÓVIL (< md) */}
-            <AnimatePresence>
-                {isMobileOpen && (
-                    <div className="fixed inset-0 z-50 md:hidden">
-                        {/* Fondo oscuro traslúcido */}
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={onCloseMobile}
-                            className="fixed inset-0 bg-black/60 backdrop-blur-xs cursor-pointer"
-                        />
+            {/* DRAWER MODAL MÓVIL (< md) CON PORTAL GLOBAL FUERA DE APP-CONTAINER */}
+            {typeof document !== 'undefined' && createPortal(
+                <AnimatePresence>
+                    {isMobileOpen && (
+                        <div className="fixed inset-0 z-[9999] md:hidden">
+                            {/* Fondo oscuro traslúcido */}
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={onCloseMobile}
+                                className="fixed inset-0 bg-black/70 backdrop-blur-xs cursor-pointer z-[9998]"
+                            />
 
-                        {/* Panel deslizable */}
-                        <motion.aside
-                            initial={{ x: '-100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '-100%' }}
-                            transition={{ type: 'spring', damping: 26, stiffness: 280 }}
-                            className={`fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] h-full flex flex-col z-50 shadow-2xl overflow-hidden select-none ${sidebarBaseClass}`}
-                        >
-                            {renderBody(true)}
-                        </motion.aside>
-                    </div>
-                )}
-            </AnimatePresence>
+                            {/* Panel deslizable 100% OPACO para evitar superposiciones */}
+                            <motion.aside
+                                initial={{ x: '-100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '-100%' }}
+                                transition={{ type: 'spring', damping: 26, stiffness: 280 }}
+                                className={`fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] h-[100dvh] flex flex-col z-[9999] shadow-2xl overflow-hidden select-none ${
+                                    isClinicalTheme 
+                                        ? 'bg-white text-slate-900 border-r border-slate-200' 
+                                        : 'bg-[#0c101d] text-white border-r border-white/10'
+                                }`}
+                            >
+                                {renderBody(true)}
+                            </motion.aside>
+                        </div>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </>
     );
 };

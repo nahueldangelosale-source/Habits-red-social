@@ -24,39 +24,6 @@ interface ValidationsActions {
     getPendingCount: () => number;
 }
 
-const MOCK_INITIAL_QUEUE: ValidationTask[] = [
-    {
-        id: "v-1",
-        client_id: "c-1",
-        client_name: "Gonzalo Quesada",
-        video_url: "https://www.w3schools.com/html/mov_bbb.mp4",
-        priority: "P1",
-        exercise_name: "Back Squat",
-        weight_kg: 160,
-        message: "Dolor agudo lumbar detectado en la fase excéntrica. Posible retroversión pélvica."
-    },
-    {
-        id: "v-2",
-        client_id: "c-2",
-        client_name: "Martina Silva",
-        video_url: "https://www.w3schools.com/html/mov_bbb.mp4",
-        priority: "P2",
-        exercise_name: "Deadlift",
-        weight_kg: 90,
-        message: "Pérdida de tensión en el core (bracing). Sugiere revisión."
-    },
-    {
-        id: "v-3",
-        client_id: "c-3",
-        client_name: "Federico Mancuello",
-        video_url: "https://www.w3schools.com/html/mov_bbb.mp4",
-        priority: "P3",
-        exercise_name: "Bench Press",
-        weight_kg: 110,
-        message: "Ejecución perfecta. ACWR estable."
-    }
-];
-
 export const useValidationsStore = create<ValidationsState & ValidationsActions>()(
     devtools(
         immer((set, get) => ({

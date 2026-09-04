@@ -1,15 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, Dumbbell, Activity } from 'lucide-react';
+import { Menu, Dumbbell, Activity, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useRBAC } from '../../context/RBACContext';
 import { useTheme } from '../../context/ThemeContext';
 
 interface CoachMobileHeaderProps {
-    onOpenMenu: () => void;
+    isOpen?: boolean;
+    onToggleMenu: () => void;
 }
 
-export const CoachMobileHeader: React.FC<CoachMobileHeaderProps> = ({ onOpenMenu }) => {
+export const CoachMobileHeader: React.FC<CoachMobileHeaderProps> = ({ isOpen = false, onToggleMenu }) => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const { activeWorkspace, setWorkspace } = useRBAC();
@@ -95,7 +96,7 @@ export const CoachMobileHeader: React.FC<CoachMobileHeaderProps> = ({ onOpenMenu
 
                 {/* Avatar Initials */}
                 <div 
-                    onClick={onOpenMenu}
+                    onClick={onToggleMenu}
                     className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-rose-500 text-white font-bold text-xs flex items-center justify-center shadow-xs cursor-pointer active:scale-95"
                     title={displayName}
                 >
@@ -104,15 +105,17 @@ export const CoachMobileHeader: React.FC<CoachMobileHeaderProps> = ({ onOpenMenu
 
                 {/* Hamburger Drawer Toggle */}
                 <button
-                    onClick={onOpenMenu}
-                    aria-label="Abrir menú"
+                    onClick={onToggleMenu}
+                    aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
                     className={`p-2 rounded-xl transition-colors active:scale-95 ${
-                        isClinical 
-                            ? 'text-slate-700 hover:bg-slate-100' 
-                            : 'text-zinc-300 hover:bg-white/10'
+                        isOpen
+                            ? 'bg-indigo-500/15 text-indigo-600 dark:text-indigo-400'
+                            : isClinical 
+                                ? 'text-slate-700 hover:bg-slate-100' 
+                                : 'text-zinc-300 hover:bg-white/10'
                     }`}
                 >
-                    <Menu size={20} />
+                    {isOpen ? <X size={20} /> : <Menu size={20} />}
                 </button>
             </div>
         </header>

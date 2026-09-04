@@ -395,8 +395,17 @@ export const useCoachCommunicationStore = create<CoachCommunicationState>()(
         }
       }),
       {
-        name: 'bienestar-coach-communication-store'
+        name: 'bienestar-coach-communication-v2'
       }
     )
   )
 );
+
+// Purgar storage anterior con mock data '3' para que todo empiece en 0
+if (typeof window !== 'undefined') {
+  try {
+    localStorage.removeItem('bienestar-coach-communication-store');
+  } catch {
+    // Ignore storage restrictions
+  }
+}

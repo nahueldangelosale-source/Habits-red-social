@@ -130,7 +130,10 @@ export const AppLayout: React.FC = () => {
                 />
 
                 {/* COACH MOBILE TOP HEADER (< md) */}
-                <CoachMobileHeader onOpenMenu={() => setIsMobileMenuOpen(true)} />
+                <CoachMobileHeader 
+                    isOpen={isMobileMenuOpen}
+                    onToggleMenu={() => setIsMobileMenuOpen(prev => !prev)} 
+                />
 
                 <div className={`app-container relative z-10 min-h-screen transition-all duration-1000 has-sidebar ${isSidebarCollapsed ? 'sidebar-collapsed' : ''
                     } ${isClinical ? 'bg-clinical-mesh' : calmMode ? 'bg-slate-950 text-slate-400' : 'bg-transparent'
@@ -161,7 +164,10 @@ export const AppLayout: React.FC = () => {
                 </div>
 
                 {/* COACH MOBILE BOTTOM DOCK (< md) */}
-                <CoachBottomNav onOpenMenu={() => setIsMobileMenuOpen(true)} />
+                <CoachBottomNav 
+                    isOpen={isMobileMenuOpen}
+                    onToggleMenu={() => setIsMobileMenuOpen(prev => !prev)} 
+                />
             </RBACProvider>
     );
 };
