@@ -11,7 +11,7 @@ import {
   MoreVertical, ArrowLeft, Clock, Shield, Apple, Dumbbell,
   Sparkles, ExternalLink, Info, CheckCircle2, Cloud,
   Share2, DownloadCloud, FileUp, Salad, ChefHat, BookOpen,
-  HelpCircle, Link as LinkIcon, Download, Edit3, Flame
+  HelpCircle, Link as LinkIcon, Download, Edit3, Flame, Database
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TemplatePreview } from './TemplatePreview';
@@ -200,10 +200,19 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onSwitchToRout
         </div>
 
         {/* Acciones Globales: Guía de Uso & Importar Código */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => navigate('/import')}
+            className="px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold text-xs flex items-center gap-1.5 border border-amber-200/80 dark:border-amber-500/20 transition-all shadow-2xs cursor-pointer"
+            title="Importar clientes, rutinas y planes desde Excel, CSV o PDF"
+          >
+            <Database size={14} className="text-amber-500" />
+            <span>Importador Masivo</span>
+          </button>
+
           <button
             onClick={() => setIsImportModalOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-xs flex items-center gap-1.5 border border-slate-200 dark:border-zinc-800 transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-zinc-900 hover:bg-slate-200 dark:hover:bg-zinc-800 text-slate-700 dark:text-zinc-300 font-bold text-xs flex items-center gap-1.5 border border-slate-200 dark:border-zinc-800 transition-colors cursor-pointer"
           >
             <DownloadCloud size={14} className="text-indigo-500" />
             <span>Importar Código</span>
@@ -211,7 +220,7 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onSwitchToRout
 
           <button
             onClick={() => setIsWelcomeWizardOpen(true)}
-            className="px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold text-xs flex items-center gap-1.5 border border-indigo-200/80 dark:border-indigo-500/20 transition-colors"
+            className="px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-bold text-xs flex items-center gap-1.5 border border-indigo-200/80 dark:border-indigo-500/20 transition-colors cursor-pointer"
           >
             <HelpCircle size={14} />
             <span>Guía Rápida</span>
@@ -320,6 +329,24 @@ export const TemplateLibrary: React.FC<TemplateLibraryProps> = ({ onSwitchToRout
                     <div>
                       <p className="font-bold">Subir Documento o Guía</p>
                       <p className="text-[10px] text-slate-500 dark:text-zinc-400">PDF, Word o Drive</p>
+                    </div>
+                  </button>
+
+                  <div className="h-px bg-slate-100 dark:bg-zinc-800 my-1" />
+
+                  <button 
+                    onClick={() => {
+                      setIsCreateOpen(false);
+                      navigate('/import');
+                    }}
+                    className="w-full text-left p-2 text-xs text-slate-700 dark:text-zinc-200 hover:bg-amber-50 dark:hover:bg-amber-950/40 rounded-xl flex items-center gap-3 transition-colors"
+                  >
+                    <div className="bg-amber-100 dark:bg-amber-900/50 p-1.5 rounded-lg text-amber-600 dark:text-amber-400">
+                      <Database size={15} />
+                    </div>
+                    <div>
+                      <p className="font-bold">Importador Masivo</p>
+                      <p className="text-[10px] text-slate-500 dark:text-zinc-400">Excel, CSV o PDF con IA</p>
                     </div>
                   </button>
                 </motion.div>

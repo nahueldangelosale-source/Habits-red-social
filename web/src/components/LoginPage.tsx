@@ -365,8 +365,21 @@ export const LoginPage = () => {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center p-3 sm:p-4 font-sans relative overflow-y-auto bg-gradient-to-b from-[#F3F5FA] via-[#F8FAFD] to-[#EDF2FA] text-slate-900 select-none py-8">
+        <div className="min-h-[100dvh] w-full flex items-center justify-center p-0 sm:p-4 font-sans relative overflow-y-auto bg-gradient-to-b from-[#F3F5FA] via-[#F8FAFD] to-[#EDF2FA] text-slate-900 select-none">
             
+            {/* VIDEO BACKGROUND / PRESENTATION */}
+            <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 w-full h-full object-cover opacity-20 pointer-events-none mix-blend-multiply"
+                src="/intro-habits.mp4"
+                onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                }}
+            />
+
             {/* MALLA AMBIENTAL CLÍNICA SOFT */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
                 <div className="absolute -top-[10%] -right-[10%] w-[550px] h-[550px] rounded-full bg-purple-300/15 blur-[120px]" />
@@ -374,14 +387,14 @@ export const LoginPage = () => {
                 <div className="absolute -bottom-[15%] right-[20%] w-[500px] h-[500px] rounded-full bg-emerald-300/15 blur-[120px]" />
             </div>
 
-            {/* TARJETA LIQUID GLASS PREMIUM */}
+            {/* TARJETA LIQUID GLASS PREMIUM: EDGE-TO-EDGE EN MÓVIL, CARD EN DESKTOP */}
             <motion.div 
-                initial={{ opacity: 0, y: 12, scale: 0.98 }}
+                initial={{ opacity: 0, y: 10, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full max-w-[430px] relative z-10 my-auto"
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full min-h-[100dvh] sm:min-h-0 sm:max-w-[430px] relative z-10 my-auto flex flex-col justify-center"
             >
-                <div className="relative rounded-3xl p-6 sm:p-7 backdrop-blur-3xl bg-white/90 border border-white/80 shadow-[0_20px_50px_rgba(30,41,59,0.06),0_1px_3px_rgba(30,41,59,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] overflow-hidden">
+                <div className="relative w-full min-h-[100dvh] sm:min-h-0 rounded-none sm:rounded-3xl p-6 sm:p-7 backdrop-blur-3xl bg-white/95 sm:bg-white/90 border-0 sm:border sm:border-white/80 shadow-none sm:shadow-[0_20px_50px_rgba(30,41,59,0.06),0_1px_3px_rgba(30,41,59,0.04),inset_0_1px_1px_rgba(255,255,255,0.9)] overflow-hidden flex flex-col justify-center">
                     
                     {/* BANDERITAS DUALES DE IDIOMA */}
                     <div className="absolute top-4 right-4 z-20">

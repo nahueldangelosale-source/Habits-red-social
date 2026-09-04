@@ -60,7 +60,7 @@ const MOCK_INITIAL_QUEUE: ValidationTask[] = [
 export const useValidationsStore = create<ValidationsState & ValidationsActions>()(
     devtools(
         immer((set, get) => ({
-            queue: MOCK_INITIAL_QUEUE,
+            queue: [],
             isProcessing: false,
             
             approveTask: (taskId) => {

@@ -31,7 +31,8 @@ import {
     LogOut,
     Sparkles,
     Sun,
-    Moon
+    Moon,
+    X
 } from 'lucide-react';
 
 import './Sidebar.css';
@@ -42,9 +43,16 @@ export type View = 'dashboard' | 'roster' | 'lab' | 'inbox' | 'settings' | 'impo
 interface SidebarProps {
     isCollapsed: boolean;
     toggleSidebar: () => void;
+    isMobileOpen?: boolean;
+    onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+    isCollapsed, 
+    toggleSidebar,
+    isMobileOpen = false,
+    onCloseMobile
+}) => {
     const { mode, toggleMode, branding } = useTheme();
     const { t, lang } = useLanguage();
     const { currentRole, isProfessional, isAdmin, activeWorkspace, setWorkspace } = useRBAC();
@@ -88,6 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) 
     }, [isAdmin, currentRole]);
 
     const handleViewChange = (view: View) => {
+        onCloseMobile?.();
         if (view === 'dashboard') navigate('/dashboard');
         else if (view === 'communication') navigate('/inbox?tab=communication');
         else navigate(`/${view}`);
@@ -95,11 +104,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) 
 
     // Role switcher (Does NOT alter theme color)
     const handleSwitchToCoach = () => {
+        onCloseMobile?.();
         setWorkspace('PT');
         navigate('/trainer');
     };
 
     const handleSwitchToNutri = () => {
+        onCloseMobile?.();
         setWorkspace('CLINICAL');
         navigate('/nutricionista');
     };
@@ -289,226 +300,281 @@ export const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, toggleSidebar }) 
         );
     };
 
-    return (
-        <motion.div
-            className={`h-screen flex flex-col z-50 fixed left-0 top-0 overflow-x-hidden select-none transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${sidebarBaseClass} ${isCollapsed ? 'w-20' : 'w-72'}`}
-            initial={false}
-        >
-            {/* Header (Clean Logo Area with Vibrant Habits Branding) */}
-            <div className={`h-20 flex items-center mb-1 transition-all duration-300 overflow-x-hidden border-b ${isClinicalTheme ? 'border-slate-200/70 bg-gradient-to-b from-indigo-500/[0.05] to-transparent' : 'border-white/5 bg-gradient-to-b from-indigo-500/5 to-transparent'} ${isCollapsed ? 'justify-center px-2' : 'justify-between px-5'}`}>
-                {!isCollapsed ? (
-                    <motion.div
-                        className="logo-area flex items-center justify-start gap-3 py-2 px-1 flex-1 cursor-pointer group"
-                        onClick={() => navigate(isNutriWorkspace ? '/nutricionista' : '/trainer')}
-                        whileHover={{ scale: 1.02 }}
-                    >
-                        {/* Logo Vectorial Mandala Limpio y Nítido con Cápsula Liquid Glass */}
-                        <div className="w-11 h-11 flex-shrink-0 relative flex items-center justify-center rounded-2xl bg-white/95 dark:bg-white/10 p-1.5 shadow-[0_4px_18px_rgba(99,102,241,0.16)] border border-indigo-200/90 dark:border-white/10">
-                            <img 
-                                src="/logo-habits-transparent.png" 
-                                alt="Habits - Tu Red Social Saludable" 
-                                className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(99,102,241,0.25)] group-hover:scale-105 transition-transform" 
-                                onError={(e) => { 
-                                    e.currentTarget.src = '/logo.png';
-                                }} 
-                            />
-                        </div>
+    const renderBody = (isMobileDrawer: boolean) => {
+        const collapsed = isMobileDrawer ? false : isCollapsed;
 
-                        {/* Tipografía con Punto Gradiente Ámbar/Rosa/Índigo + Subtítulo */}
-                        <div className="flex flex-col">
-                            <span className={`font-heading font-black text-2xl tracking-tight leading-none flex items-baseline ${isClinicalTheme ? 'text-slate-900' : 'text-white'}`}>
-                                Habits
-                                <span className="text-transparent bg-clip-text bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-600 text-4xl translate-y-0.5 ml-0.5 font-black drop-shadow-[0_2px_8px_rgba(244,63,94,0.35)]">
-                                    .
+        return (
+            <>
+                {/* Header (Clean Logo Area with Vibrant Habits Branding) */}
+                <div className={`h-20 flex items-center mb-1 transition-all duration-300 overflow-x-hidden border-b ${isClinicalTheme ? 'border-slate-200/70 bg-gradient-to-b from-indigo-500/[0.05] to-transparent' : 'border-white/5 bg-gradient-to-b from-indigo-500/5 to-transparent'} ${collapsed ? 'justify-center px-2' : 'justify-between px-5'}`}>
+                    {!collapsed ? (
+                        <motion.div
+                            className="logo-area flex items-center justify-start gap-3 py-2 px-1 flex-1 cursor-pointer group"
+                            onClick={() => {
+                                if (isMobileDrawer) onCloseMobile?.();
+                                navigate(isNutriWorkspace ? '/nutricionista' : '/trainer');
+                            }}
+                            whileHover={{ scale: 1.02 }}
+                        >
+                            {/* Logo Vectorial Mandala Limpio y Nítido con Cápsula Liquid Glass */}
+                            <div className="w-11 h-11 flex-shrink-0 relative flex items-center justify-center rounded-2xl bg-white/95 dark:bg-white/10 p-1.5 shadow-[0_4px_18px_rgba(99,102,241,0.16)] border border-indigo-200/90 dark:border-white/10">
+                                <img 
+                                    src="/logo-habits-transparent.png" 
+                                    alt="Habits - Tu Red Social Saludable" 
+                                    className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(99,102,241,0.25)] group-hover:scale-105 transition-transform" 
+                                    onError={(e) => { 
+                                        e.currentTarget.src = '/logo.png';
+                                    }} 
+                                />
+                            </div>
+
+                            {/* Tipografía con Punto Gradiente Ámbar/Rosa/Índigo + Subtítulo */}
+                            <div className="flex flex-col">
+                                <span className={`font-heading font-black text-2xl tracking-tight leading-none flex items-baseline ${isClinicalTheme ? 'text-slate-900' : 'text-white'}`}>
+                                    Habits
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-600 text-4xl translate-y-0.5 ml-0.5 font-black drop-shadow-[0_2px_8px_rgba(244,63,94,0.35)]">
+                                        .
+                                    </span>
                                 </span>
-                            </span>
-                            <span className="text-[8px] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500 mt-0.5">
-                                Tu Red Social Saludable
-                            </span>
-                        </div>
-                    </motion.div>
-                ) : (
-                    <button
-                        onClick={toggleSidebar}
-                        title="Expandir barra lateral"
-                        className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-rose-500/10 hover:from-indigo-500/20 hover:to-rose-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20 shadow-xs transition-all active:scale-95 group p-1.5"
-                    >
-                        <img src="/logo-habits-transparent.png" alt="Habits" className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform" />
-                    </button>
-                )}
-                
-                <button
-                    onClick={toggleSidebar}
-                    title={isCollapsed ? "Expandir barra lateral" : "Ocultar barra lateral"}
-                    className={`p-2 rounded-xl transition-colors shrink-0 ${
-                        isClinicalTheme 
-                            ? 'text-slate-400 hover:bg-slate-100 hover:text-slate-700' 
-                            : 'text-zinc-400 hover:bg-white/10 hover:text-white'
-                    } ${isCollapsed ? 'hidden' : ''}`}
-                >
-                    <Menu size={19} />
-                </button>
-            </div>
-
-            {/* Scrollable Content (Strictly no horizontal scrollbar) */}
-            <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 space-y-4 no-scrollbar py-2">
-
-                {/* VISTA 1: COACH / ENTRENADOR */}
-                {!isNutriWorkspace && (
-                    <div className="space-y-1">
-                        <MenuItem view="trainer" icon={Dumbbell} label={lang === 'es' ? 'Panel Principal' : 'Main Panel'} badge="CORE" color="indigo" />
-                        <MenuItem view="calendar" icon={CalendarDays} label={lang === 'es' ? 'Agenda & Turnos' : 'Calendar & Appointments'} color="purple" />
-                        <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Contactos Totales' : 'Total Contacts'} color="sky" />
-                        <MenuItem view="finance" icon={CreditCard} label={lang === 'es' ? 'Finanzas' : 'Finance'} badge="MRR" color="emerald" />
-                        <MenuItem view="library" icon={Database} label={lang === 'es' ? 'Biblioteca' : 'Library'} color="amber" />
-                        <MenuItem view="inbox" icon={MessageSquare} label="Mensajes & Validaciones" badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
-                        <MenuItem view="gamification" icon={Swords} label={lang === 'es' ? 'Grupos & Retos' : 'Groups & Challenges'} color="fuchsia" />
-                    </div>
-                )}
-
-                {/* VISTA 2: NUTRICIÓN & CLÍNICA */}
-                {isNutriWorkspace && (
-                    <div className="space-y-1">
-                        <MenuItem view="nutricionista" icon={Activity} label="Consultorio Médico" color="teal" />
-                        <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Pacientes Totales' : 'Total Patients'} color="sky" />
-                        <MenuItem view="dietqa" icon={Stethoscope} label="DietQA" badge="MOTOR" color="emerald" />
-                        <MenuItem view="library" icon={Database} label={lang === 'es' ? 'Biblioteca' : 'Library'} color="amber" />
-                        <MenuItem view="inbox" icon={MessageSquare} label="Mensajes & Validaciones" badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
-                        <MenuItem view="smartlab" icon={FlaskConical} label="Smart Lab (Bio-Sync)" color="cyan" />
-                        <MenuItem view="calendar" icon={CalendarDays} label="Smart Calendar" color="purple" />
-                    </div>
-                )}
-
-                {/* DEBUG & MANTENIMIENTO EXPANDABLE */}
-                {isAdmin && (
-                    <div className="space-y-1 pb-2">
+                                <span className="text-[8px] font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-500 mt-0.5">
+                                    Tu Red Social Saludable
+                                </span>
+                            </div>
+                        </motion.div>
+                    ) : (
                         <button
-                            onClick={() => setDevOpen(!devOpen)}
-                            className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-all duration-300 ${
-                                isClinicalTheme ? 'hover:bg-slate-50 text-slate-400' : 'hover:bg-white/5 text-zinc-400'
+                            onClick={toggleSidebar}
+                            title="Expandir barra lateral"
+                            className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500/10 via-purple-500/10 to-rose-500/10 hover:from-indigo-500/20 hover:to-rose-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-500/20 shadow-xs transition-all active:scale-95 group p-1.5"
+                        >
+                            <img src="/logo-habits-transparent.png" alt="Habits" className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform" />
+                        </button>
+                    )}
+                    
+                    {isMobileDrawer ? (
+                        <button
+                            onClick={onCloseMobile}
+                            aria-label="Cerrar menú"
+                            className={`p-2 rounded-xl transition-colors shrink-0 ${
+                                isClinicalTheme 
+                                    ? 'text-slate-400 hover:bg-slate-100 hover:text-slate-700' 
+                                    : 'text-zinc-400 hover:bg-white/10 hover:text-white'
                             }`}
                         >
-                            <span className="text-[10px] font-black uppercase tracking-widest truncate">
-                                {!isCollapsed ? (lang === 'es' ? '⚙️ Herramientas Dev' : '⚙️ Dev Tools') : 'DEV'}
-                            </span>
-                            {!isCollapsed && (
-                                devOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />
-                            )}
+                            <X size={20} />
                         </button>
-                        <AnimatePresence initial={false}>
-                            {devOpen && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="overflow-hidden space-y-1"
-                                >
-                                    <MenuItem view="communication" icon={Bot} label={lang === 'es' ? 'Canales & Auto-Respuestas' : 'Channels & Auto-Reply'} />
-                                    <MenuItem view="branding" icon={Palette} label={lang === 'es' ? 'Personalización de Marca' : 'Brand Settings'} />
-                                    <MenuItem view="import" icon={Database} label={lang === 'es' ? 'Importador Masivo' : 'Magic Import'} />
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-                )}
-            </div>
-
-            {/* Footer con SELECTOR DE ROL + BOTÓN DE TEMA & LOGOUT */}
-            <div className={`p-4 mt-auto border-t overflow-x-hidden ${isClinicalTheme ? 'border-slate-200/70 bg-gradient-to-t from-indigo-500/[0.02] to-transparent' : 'border-white/5 bg-gradient-to-t from-indigo-500/5 to-transparent'}`}>
-                
-                {/* Switcher Profesional */}
-                {!isCollapsed ? (
-                    <div className="flex bg-slate-100/90 dark:bg-zinc-900 p-1 rounded-2xl border border-slate-200/80 dark:border-zinc-800 mb-3 shadow-2xs">
+                    ) : (
                         <button
-                            onClick={handleSwitchToCoach}
-                            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-black font-montserrat flex items-center justify-center gap-1.5 transition-all ${
-                                !isNutriWorkspace
-                                    ? 'bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 font-bold'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white'
-                            }`}
+                            onClick={toggleSidebar}
+                            title={collapsed ? "Expandir barra lateral" : "Ocultar barra lateral"}
+                            className={`p-2 rounded-xl transition-colors shrink-0 ${
+                                isClinicalTheme 
+                                    ? 'text-slate-400 hover:bg-slate-100 hover:text-slate-700' 
+                                    : 'text-zinc-400 hover:bg-white/10 hover:text-white'
+                            } ${collapsed ? 'hidden' : ''}`}
                         >
-                            <Dumbbell size={13} />
-                            <span>Coach</span>
+                            <Menu size={19} />
                         </button>
+                    )}
+                </div>
 
-                        <button
-                            onClick={handleSwitchToNutri}
-                            className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-black font-montserrat flex items-center justify-center gap-1.5 transition-all ${
-                                isNutriWorkspace
-                                    ? 'bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 text-white shadow-md shadow-emerald-500/25 font-bold'
-                                    : 'text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white'
-                            }`}
-                        >
-                            <Activity size={13} />
-                            <span>Nutrición</span>
-                        </button>
-                    </div>
-                ) : (
-                    <div className="flex flex-col items-center gap-2 mb-3">
-                        <button
-                            onClick={isNutriWorkspace ? handleSwitchToCoach : handleSwitchToNutri}
-                            className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-center text-indigo-500 dark:text-indigo-400 hover:scale-105 transition-transform"
-                            title={isNutriWorkspace ? "Cambiar a Coach" : "Cambiar a Nutrición"}
-                        >
-                            {isNutriWorkspace ? <Activity size={18} className="text-emerald-500" /> : <Dumbbell size={18} className="text-indigo-500" />}
-                        </button>
+                {/* Scrollable Content (Strictly no horizontal scrollbar) */}
+                <div className="flex-1 overflow-y-auto overflow-x-hidden px-3 space-y-4 no-scrollbar py-2">
 
-                        <button
-                            onClick={toggleMode}
-                            className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:scale-105 transition-transform"
-                            title={isClinicalTheme ? "Cambiar a Modo Oscuro" : "Cambiar a Modo Claro"}
-                        >
-                            {isClinicalTheme ? <Moon size={16} /> : <Sun size={16} className="text-amber-400" />}
-                        </button>
-                    </div>
-                )}
-
-                {/* Perfil del Usuario + Botones de Tema y Logout */}
-                <div className={`flex items-center gap-2.5 overflow-x-hidden ${isCollapsed ? 'justify-center' : ''}`}>
-                    <div className="relative shrink-0 p-[2px] rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-600 shadow-xs">
-                        <div className="w-9 h-9 rounded-full bg-slate-950 flex items-center justify-center text-white text-xs font-black shadow-inner">
-                            {initials}
-                        </div>
-                        <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></div>
-                    </div>
-
-                    {!isCollapsed && (
-                        <div className="overflow-hidden flex-1 min-w-0">
-                            <p className={`text-sm font-bold truncate ${isClinicalTheme ? 'text-slate-900' : 'text-white'}`}>{displayName}</p>
-                            <p className={`text-xs truncate ${isClinicalTheme ? 'text-slate-500' : 'text-zinc-400'}`}>
-                                {roleTitle}
-                            </p>
+                    {/* VISTA 1: COACH / ENTRENADOR */}
+                    {!isNutriWorkspace && (
+                        <div className="space-y-1">
+                            <MenuItem view="trainer" icon={Dumbbell} label={lang === 'es' ? 'Panel Principal' : 'Main Panel'} badge="CORE" color="indigo" />
+                            <MenuItem view="calendar" icon={CalendarDays} label={lang === 'es' ? 'Agenda & Turnos' : 'Calendar & Appointments'} color="purple" />
+                            <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Contactos Totales' : 'Total Contacts'} color="sky" />
+                            <MenuItem view="finance" icon={CreditCard} label={lang === 'es' ? 'Finanzas' : 'Finance'} badge="MRR" color="emerald" />
+                            <MenuItem view="library" icon={Database} label={lang === 'es' ? 'Biblioteca' : 'Library'} color="amber" />
+                            <MenuItem view="inbox" icon={MessageSquare} label="Mensajes & Validaciones" badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
+                            <MenuItem view="gamification" icon={Swords} label={lang === 'es' ? 'Grupos & Retos' : 'Groups & Challenges'} color="fuchsia" />
                         </div>
                     )}
 
-                    {!isCollapsed && (
-                        <div className="flex items-center gap-1 shrink-0">
-                            {/* Botón Swap Theme en Footer */}
-                            <button 
-                                onClick={toggleMode}
-                                title={isClinicalTheme ? "Cambiar a Modo Oscuro" : "Cambiar a Modo Claro"}
-                                className={`p-2 rounded-xl transition-colors ${
-                                    isClinicalTheme ? 'hover:bg-slate-200 text-slate-500 hover:text-indigo-600' : 'hover:bg-white/10 text-zinc-400 hover:text-amber-300'
-                                }`}
-                            >
-                                {isClinicalTheme ? <Moon size={16} /> : <Sun size={16} className="text-amber-400" />}
-                            </button>
+                    {/* VISTA 2: NUTRICIÓN & CLÍNICA */}
+                    {isNutriWorkspace && (
+                        <div className="space-y-1">
+                            <MenuItem view="nutricionista" icon={Activity} label="Consultorio Médico" color="teal" />
+                            <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Pacientes Totales' : 'Total Patients'} color="sky" />
+                            <MenuItem view="dietqa" icon={Stethoscope} label="DietQA" badge="MOTOR" color="emerald" />
+                            <MenuItem view="library" icon={Database} label={lang === 'es' ? 'Biblioteca' : 'Library'} color="amber" />
+                            <MenuItem view="inbox" icon={MessageSquare} label="Mensajes & Validaciones" badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
+                            <MenuItem view="smartlab" icon={FlaskConical} label="Smart Lab (Bio-Sync)" color="cyan" />
+                            <MenuItem view="calendar" icon={CalendarDays} label="Smart Calendar" color="purple" />
+                        </div>
+                    )}
 
-                            {/* Botón Cerrar Sesión */}
-                            <button 
-                                onClick={logout}
-                                title="Cerrar Sesión"
-                                className={`p-2 rounded-xl transition-colors ${
-                                    isClinicalTheme ? 'hover:bg-slate-200 text-slate-500 hover:text-red-600' : 'hover:bg-white/10 text-zinc-400 hover:text-red-400'
+                    {/* DEBUG & MANTENIMIENTO EXPANDABLE */}
+                    {isAdmin && (
+                        <div className="space-y-1 pb-2">
+                            <button
+                                onClick={() => setDevOpen(!devOpen)}
+                                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-left transition-all duration-300 ${
+                                    isClinicalTheme ? 'hover:bg-slate-50 text-slate-400' : 'hover:bg-white/5 text-zinc-400'
                                 }`}
                             >
-                                <LogOut size={16} />
+                                <span className="text-[10px] font-black uppercase tracking-widest truncate">
+                                    {!collapsed ? (lang === 'es' ? '⚙️ Herramientas Dev' : '⚙️ Dev Tools') : 'DEV'}
+                                </span>
+                                {!collapsed && (
+                                    devOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />
+                                )}
                             </button>
+                            <AnimatePresence initial={false}>
+                                {devOpen && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: 'auto', opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                        className="overflow-hidden space-y-1"
+                                    >
+                                        <MenuItem view="branding" icon={Palette} label={lang === 'es' ? 'Personalización de Marca' : 'Brand Settings'} />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </div>
                     )}
                 </div>
-            </div>
-        </motion.div>
+
+                {/* Footer con SELECTOR DE ROL + BOTÓN DE TEMA & LOGOUT */}
+                <div className={`p-4 mt-auto border-t overflow-x-hidden ${isClinicalTheme ? 'border-slate-200/70 bg-gradient-to-t from-indigo-500/[0.02] to-transparent' : 'border-white/5 bg-gradient-to-t from-indigo-500/5 to-transparent'}`}>
+                    
+                    {/* Switcher Profesional */}
+                    {!collapsed ? (
+                        <div className="flex bg-slate-100/90 dark:bg-zinc-900 p-1 rounded-2xl border border-slate-200/80 dark:border-zinc-800 mb-3 shadow-2xs">
+                            <button
+                                onClick={handleSwitchToCoach}
+                                className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-black font-montserrat flex items-center justify-center gap-1.5 transition-all ${
+                                    !isNutriWorkspace
+                                        ? 'bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-500/25 font-bold'
+                                        : 'text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white'
+                                }`}
+                            >
+                                <Dumbbell size={13} />
+                                <span>Coach</span>
+                            </button>
+
+                            <button
+                                onClick={handleSwitchToNutri}
+                                className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-black font-montserrat flex items-center justify-center gap-1.5 transition-all ${
+                                    isNutriWorkspace
+                                        ? 'bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-500 text-white shadow-md shadow-emerald-500/25 font-bold'
+                                        : 'text-slate-600 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-white'
+                                }`}
+                            >
+                                <Activity size={13} />
+                                <span>Nutrición</span>
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center gap-2 mb-3">
+                            <button
+                                onClick={isNutriWorkspace ? handleSwitchToCoach : handleSwitchToNutri}
+                                className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-center text-indigo-500 dark:text-indigo-400 hover:scale-105 transition-transform"
+                                title={isNutriWorkspace ? "Cambiar a Coach" : "Cambiar a Nutrición"}
+                            >
+                                {isNutriWorkspace ? <Activity size={18} className="text-emerald-500" /> : <Dumbbell size={18} className="text-indigo-500" />}
+                            </button>
+
+                            <button
+                                onClick={toggleMode}
+                                className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex items-center justify-center text-slate-600 dark:text-zinc-300 hover:scale-105 transition-transform"
+                                title={isClinicalTheme ? "Cambiar a Modo Oscuro" : "Cambiar a Modo Claro"}
+                            >
+                                {isClinicalTheme ? <Moon size={16} /> : <Sun size={16} className="text-amber-400" />}
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Perfil del Usuario + Botones de Tema y Logout */}
+                    <div className={`flex items-center gap-2.5 overflow-x-hidden ${collapsed ? 'justify-center' : ''}`}>
+                        <div className="relative shrink-0 p-[2px] rounded-full bg-gradient-to-tr from-amber-400 via-rose-500 to-indigo-600 shadow-xs">
+                            <div className="w-9 h-9 rounded-full bg-slate-950 flex items-center justify-center text-white text-xs font-black shadow-inner">
+                                {initials}
+                            </div>
+                            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full"></div>
+                        </div>
+
+                        {!collapsed && (
+                            <div className="overflow-hidden flex-1 min-w-0">
+                                <p className={`text-sm font-bold truncate ${isClinicalTheme ? 'text-slate-900' : 'text-white'}`}>{displayName}</p>
+                                <p className={`text-xs truncate ${isClinicalTheme ? 'text-slate-500' : 'text-zinc-400'}`}>
+                                    {roleTitle}
+                                </p>
+                            </div>
+                        )}
+
+                        {!collapsed && (
+                            <div className="flex items-center gap-1 shrink-0">
+                                {/* Botón Swap Theme en Footer */}
+                                <button 
+                                    onClick={toggleMode}
+                                    title={isClinicalTheme ? "Cambiar a Modo Oscuro" : "Cambiar a Modo Claro"}
+                                    className={`p-2 rounded-xl transition-colors ${
+                                        isClinicalTheme ? 'hover:bg-slate-200 text-slate-500 hover:text-indigo-600' : 'hover:bg-white/10 text-zinc-400 hover:text-amber-300'
+                                    }`}
+                                >
+                                    {isClinicalTheme ? <Moon size={16} /> : <Sun size={16} className="text-amber-400" />}
+                                </button>
+
+                                {/* Botón Cerrar Sesión */}
+                                <button 
+                                    onClick={logout}
+                                    title="Cerrar Sesión"
+                                    className={`p-2 rounded-xl transition-colors ${
+                                        isClinicalTheme ? 'hover:bg-slate-200 text-slate-500 hover:text-red-600' : 'hover:bg-white/10 text-zinc-400 hover:text-red-400'
+                                    }`}
+                                >
+                                    <LogOut size={16} />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </>
+        );
+    };
+
+    return (
+        <>
+            {/* BARRA LATERAL ESCRITORIO (>= md) */}
+            <motion.aside
+                className={`hidden md:flex flex-col h-screen z-50 fixed left-0 top-0 overflow-x-hidden select-none transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${sidebarBaseClass} ${isCollapsed ? 'w-20' : 'w-72'}`}
+                initial={false}
+            >
+                {renderBody(false)}
+            </motion.aside>
+
+            {/* DRAWER MODAL MÓVIL (< md) */}
+            <AnimatePresence>
+                {isMobileOpen && (
+                    <div className="fixed inset-0 z-50 md:hidden">
+                        {/* Fondo oscuro traslúcido */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={onCloseMobile}
+                            className="fixed inset-0 bg-black/60 backdrop-blur-xs cursor-pointer"
+                        />
+
+                        {/* Panel deslizable */}
+                        <motion.aside
+                            initial={{ x: '-100%' }}
+                            animate={{ x: 0 }}
+                            exit={{ x: '-100%' }}
+                            transition={{ type: 'spring', damping: 26, stiffness: 280 }}
+                            className={`fixed top-0 bottom-0 left-0 w-80 max-w-[85vw] h-full flex flex-col z-50 shadow-2xl overflow-hidden select-none ${sidebarBaseClass}`}
+                        >
+                            {renderBody(true)}
+                        </motion.aside>
+                    </div>
+                )}
+            </AnimatePresence>
+        </>
     );
 };

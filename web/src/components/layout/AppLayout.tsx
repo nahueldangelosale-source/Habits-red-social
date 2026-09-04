@@ -15,11 +15,14 @@ import { useCognitiveLoad } from '../../hooks/useCognitiveLoad';
 import { CheckoutInvoice } from '../checkout/CheckoutInvoice';
 import { CoachWelcomeWizardModal } from '../onboarding/CoachWelcomeWizardModal';
 import { Toaster } from 'react-hot-toast';
+import { CoachMobileHeader } from './CoachMobileHeader';
+import { CoachBottomNav } from './CoachBottomNav';
 
 export const AppLayout: React.FC = () => {
     const { isAuthenticated, isLoading, user } = useAuth();
     const { calmMode } = useCognitiveLoad();
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const { mode } = useTheme();
     const isClinical = mode === 'CLINICAL';
     const location = useLocation();
@@ -126,6 +129,9 @@ export const AppLayout: React.FC = () => {
                     coachName={displayName}
                 />
 
+                {/* COACH MOBILE TOP HEADER (< md) */}
+                <CoachMobileHeader onOpenMenu={() => setIsMobileMenuOpen(true)} />
+
                 <div className={`app-container relative z-10 min-h-screen transition-all duration-1000 has-sidebar ${isSidebarCollapsed ? 'sidebar-collapsed' : ''
                     } ${isClinical ? 'bg-clinical-mesh' : calmMode ? 'bg-slate-950 text-slate-400' : 'bg-transparent'
                     }`}>
@@ -137,16 +143,25 @@ export const AppLayout: React.FC = () => {
                         <Sidebar
                             isCollapsed={isSidebarCollapsed}
                             toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                            isMobileOpen={isMobileMenuOpen}
+                            onCloseMobile={() => setIsMobileMenuOpen(false)}
                         />
                     </div>
 
-                    <main className={`main-content transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${isFocusMode ? 'ml-0 w-full' : (isSidebarCollapsed ? 'ml-20' : 'ml-72')} flex-1`}>
+                    <main className={`main-content transition-all duration-500 ease-[cubic-bezier(0.25,0.1,0.25,1)] ${
+                        isFocusMode 
+                            ? 'ml-0 w-full' 
+                            : (isSidebarCollapsed ? 'md:ml-20' : 'md:ml-72')
+                    } ml-0 pt-16 pb-24 md:pt-0 md:pb-0 flex-1 overflow-x-hidden min-h-screen`}>
                         {/* Views wrapped in Suspense for lazy loading */}
                         <Suspense fallback={<ViewSkeleton />}>
                             <Outlet />
                         </Suspense>
                     </main>
                 </div>
+
+                {/* COACH MOBILE BOTTOM DOCK (< md) */}
+                <CoachBottomNav onOpenMenu={() => setIsMobileMenuOpen(true)} />
             </RBACProvider>
     );
 };
