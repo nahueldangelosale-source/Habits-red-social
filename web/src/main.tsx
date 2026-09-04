@@ -12,10 +12,11 @@ import { PWAPrompt } from './components/PWAPrompt';
 import { Toaster } from 'react-hot-toast';
 import { OpenTelemetryInterceptor } from './infrastructure/telemetry/OpenTelemetryInterceptor';
 
-// Initialize OpenTelemetry only if explicitly enabled
-if (import.meta.env.VITE_ENABLE_TELEMETRY === 'true') {
-  OpenTelemetryInterceptor.getInstance().initialize();
-}
+// Auto-recover from stale dynamic imports after new deployments
+window.addEventListener('vite:preloadError', (event) => {
+  console.warn('[Vite] Dynamic import preload error detected. Reloading page...', event);
+  window.location.reload();
+});
 
 const queryClient = new QueryClient({
   defaultOptions: {

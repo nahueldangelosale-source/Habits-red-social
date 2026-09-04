@@ -22,6 +22,10 @@ export class ApiError extends Error {
  * - 422 Unprocessable Entity: Alerta sobre mismatch en el contrato de Pydantic v2.
  */
 export async function apiRequest<T>(url: string, options: RequestInit = {}): Promise<T> {
+  const targetUrl = url.startsWith('http') 
+    ? url 
+    : `${API_BASE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
+
   let token = localStorage.getItem('token');
   
   // No auto-injecting demo tokens anymore. This broke the real auth flow.
@@ -36,7 +40,7 @@ export async function apiRequest<T>(url: string, options: RequestInit = {}): Pro
     headers.set('Content-Type', 'application/json');
   }
 
-  const response = await fetch(url, {
+  const response = await fetch(targetUrl, {
     ...options,
     headers,
   });
@@ -57,7 +61,7 @@ export async function apiRequest<T>(url: string, options: RequestInit = {}): Pro
 
   if (response.status === 401 || response.status === 403) {
     // Evitar loop infinito si el refresh mismo falla
-    if (url.includes('/api/v1/auth-b2c/refresh')) {
+    if (targetUrl.includes('/api/v1/auth-b2c/refresh')) {
       throw new ApiError(response.status, "UNAUTHORIZED");
     }
     
@@ -80,7 +84,7 @@ export async function apiRequest<T>(url: string, options: RequestInit = {}): Pro
       const newHeaders = new Headers(options.headers || {});
       newHeaders.set('Authorization', `Bearer ${refreshData.access_token}`);
       
-      const retryResponse = await fetch(url, { ...options, headers: newHeaders });
+      const retryResponse = await fetch(targetUrl, { ...options, headers: newHeaders });
       
       if (!retryResponse.ok) {
         const errorData = await retryResponse.json().catch(() => null);

@@ -414,11 +414,6 @@ async def google_auth(
                 )
                 if resp.status_code == 200:
                     google_data = resp.json()
-                    # Also fetch tokeninfo to verify aud/azp
-                    t_resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?access_token={credential}")
-                    if t_resp.status_code == 200:
-                        t_data = t_resp.json()
-                        google_data["aud"] = t_data.get("aud") or t_data.get("azp")
                 else:
                     # Fallback to tokeninfo with access_token
                     t_resp = await client.get(f"https://oauth2.googleapis.com/tokeninfo?access_token={credential}")

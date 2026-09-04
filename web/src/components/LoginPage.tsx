@@ -156,13 +156,12 @@ export const LoginPage = () => {
                         }
 
                         if (tokenResponse?.access_token) {
-                            const toastId = toast.loading(lang === 'es' ? 'Iniciando sesión con Google...' : 'Signing in with Google...');
+                            const toastId = toast.loading(
+                                mode === 'register'
+                                    ? (lang === 'es' ? 'Creando tu espacio de Coach...' : 'Setting up your Coach space...')
+                                    : (lang === 'es' ? 'Iniciando sesión con Google...' : 'Signing in with Google...')
+                            );
                             try {
-                                const userRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                                    headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-                                });
-                                const googleUser = await userRes.json();
-                                
                                 const res = await fetch(`${API_URL}/api/v1/auth/google`, {
                                     method: 'POST',
                                     headers: { 'Content-Type': 'application/json' },
