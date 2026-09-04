@@ -19,7 +19,7 @@
     "dev": "npm run dev --workspace=web",
     "backend": "cd backend && python -m uvicorn app.main:app --reload --port 8000",
     "web": "npm run dev --workspace=web",
-    "prepare": "husky"
+    "prepare": "node -e \"if (!process.env.CI && !process.env.VERCEL) { try { require('child_process').execSync('husky', {stdio: 'inherit'}) } catch {} }\""
   },
   "engines": {
     "node": ">=18.0.0"
