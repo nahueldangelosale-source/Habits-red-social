@@ -1,11 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   CalendarDays, Clock, Plus, Users, Dumbbell, Apple, Video, 
   CheckCircle2, ChevronLeft, ChevronRight, MapPin, ExternalLink,
   Sparkles, CheckSquare, ListTodo, X, BellRing, Hourglass, 
   ArrowRight, Calendar as CalendarIcon, Ruler, Scale, Activity,
-  HeartPulse, PlusCircle, Tag, Check
+  HeartPulse, PlusCircle, Tag, Check, Copy, RotateCcw, Trash2,
+  Star, Flame, Repeat
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
@@ -74,10 +75,10 @@ const TIME_SLOTS = [
   '18:00', '19:00', '20:00'
 ];
 
-const getCurrentWeekDates = () => {
+const getWeekDates = (offsetWeeks = 0) => {
   const now = new Date();
   const currentDay = now.getDay();
-  const diffToMonday = now.getDate() - currentDay + (currentDay === 0 ? -6 : 1);
+  const diffToMonday = now.getDate() - currentDay + (currentDay === 0 ? -6 : 1) + (offsetWeeks * 7);
   const monday = new Date(now.getFullYear(), now.getMonth(), diffToMonday);
 
   const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
@@ -91,19 +92,95 @@ const getCurrentWeekDates = () => {
   });
 };
 
-const WEEK_DAYS = getCurrentWeekDates();
-
 const EMOJI_OPTIONS = ['✨', '💆', '🧠', '🏊', '🥊', '🧘', '🚴', '🎯', '🏃', '🧊', '🩺', '🔥'];
 
 export const ProfessionalAgenda: React.FC = () => {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState<Appointment[]>(INITIAL_APPOINTMENTS);
-  const [tasks, setTasks] = useState<CoachTask[]>(INITIAL_TASKS);
+
+  // 1. Navegación Dinámica de Semanas
+  const [weekOffset, setWeekOffset] = useState<number>(0);
+  const WEEK_DAYS = useMemo(() => getWeekDates(weekOffset), [weekOffset]);
+  const isCurrentWeek = weekOffset === 0;
+
+  // 2. Persistencia Local para Turnos y Tareas
+  const [appointments, setAppointments] = useState<Appointment[]>(() => {
+    try {
+      const saved = localStorage.getItem('habits_agenda_appointments_v1');
+      return saved ? JSON.parse(saved) : INITIAL_APPOINTMENTS;
+    } catch {
+      return INITIAL_APPOINTMENTS;
+    }
+  });
+
+  const [tasks, setTasks] = useState<CoachTask[]>(() => {
+    try {
+      const saved = localStorage.getItem('habits_agenda_tasks_v1');
+      return saved ? JSON.parse(saved) : INITIAL_TASKS;
+    } catch {
+      return INITIAL_TASKS;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('habits_agenda_appointments_v1', JSON.stringify(appointments));
+    } catch (e) {
+      console.warn("Error saving appointments to localStorage", e);
+    }
+  }, [appointments]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('habits_agenda_tasks_v1', JSON.stringify(tasks));
+    } catch (e) {
+      console.warn("Error saving tasks to localStorage", e);
+    }
+  }, [tasks]);
+
   const [serviceTypes, setServiceTypes] = useState<ServiceTypeOption[]>(DEFAULT_SERVICE_TYPES);
   
   // Tab principal
   const [activeTab, setActiveTab] = useState<'CALENDAR' | 'TASKS' | 'SCHEDULE'>('CALENDAR');
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'CYCLE' | 'MANUAL'>('ALL');
+
+  // 3. Panel Lateral Microsoft To Do
+  const [isToDoOpen, setIsToDoOpen] = useState(true);
+  const [toDoCategoryFilter, setToDoCategoryFilter] = useState<'ALL' | 'IMPORTANT' | 'HABITS' | 'CYCLES'>('ALL');
+  const [quickTodoInput, setQuickTodoInput] = useState('');
+  const [quickTodoPriority, setQuickTodoPriority] = useState<CoachTask['priority']>('MEDIUM');
+
+  // 4. Drag-to-Select ("Pintar Días y Horas Corrido como Google Calendar")
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState<{ dayIndex: number; timeIndex: number } | null>(null);
+  const [dragCurrent, setDragCurrent] = useState<{ dayIndex: number; timeIndex: number } | null>(null);
+  const [dragJustEnded, setDragJustEnded] = useState(false);
+
+  // Modal Contextual para Selección de Múltiples Días/Horas
+  const [isMultiSelectModalOpen, setIsMultiSelectModalOpen] = useState(false);
+  const [multiSelectData, setMultiSelectData] = useState<{
+    startDayIndex: number;
+    endDayIndex: number;
+    startTimeIndex: number;
+    endTimeIndex: number;
+    selectedDays: { key: string; name: string; dateStr: string; fullDate: string }[];
+    timeStart: string;
+    timeEnd: string;
+    creationMode: 'INDIVIDUAL_DAYS' | 'CONTINUOUS_BLOCK';
+  }>({
+    startDayIndex: 0,
+    endDayIndex: 0,
+    startTimeIndex: 0,
+    endTimeIndex: 0,
+    selectedDays: [],
+    timeStart: '08:00',
+    timeEnd: '09:00',
+    creationMode: 'INDIVIDUAL_DAYS'
+  });
+
+  const [multiTitle, setMultiTitle] = useState('Entrenamiento & Bloque Semanal');
+  const [multiType, setMultiType] = useState('WORKOUT_1ON1');
+  const [multiAthlete, setMultiAthlete] = useState('');
+  const [multiNotes, setMultiNotes] = useState('');
   
   // Selector de día para vista móvil optimizada
   const [selectedMobileDay, setSelectedMobileDay] = useState<string>(() => {
@@ -115,7 +192,7 @@ export const ProfessionalAgenda: React.FC = () => {
 
   const selectedDayObj = useMemo(() => {
     return WEEK_DAYS.find(d => d.key === selectedMobileDay) || WEEK_DAYS[0];
-  }, [selectedMobileDay]);
+  }, [selectedMobileDay, WEEK_DAYS]);
   
   // Modals
   const [isAppointmentModalOpen, setIsAppointmentModalOpen] = useState(false);
@@ -272,6 +349,217 @@ export const ProfessionalAgenda: React.FC = () => {
     toast.success('Tarea agregada a tu lista', { icon: '📌' });
   };
 
+  // ═══════════════════════════════════════════════════════════════
+  // REPLICAR SEMANA AUTOMÁTICAMENTE (COPIAR A PRÓXIMA SEMANA)
+  // ═══════════════════════════════════════════════════════════════
+  const handleReplicateWeek = () => {
+    const currentWeekDates = WEEK_DAYS.map(d => d.fullDate);
+    const currentWeekApts = appointments.filter(a => currentWeekDates.includes(a.date) && a.status !== 'CANCELLED');
+
+    if (currentWeekApts.length === 0) {
+      toast('No hay turnos agendados en la semana actual para replicar.', { icon: 'ℹ️' });
+      return;
+    }
+
+    const nextWeekApts: Appointment[] = currentWeekApts.map(apt => {
+      const orig = new Date(apt.date + 'T12:00:00');
+      orig.setDate(orig.getDate() + 7);
+      const newDateStr = orig.toISOString().split('T')[0];
+      return {
+        ...apt,
+        id: `apt-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        date: newDateStr,
+        status: 'CONFIRMED'
+      };
+    });
+
+    setAppointments(prev => [...prev, ...nextWeekApts]);
+    setWeekOffset(prev => prev + 1);
+    toast.success(`¡Semana replicada! Se copiaron ${nextWeekApts.length} turnos a la próxima semana.`, {
+      icon: '🔁',
+      duration: 4000
+    });
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // DRAG-TO-SELECT ("PINTAR DÍAS Y HORAS CORRIDO" - GOOGLE CALENDAR)
+  // ═══════════════════════════════════════════════════════════════
+  const selectionBounds = useMemo(() => {
+    if (!dragStart || !dragCurrent) return null;
+    const minDay = Math.min(dragStart.dayIndex, dragCurrent.dayIndex);
+    const maxDay = Math.max(dragStart.dayIndex, dragCurrent.dayIndex);
+    const minTime = Math.min(dragStart.timeIndex, dragCurrent.timeIndex);
+    const maxTime = Math.max(dragStart.timeIndex, dragCurrent.timeIndex);
+    return { minDay, maxDay, minTime, maxTime };
+  }, [dragStart, dragCurrent]);
+
+  const isCellSelected = (dayIndex: number, timeIndex: number) => {
+    if (!selectionBounds) return false;
+    return (
+      dayIndex >= selectionBounds.minDay &&
+      dayIndex <= selectionBounds.maxDay &&
+      timeIndex >= selectionBounds.minTime &&
+      timeIndex <= selectionBounds.maxTime
+    );
+  };
+
+  const handleCellMouseDown = (dayIndex: number, timeIndex: number, e: React.MouseEvent) => {
+    if (e.button !== 0) return; // Solo click principal
+    setIsDragging(true);
+    setDragStart({ dayIndex, timeIndex });
+    setDragCurrent({ dayIndex, timeIndex });
+  };
+
+  const handleCellMouseEnter = (dayIndex: number, timeIndex: number) => {
+    if (isDragging) {
+      setDragCurrent({ dayIndex, timeIndex });
+    }
+  };
+
+  const handleGridMouseUp = () => {
+    if (!isDragging || !dragStart || !dragCurrent) {
+      setIsDragging(false);
+      return;
+    }
+
+    const minDay = Math.min(dragStart.dayIndex, dragCurrent.dayIndex);
+    const maxDay = Math.max(dragStart.dayIndex, dragCurrent.dayIndex);
+    const minTime = Math.min(dragStart.timeIndex, dragCurrent.timeIndex);
+    const maxTime = Math.max(dragStart.timeIndex, dragCurrent.timeIndex);
+
+    const totalCells = (maxDay - minDay + 1) * (maxTime - minTime + 1);
+
+    if (totalCells > 1) {
+      const selectedDays = WEEK_DAYS.slice(minDay, maxDay + 1);
+      const startHourStr = TIME_SLOTS[minTime] || '08:00';
+      const endHourBase = TIME_SLOTS[maxTime] || '09:00';
+      const [h, m] = endHourBase.split(':');
+      const endHourPlusOne = String(Math.min(23, Number(h) + 1)).padStart(2, '0') + ':' + (m || '00');
+
+      setMultiSelectData({
+        startDayIndex: minDay,
+        endDayIndex: maxDay,
+        startTimeIndex: minTime,
+        endTimeIndex: maxTime,
+        selectedDays,
+        timeStart: startHourStr,
+        timeEnd: endHourPlusOne,
+        creationMode: 'INDIVIDUAL_DAYS'
+      });
+      setMultiTitle(selectedDays.length > 1 ? `Entrenamiento (${selectedDays.length} Días)` : 'Bloque de Entrenamiento');
+      setIsMultiSelectModalOpen(true);
+      setDragJustEnded(true);
+      setTimeout(() => setDragJustEnded(false), 250);
+    }
+
+    setIsDragging(false);
+    setDragStart(null);
+    setDragCurrent(null);
+  };
+
+  // Listener global de seguridad para mouseup
+  useEffect(() => {
+    const onGlobalMouseUp = () => {
+      if (isDragging) {
+        handleGridMouseUp();
+      }
+    };
+    window.addEventListener('mouseup', onGlobalMouseUp);
+    return () => window.removeEventListener('mouseup', onGlobalMouseUp);
+  }, [isDragging, dragStart, dragCurrent, WEEK_DAYS]);
+
+  // Confirmar creación multi-bloque
+  const handleConfirmMultiBlock = (e: React.FormEvent) => {
+    e.preventDefault();
+    const matchedService = serviceTypes.find(s => s.id === multiType);
+
+    if (multiSelectData.creationMode === 'INDIVIDUAL_DAYS') {
+      const newApts: Appointment[] = multiSelectData.selectedDays.map((day, idx) => ({
+        id: `apt-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 5)}`,
+        athleteName: multiAthlete.trim() || 'Atleta Asignado',
+        athleteAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+        type: multiType,
+        customServiceName: matchedService?.name,
+        customServiceEmoji: matchedService?.emoji,
+        title: multiTitle.trim() || matchedService?.defaultTitle || 'Sesión Agendada',
+        date: day.fullDate,
+        timeStart: multiSelectData.timeStart,
+        timeEnd: multiSelectData.timeEnd,
+        format: 'IN_PERSON',
+        locationOrLink: 'Gimnasio Central',
+        status: 'CONFIRMED',
+        notes: multiNotes
+      }));
+
+      setAppointments(prev => [...prev, ...newApts]);
+      toast.success(`¡${newApts.length} turnos agendados con éxito!`, { icon: '🎨' });
+    } else {
+      const newApts: Appointment[] = multiSelectData.selectedDays.map((day, idx) => ({
+        id: `block-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 5)}`,
+        athleteName: multiAthlete.trim() || 'Bloqueo Horario',
+        athleteAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+        type: multiType,
+        customServiceName: matchedService?.name,
+        customServiceEmoji: matchedService?.emoji,
+        title: `[BLOQUE] ${multiTitle.trim()}`,
+        date: day.fullDate,
+        timeStart: multiSelectData.timeStart,
+        timeEnd: multiSelectData.timeEnd,
+        format: 'IN_PERSON',
+        locationOrLink: 'Espacio Reservado',
+        status: 'CONFIRMED',
+        notes: multiNotes
+      }));
+
+      setAppointments(prev => [...prev, ...newApts]);
+      toast.success(`¡Bloque fijado para ${newApts.length} días!`, { icon: '🛡️' });
+    }
+
+    setIsMultiSelectModalOpen(false);
+    setMultiAthlete('');
+    setMultiNotes('');
+  };
+
+  // ═══════════════════════════════════════════════════════════════
+  // MICROSOFT TO DO HANDLERS
+  // ═══════════════════════════════════════════════════════════════
+  const handleAddQuickTodo = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && quickTodoInput.trim()) {
+      e.preventDefault();
+      const newTask: CoachTask = {
+        id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+        title: quickTodoInput.trim(),
+        category: 'PLAN',
+        dueDate: 'Hoy',
+        priority: quickTodoPriority,
+        completed: false
+      };
+      setTasks(prev => [newTask, ...prev]);
+      setQuickTodoInput('');
+      toast.success('Tarea agregada a To Do', { icon: '📌', duration: 2000 });
+    }
+  };
+
+  const handleScheduleTaskToCalendar = (task: CoachTask) => {
+    setNewApt({
+      athleteName: task.athleteName || 'Atleta Asignado',
+      title: task.title,
+      type: 'WORKOUT_1ON1',
+      date: WEEK_DAYS[0]?.fullDate || new Date().toISOString().split('T')[0],
+      timeStart: '10:00',
+      timeEnd: '11:00',
+      format: 'IN_PERSON',
+      locationOrLink: 'Gimnasio Central',
+      notes: `Generado desde To Do: ${task.title}`
+    });
+    setIsAppointmentModalOpen(true);
+  };
+
+  const handleDeleteTask = (id: string) => {
+    setTasks(prev => prev.filter(t => t.id !== id));
+    toast('Tarea eliminada', { icon: '🗑️' });
+  };
+
   // Tareas filtradas
   const filteredTasks = useMemo(() => {
     if (taskFilter === 'CYCLE') return tasks.filter(t => t.category === 'CYCLE_RENEWAL');
@@ -282,6 +570,16 @@ export const ProfessionalAgenda: React.FC = () => {
   const cycleTasks = useMemo(() => {
     return tasks.filter(t => t.category === 'CYCLE_RENEWAL' && !t.completed);
   }, [tasks]);
+
+  // Tareas filtradas para el panel Microsoft To Do
+  const toDoFilteredTasks = useMemo(() => {
+    return tasks.filter(t => {
+      if (toDoCategoryFilter === 'IMPORTANT') return t.priority === 'HIGH';
+      if (toDoCategoryFilter === 'HABITS') return t.category === 'PLAN' || t.category === 'CLIENT';
+      if (toDoCategoryFilter === 'CYCLES') return t.category === 'CYCLE_RENEWAL';
+      return true;
+    });
+  }, [tasks, toDoCategoryFilter]);
 
   const stats = useMemo(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -359,11 +657,11 @@ export const ProfessionalAgenda: React.FC = () => {
             className="py-2.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-black font-montserrat flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
           >
             <Plus size={15} />
-            <span>+ Agendar Turno</span>
+            <span>Agendar Turno</span>
           </button>
 
           {/* Fila secundaria simétrica en móvil */}
-          <div className="grid grid-cols-2 sm:flex items-center gap-2">
+          <div className="grid grid-cols-3 sm:flex items-center gap-2">
             <button
               onClick={() => setIsCycleConfigModalOpen(true)}
               className="py-2 px-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-[11px] font-bold font-montserrat flex items-center justify-center gap-1.5 transition-all shadow-2xs hover:bg-amber-100 dark:hover:bg-amber-900 active:scale-95 truncate cursor-pointer"
@@ -379,6 +677,19 @@ export const ProfessionalAgenda: React.FC = () => {
             >
               <CheckSquare size={13} className="text-emerald-500 shrink-0" />
               <span className="truncate">+ Tarea</span>
+            </button>
+
+            <button
+              onClick={() => setIsToDoOpen(prev => !prev)}
+              className={`py-2 px-3 rounded-2xl border text-[11px] font-bold font-montserrat flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-95 truncate cursor-pointer ${
+                isToDoOpen
+                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                  : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
+              }`}
+              title="Abrir o cerrar panel lateral de To Do"
+            >
+              <ListTodo size={13} className="shrink-0" />
+              <span className="truncate">To Do ({stats.pendingTasksCount})</span>
             </button>
           </div>
         </div>
@@ -512,225 +823,570 @@ export const ProfessionalAgenda: React.FC = () => {
       {/* 🌟 4. CONTENIDO SEGÚN LA PESTAÑA SELECCIONADA */}
       {activeTab === 'CALENDAR' ? (
         /* ═══════════════════════════════════════════════════════════════
-           PESTAÑA 1: CALENDARIO SEMANAL VISUAL (LIBRE / OCUPADO)
+           PESTAÑA 1: CALENDARIO SEMANAL VISUAL (LIBRE / OCUPADO) + TO DO
            ═══════════════════════════════════════════════════════════════ */
-        <div className="space-y-3">
+        <div className="space-y-4">
           
-          {/* Barra de navegación de la semana */}
-          <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center justify-between px-1">
-            <div className="flex items-center gap-2">
-              <div className="flex bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl p-0.5">
-                <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500">
+          {/* Barra de navegación de la semana con controles ágiles */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-white dark:bg-[#0a0d16] p-3 md:p-3.5 rounded-2xl border border-slate-200/80 dark:border-zinc-800 shadow-2xs">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              {/* Botones de navegación de semana */}
+              <div className="flex bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl p-0.5">
+                <button 
+                  onClick={() => setWeekOffset(prev => prev - 1)}
+                  className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-300 transition-colors cursor-pointer active:scale-95"
+                  title="Semana anterior"
+                >
                   <ChevronLeft size={16} />
                 </button>
-                <button className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-zinc-800 text-slate-500">
+                <button 
+                  onClick={() => setWeekOffset(prev => prev + 1)}
+                  className="p-1.5 rounded-lg hover:bg-white dark:hover:bg-zinc-800 text-slate-600 dark:text-zinc-300 transition-colors cursor-pointer active:scale-95"
+                  title="Semana siguiente"
+                >
                   <ChevronRight size={16} />
                 </button>
               </div>
-              <h2 className="text-sm md:text-base font-black font-montserrat text-slate-900 dark:text-white">
-                Semana Actual: {WEEK_DAYS[0]?.dateStr} al {WEEK_DAYS[6]?.dateStr}
-              </h2>
-            </div>
 
-            <div className="text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-1">
-              <Sparkles size={12} className="text-emerald-500" />
-              <span>Toca cualquier casilla libre para asignar un turno en 1 segundo.</span>
-            </div>
-          </div>
-
-          {/* MÓVIL: Selector de Día Horizontal + Lista de Horas (< md) */}
-          <div className="md:hidden space-y-3">
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
-              {WEEK_DAYS.map((day) => {
-                const isSelected = day.key === selectedMobileDay;
-                const todayStr = new Date().toISOString().split('T')[0];
-                const isToday = day.fullDate === todayStr;
-                const dayAptsCount = appointments.filter(a => (a.date === day.fullDate || a.date === day.dateStr) && a.status !== 'CANCELLED').length;
-
-                return (
-                  <button
-                    key={day.key}
-                    onClick={() => setSelectedMobileDay(day.key)}
-                    className={`flex-1 min-w-[46px] py-2 px-1 rounded-2xl border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer ${
-                      isSelected 
-                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' 
-                        : (isToday 
-                            ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' 
-                            : 'bg-white dark:bg-[#0a0d16] text-slate-700 dark:text-zinc-300 border-slate-200/80 dark:border-zinc-800')
-                    }`}
-                  >
-                    <span className="text-[9px] uppercase font-bold tracking-wider opacity-75">{day.name.slice(0, 3)}</span>
-                    <span className="text-xs font-black font-montserrat mt-0.5">{day.dateStr.split(' ')[0]}</span>
-                    {dayAptsCount > 0 && (
-                      <span className={`text-[8px] font-black px-1.5 py-0.2 rounded-full mt-0.5 ${
-                        isSelected ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300'
-                      }`}>
-                        {dayAptsCount}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Panel de Horarios del Día Seleccionado en Móvil */}
-            <div className="bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 pb-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
-                  <span className="text-xs font-black font-montserrat text-slate-900 dark:text-white">
-                    {selectedDayObj.name} {selectedDayObj.dateStr}
-                  </span>
-                </div>
+              {/* Botón Volver a Hoy */}
+              {!isCurrentWeek && (
                 <button
-                  onClick={() => setShowFullWeeklyGridMobile(prev => !prev)}
-                  className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
+                  onClick={() => setWeekOffset(0)}
+                  className="py-1 px-2.5 rounded-lg text-xs font-bold font-montserrat bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+                  title="Volver a la semana actual"
                 >
-                  <CalendarDays size={12} />
-                  <span>{showFullWeeklyGridMobile ? 'Ocultar Cuadrícula' : 'Ver Cuadrícula 7D'}</span>
+                  <RotateCcw size={11} />
+                  <span>Hoy</span>
                 </button>
+              )}
+
+              {/* Etiqueta de la Semana */}
+              <div className="flex items-center gap-2">
+                <h2 className="text-sm md:text-base font-black font-montserrat text-slate-900 dark:text-white">
+                  Semana: {WEEK_DAYS[0]?.name} {WEEK_DAYS[0]?.dateStr} — {WEEK_DAYS[6]?.name} {WEEK_DAYS[6]?.dateStr}
+                </h2>
+                {weekOffset !== 0 && (
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-800/60">
+                    {weekOffset > 0 ? `+${weekOffset} sem` : `${weekOffset} sem`}
+                  </span>
+                )}
               </div>
+            </div>
 
-              {/* Horarios del Día */}
-              <div className="divide-y divide-slate-100 dark:divide-zinc-900/80 max-h-[420px] overflow-y-auto pr-1">
-                {TIME_SLOTS.map((time) => {
-                  const slotHour = parseInt(time.split(':')[0], 10);
-                  const matchingApt = appointments.find(a => {
-                    const aptHour = parseInt(a.timeStart.split(':')[0], 10);
-                    return (a.date === selectedDayObj.fullDate || a.date === selectedDayObj.dateStr) && aptHour === slotHour;
-                  });
+            {/* Acciones de Navegación: Replicar Semana & Toggle To Do */}
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              <button
+                onClick={handleReplicateWeek}
+                className="py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold font-montserrat flex items-center gap-1.5 border border-slate-200 dark:border-zinc-700 shadow-2xs transition-all active:scale-95 cursor-pointer"
+                title="Copia los turnos y actividades de esta semana a la siguiente semana (+7 días)"
+              >
+                <Repeat size={13} className="text-indigo-600 dark:text-indigo-400" />
+                <span>Replicar Semana</span>
+              </button>
 
-                  if (matchingApt) {
-                    const service = serviceTypes.find(s => s.id === matchingApt.type);
-                    return (
-                      <div key={time} className="py-2.5 flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span className="w-11 text-xs font-mono font-bold text-slate-400 shrink-0">{time}</span>
-                          <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-xs min-w-0">
-                            <span className="text-xs font-black font-montserrat block truncate">{matchingApt.athleteName}</span>
-                            <span className="text-[10px] text-indigo-100 block truncate">{service ? `${service.emoji} ${service.defaultTitle}` : matchingApt.title}</span>
-                          </div>
-                        </div>
-                        <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
-                          Ocupado
-                        </span>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div key={time} className="py-2 flex items-center justify-between gap-2 group">
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-11 text-xs font-mono font-bold text-slate-400">{time}</span>
-                        <span className="text-xs font-medium text-slate-400 italic">Libre</span>
-                      </div>
-                      <button
-                        onClick={() => handleQuickBookSlot(selectedDayObj.fullDate, time)}
-                        className="py-1 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
-                      >
-                        <Plus size={12} />
-                        <span>Agendar</span>
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
+              <button
+                onClick={() => setIsToDoOpen(prev => !prev)}
+                className={`py-1.5 px-3 rounded-xl text-xs font-bold font-montserrat flex items-center gap-1.5 border transition-all active:scale-95 cursor-pointer ${
+                  isToDoOpen
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                    : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-50'
+                }`}
+                title="Alternar panel Microsoft To Do"
+              >
+                <ListTodo size={13} />
+                <span>{isToDoOpen ? 'Ocultar To Do' : 'Ver To Do'}</span>
+              </button>
             </div>
           </div>
 
-          {/* Cuadrícula Semanal con Scroll Horizontal Seguro (Visible en Desktop o al expandir en Móvil) */}
-          <div className={`${showFullWeeklyGridMobile ? 'block' : 'hidden md:block'} bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl overflow-x-auto shadow-xs`}>
-            <div className="min-w-[700px]">
-            
-            {/* Cabecera de Días */}
-            <div className="grid grid-cols-8 border-b border-slate-200 dark:border-zinc-800 bg-slate-50/80 dark:bg-zinc-900/60 text-center text-xs font-black font-montserrat">
-              <div className="py-3 px-2 border-r border-slate-200 dark:border-zinc-800 text-slate-400 font-mono">
-                HORA
-              </div>
-              {WEEK_DAYS.map((day) => {
-                const todayStr = new Date().toISOString().split('T')[0];
-                const isToday = day.fullDate === todayStr;
-                return (
-                  <div
-                    key={day.key}
-                    className={`py-3 px-1 border-r border-slate-200 dark:border-zinc-800 last:border-r-0 ${
-                      isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-zinc-300'
-                    }`}
-                  >
-                    <span className="block text-[11px] uppercase tracking-wider">{day.name}</span>
-                    <span className="block text-xs font-mono font-bold">{day.dateStr}</span>
-                  </div>
-                );
-              })}
+          {/* Guía Pedagógica de Drag-to-Select */}
+          <div className="flex items-center justify-between text-xs px-2 py-1 bg-slate-50/50 dark:bg-zinc-900/30 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800">
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400">
+              <Sparkles size={13} className="text-indigo-500 shrink-0" />
+              <span className="hidden sm:inline"><b>Tip de Productividad:</b> Haz clic y <b>arrastra el mouse</b> sobre varios días/horas corrido para agendar o bloquear en lote.</span>
+              <span className="sm:hidden"><b>Tip:</b> Arrastra el mouse para agendar días corridos.</span>
             </div>
+            <span className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 font-bold shrink-0">
+              Google Calendar Style ⚡
+            </span>
+          </div>
 
-            {/* Filas de Horas */}
-            <div className="divide-y divide-slate-100 dark:divide-zinc-900">
-              {TIME_SLOTS.map((time) => (
-                <div key={time} className="grid grid-cols-8 min-h-[58px]">
-                  
-                  {/* Hora */}
-                  <div className="p-2 border-r border-slate-200 dark:border-zinc-800 flex items-center justify-center text-xs font-mono font-bold text-slate-400 bg-slate-50/30 dark:bg-zinc-900/10">
-                    {time}
+          {/* CONTENEDOR FLEX: CALENDARIO + PANEL MICROSOFT TO DO */}
+          <div className="flex flex-col xl:flex-row gap-5 items-start">
+            
+            {/* ═══ COLUMNA PRINCIPAL: CUADRÍCULA DEL CALENDARIO ═══ */}
+            <div className="flex-1 w-full min-w-0 space-y-3">
+              
+              {/* MÓVIL: Selector de Día Horizontal + Lista de Horas (< md) */}
+              <div className="md:hidden space-y-3">
+                <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1">
+                  {WEEK_DAYS.map((day) => {
+                    const isSelected = day.key === selectedMobileDay;
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    const isToday = day.fullDate === todayStr;
+                    const dayAptsCount = appointments.filter(a => (a.date === day.fullDate || a.date === day.dateStr) && a.status !== 'CANCELLED').length;
+
+                    return (
+                      <button
+                        key={day.key}
+                        onClick={() => setSelectedMobileDay(day.key)}
+                        className={`flex-1 min-w-[46px] py-2 px-1 rounded-2xl border transition-all active:scale-95 flex flex-col items-center justify-center cursor-pointer ${
+                          isSelected 
+                            ? 'bg-indigo-600 text-white border-indigo-600 shadow-sm' 
+                            : (isToday 
+                                ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800' 
+                                : 'bg-white dark:bg-[#0a0d16] text-slate-700 dark:text-zinc-300 border-slate-200/80 dark:border-zinc-800')
+                        }`}
+                      >
+                        <span className="text-[9px] uppercase font-bold tracking-wider opacity-75">{day.name.slice(0, 3)}</span>
+                        <span className="text-xs font-black font-montserrat mt-0.5">{day.dateStr.split(' ')[0]}</span>
+                        {dayAptsCount > 0 && (
+                          <span className={`text-[8px] font-black px-1.5 py-0.2 rounded-full mt-0.5 ${
+                            isSelected ? 'bg-white/20 text-white' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300'
+                          }`}>
+                            {dayAptsCount}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Panel de Horarios del Día Seleccionado en Móvil */}
+                <div className="bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 pb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                      <span className="text-xs font-black font-montserrat text-slate-900 dark:text-white">
+                        {selectedDayObj.name} {selectedDayObj.dateStr}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setShowFullWeeklyGridMobile(prev => !prev)}
+                      className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      <CalendarDays size={12} />
+                      <span>{showFullWeeklyGridMobile ? 'Ocultar Cuadrícula' : 'Ver Cuadrícula 7D'}</span>
+                    </button>
                   </div>
 
-                  {/* 7 Días */}
-                  {WEEK_DAYS.map((day) => {
-                    const slotHour = parseInt(time.split(':')[0], 10);
-                    
-                    const matchingApt = appointments.find(a => {
-                      const aptHour = parseInt(a.timeStart.split(':')[0], 10);
-                      return (a.date === day.fullDate || a.date === day.dateStr) && aptHour === slotHour;
-                    });
+                  {/* Horarios del Día */}
+                  <div className="divide-y divide-slate-100 dark:divide-zinc-900/80 max-h-[420px] overflow-y-auto pr-1">
+                    {TIME_SLOTS.map((time) => {
+                      const slotHour = parseInt(time.split(':')[0], 10);
+                      const matchingApt = appointments.find(a => {
+                        const aptHour = parseInt(a.timeStart.split(':')[0], 10);
+                        return (a.date === selectedDayObj.fullDate || a.date === selectedDayObj.dateStr) && aptHour === slotHour;
+                      });
 
-                    if (matchingApt) {
-                      const service = serviceTypes.find(s => s.id === matchingApt.type);
+                      if (matchingApt) {
+                        const service = serviceTypes.find(s => s.id === matchingApt.type);
+                        return (
+                          <div key={time} className="py-2.5 flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <span className="w-11 text-xs font-mono font-bold text-slate-400 shrink-0">{time}</span>
+                              <div className="p-2 rounded-xl bg-indigo-600 text-white shadow-xs min-w-0">
+                                <span className="text-xs font-black font-montserrat block truncate">{matchingApt.athleteName}</span>
+                                <span className="text-[10px] text-indigo-100 block truncate">{service ? `${service.emoji} ${service.defaultTitle}` : matchingApt.title}</span>
+                              </div>
+                            </div>
+                            <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
+                              Ocupado
+                            </span>
+                          </div>
+                        );
+                      }
+
+                      return (
+                        <div key={time} className="py-2 flex items-center justify-between gap-2 group">
+                          <div className="flex items-center gap-2.5">
+                            <span className="w-11 text-xs font-mono font-bold text-slate-400">{time}</span>
+                            <span className="text-xs font-medium text-slate-400 italic">Libre</span>
+                          </div>
+                          <button
+                            onClick={() => handleQuickBookSlot(selectedDayObj.fullDate, time)}
+                            className="py-1 px-2.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 text-[11px] font-bold active:scale-95 transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <Plus size={12} />
+                            <span>Agendar</span>
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Cuadrícula Semanal con Drag-to-Select (Visible en Desktop o expandida en Móvil) */}
+              <div 
+                onMouseLeave={() => {
+                  // Si el usuario saca el cursor con arrastre activo, el listener global en window se encarga
+                }}
+                className={`${showFullWeeklyGridMobile ? 'block' : 'hidden md:block'} bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl overflow-x-auto shadow-xs select-none relative`}
+              >
+                <div className="min-w-[700px]">
+                
+                  {/* Cabecera de Días */}
+                  <div className="grid grid-cols-8 border-b border-slate-200 dark:border-zinc-800 bg-slate-50/80 dark:bg-zinc-900/60 text-center text-xs font-black font-montserrat select-none">
+                    <div className="py-3 px-2 border-r border-slate-200 dark:border-zinc-800 text-slate-400 font-mono">
+                      HORA
+                    </div>
+                    {WEEK_DAYS.map((day) => {
+                      const todayStr = new Date().toISOString().split('T')[0];
+                      const isToday = day.fullDate === todayStr;
                       return (
                         <div
                           key={day.key}
-                          className="p-1 border-r border-slate-100 dark:border-zinc-900 last:border-r-0 bg-indigo-50/40 dark:bg-indigo-950/20"
+                          className={`py-3 px-1 border-r border-slate-200 dark:border-zinc-800 last:border-r-0 select-none ${
+                            isToday ? 'bg-indigo-50/70 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400' : 'text-slate-700 dark:text-zinc-300'
+                          }`}
                         >
-                          <div className="h-full w-full p-2 rounded-xl bg-indigo-600 text-white shadow-xs flex flex-col justify-between cursor-pointer hover:bg-indigo-500 transition-colors">
-                            <div className="flex items-center justify-between gap-1">
-                              <span className="text-[10px] font-mono font-bold text-indigo-100">
-                                {matchingApt.timeStart}
-                              </span>
-                              <span className="text-[8px] font-black uppercase px-1 py-0.2 rounded bg-white/20 truncate max-w-[50px]">
-                                {service ? `${service.emoji} ${service.defaultTitle.slice(0, 6)}` : 'Turno'}
-                              </span>
-                            </div>
-                            <span className="text-xs font-black font-montserrat truncate block">
-                              {matchingApt.athleteName}
-                            </span>
-                          </div>
+                          <span className="block text-[11px] uppercase tracking-wider">{day.name}</span>
+                          <span className="block text-xs font-mono font-bold">{day.dateStr}</span>
                         </div>
                       );
-                    }
+                    })}
+                  </div>
 
-                    // Celda Libre
-                    return (
-                      <div
-                        key={day.key}
-                        onClick={() => handleQuickBookSlot(day.fullDate, time)}
-                        className="p-1 border-r border-slate-100 dark:border-zinc-900 last:border-r-0 group cursor-pointer hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20 transition-colors"
-                      >
-                        <div className="h-full w-full rounded-xl border border-dashed border-slate-200/80 dark:border-zinc-800 group-hover:border-emerald-400 dark:group-hover:border-emerald-600 flex items-center justify-center transition-all p-1">
-                          <span className="text-[10px] font-bold text-slate-300 dark:text-zinc-700 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:scale-105 transition-all flex items-center gap-0.5">
-                            <Plus size={11} />
-                            <span>Libre</span>
-                          </span>
+                  {/* Filas de Horas con Soporte Drag-to-Select */}
+                  <div className="divide-y divide-slate-100 dark:divide-zinc-900">
+                    {TIME_SLOTS.map((time, timeIndex) => (
+                      <div key={time} className="grid grid-cols-8 min-h-[58px]">
+                        
+                        {/* Celda Hora */}
+                        <div className="p-2 border-r border-slate-200 dark:border-zinc-800 flex items-center justify-center text-xs font-mono font-bold text-slate-400 bg-slate-50/30 dark:bg-zinc-900/10 select-none">
+                          {time}
                         </div>
+
+                        {/* 7 Días */}
+                        {WEEK_DAYS.map((day, dayIndex) => {
+                          const slotHour = parseInt(time.split(':')[0], 10);
+                          const isSelected = isCellSelected(dayIndex, timeIndex);
+                          
+                          const matchingApt = appointments.find(a => {
+                            const aptHour = parseInt(a.timeStart.split(':')[0], 10);
+                            return (a.date === day.fullDate || a.date === day.dateStr) && aptHour === slotHour;
+                          });
+
+                          if (matchingApt) {
+                            const service = serviceTypes.find(s => s.id === matchingApt.type);
+                            return (
+                              <div
+                                key={day.key}
+                                onMouseDown={(e) => handleCellMouseDown(dayIndex, timeIndex, e)}
+                                onMouseEnter={() => handleCellMouseEnter(dayIndex, timeIndex)}
+                                onMouseUp={handleGridMouseUp}
+                                className={`p-1 border-r border-slate-100 dark:border-zinc-900 last:border-r-0 select-none transition-all ${
+                                  isSelected 
+                                    ? 'bg-indigo-600/30 ring-2 ring-indigo-500 shadow-md z-10' 
+                                    : 'bg-indigo-50/40 dark:bg-indigo-950/20'
+                                }`}
+                              >
+                                <div className="h-full w-full p-2 rounded-xl bg-indigo-600 text-white shadow-xs flex flex-col justify-between cursor-pointer hover:bg-indigo-500 transition-colors">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="text-[10px] font-mono font-bold text-indigo-100">
+                                      {matchingApt.timeStart}
+                                    </span>
+                                    <span className="text-[8px] font-black uppercase px-1 py-0.2 rounded bg-white/20 truncate max-w-[50px]">
+                                      {service ? `${service.emoji} ${service.defaultTitle.slice(0, 6)}` : 'Turno'}
+                                    </span>
+                                  </div>
+                                  <span className="text-xs font-black font-montserrat truncate block">
+                                    {matchingApt.athleteName}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          // Celda Libre Intercativa para Drag o Clic Único
+                          return (
+                            <div
+                              key={day.key}
+                              onMouseDown={(e) => handleCellMouseDown(dayIndex, timeIndex, e)}
+                              onMouseEnter={() => handleCellMouseEnter(dayIndex, timeIndex)}
+                              onMouseUp={handleGridMouseUp}
+                              onClick={() => {
+                                if (!dragJustEnded) {
+                                  handleQuickBookSlot(day.fullDate, time);
+                                }
+                              }}
+                              className={`p-1 border-r border-slate-100 dark:border-zinc-900 last:border-r-0 group cursor-pointer select-none transition-all ${
+                                isSelected 
+                                  ? 'bg-indigo-500/25 ring-2 ring-indigo-500 ring-inset shadow-inner z-10 scale-[0.98]' 
+                                  : 'hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20'
+                              }`}
+                            >
+                              <div className={`h-full w-full rounded-xl border flex items-center justify-center transition-all p-1 ${
+                                isSelected 
+                                  ? 'border-indigo-500 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs' 
+                                  : 'border-dashed border-slate-200/80 dark:border-zinc-800 group-hover:border-emerald-400 dark:group-hover:border-emerald-600'
+                              }`}>
+                                {isSelected ? (
+                                  <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-300 animate-pulse flex items-center gap-1">
+                                    <Sparkles size={10} />
+                                    <span>Seleccionado</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] font-bold text-slate-300 dark:text-zinc-700 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 group-hover:scale-105 transition-all flex items-center gap-0.5">
+                                    <Plus size={11} />
+                                    <span>Libre</span>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+
                       </div>
-                    );
-                  })}
+                    ))}
+                  </div>
 
                 </div>
-              ))}
+              </div>
+
             </div>
 
+            {/* ═══ COLUMNA LATERAL: PANEL MICROSOFT TO DO ═══ */}
+            {isToDoOpen && (
+              <div className="w-full xl:w-80 shrink-0 bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-4">
+                {/* Cabecera del To Do */}
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-xs">
+                      <ListTodo size={16} />
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-black font-montserrat text-slate-900 dark:text-white uppercase tracking-wider">
+                        Microsoft To Do
+                      </h3>
+                      <p className="text-[10px] text-slate-400">
+                        {toDoFilteredTasks.filter(t => !t.completed).length} pendientes
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsToDoOpen(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                    title="Cerrar panel lateral"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+
+                {/* Input de Adición Rápida (Estilo Microsoft To Do) */}
+                <div className="space-y-2 p-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <Plus size={14} className="text-indigo-500 shrink-0" />
+                    <input
+                      type="text"
+                      placeholder="Agregar tarea... (Enter)"
+                      value={quickTodoInput}
+                      onChange={e => setQuickTodoInput(e.target.value)}
+                      onKeyDown={handleAddQuickTodo}
+                      className="w-full text-xs bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                    />
+                  </div>
+
+                  {/* Selector rápido de prioridad para la tarea */}
+                  <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-zinc-800">
+                    <span className="text-[9px] font-bold uppercase text-slate-400">Prioridad</span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => setQuickTodoPriority('HIGH')}
+                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-all ${
+                          quickTodoPriority === 'HIGH' 
+                            ? 'bg-rose-100 dark:bg-rose-950 text-rose-600 font-black ring-1 ring-rose-400' 
+                            : 'text-slate-400 hover:text-rose-500'
+                        }`}
+                        title="Prioridad Alta"
+                      >
+                        🔴 Alta
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setQuickTodoPriority('MEDIUM')}
+                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-all ${
+                          quickTodoPriority === 'MEDIUM' 
+                            ? 'bg-amber-100 dark:bg-amber-950 text-amber-600 font-black ring-1 ring-amber-400' 
+                            : 'text-slate-400 hover:text-amber-500'
+                        }`}
+                        title="Prioridad Media"
+                      >
+                        🟡 Media
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setQuickTodoPriority('LOW')}
+                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-all ${
+                          quickTodoPriority === 'LOW' 
+                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600 font-black ring-1 ring-emerald-400' 
+                            : 'text-slate-400 hover:text-emerald-500'
+                        }`}
+                        title="Prioridad Baja"
+                      >
+                        🟢 Baja
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Filtros de Categorías de To Do */}
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1">
+                  <button
+                    onClick={() => setToDoCategoryFilter('ALL')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer ${
+                      toDoCategoryFilter === 'ALL'
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    Todas ({tasks.length})
+                  </button>
+                  <button
+                    onClick={() => setToDoCategoryFilter('IMPORTANT')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      toDoCategoryFilter === 'IMPORTANT'
+                        ? 'bg-rose-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Star size={10} />
+                    <span>Importantes</span>
+                  </button>
+                  <button
+                    onClick={() => setToDoCategoryFilter('HABITS')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      toDoCategoryFilter === 'HABITS'
+                        ? 'bg-emerald-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Flame size={10} />
+                    <span>Hábitos</span>
+                  </button>
+                  <button
+                    onClick={() => setToDoCategoryFilter('CYCLES')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      toDoCategoryFilter === 'CYCLES'
+                        ? 'bg-amber-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Hourglass size={10} />
+                    <span>Ciclos ({stats.expiringCyclesCount})</span>
+                  </button>
+                </div>
+
+                {/* Lista de Tareas con Check Circular y Agendado con 1 Clic */}
+                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                  {toDoFilteredTasks.length === 0 ? (
+                    <div className="py-8 px-4 text-center rounded-2xl bg-slate-50 dark:bg-zinc-900/40 border border-slate-100 dark:border-zinc-800 text-slate-400 space-y-1.5">
+                      <CheckCircle2 size={24} className="mx-auto text-emerald-500 opacity-60" />
+                      <p className="text-xs font-bold text-slate-700 dark:text-zinc-300">¡Todo al día!</p>
+                      <p className="text-[10px]">No hay tareas pendientes en este filtro.</p>
+                    </div>
+                  ) : (
+                    toDoFilteredTasks.map((task) => (
+                      <div
+                        key={task.id}
+                        className={`p-2.5 rounded-2xl border transition-all flex items-start justify-between gap-2 group ${
+                          task.completed
+                            ? 'bg-slate-50/60 dark:bg-zinc-900/30 border-slate-200/50 dark:border-zinc-800/40 opacity-60'
+                            : 'bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 shadow-2xs hover:border-indigo-400'
+                        }`}
+                      >
+                        {/* Checkbox Circular */}
+                        <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleTask(task.id)}
+                            className={`w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center transition-all cursor-pointer ${
+                              task.completed
+                                ? 'bg-emerald-500 text-white'
+                                : 'border-2 border-slate-300 dark:border-zinc-600 hover:border-emerald-500'
+                            }`}
+                            title={task.completed ? "Desmarcar" : "Completar"}
+                          >
+                            {task.completed && <Check size={11} className="stroke-[3]" />}
+                          </button>
+
+                          <div className="min-w-0 flex-1">
+                            <h4 className={`text-xs font-bold font-montserrat leading-snug break-words ${
+                              task.completed 
+                                ? 'line-through text-slate-400 dark:text-zinc-500' 
+                                : 'text-slate-800 dark:text-zinc-200'
+                            }`}>
+                              {task.title}
+                            </h4>
+
+                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                              <span className={`text-[8px] font-black uppercase px-1.5 py-0.2 rounded ${
+                                task.priority === 'HIGH'
+                                  ? 'bg-rose-50 dark:bg-rose-950 text-rose-600'
+                                  : task.priority === 'MEDIUM'
+                                    ? 'bg-amber-50 dark:bg-amber-950 text-amber-600'
+                                    : 'bg-slate-100 dark:bg-zinc-800 text-slate-500'
+                              }`}>
+                                {task.priority}
+                              </span>
+
+                              {task.category === 'CYCLE_RENEWAL' && (
+                                <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 uppercase">
+                                  ⏳ Ciclo
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Acciones de la Tarea: Agendar al Calendario o Borrar */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          {!task.completed && (
+                            <button
+                              type="button"
+                              onClick={() => handleScheduleTaskToCalendar(task)}
+                              className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors cursor-pointer"
+                              title="Agendar al calendario con 1 clic"
+                            >
+                              <CalendarIcon size={12} />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="p-1.5 rounded-lg text-slate-300 hover:text-rose-500 dark:text-zinc-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                            title="Eliminar tarea"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
           </div>
+
+          {/* 🌟 PÍLDORA FLOTANTE AL ARRASTRAR (DRAG-TO-SELECT FEEDBACK) */}
+          {isDragging && selectionBounds && (
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/95 text-white px-5 py-3 rounded-2xl shadow-2xl backdrop-blur-md border border-indigo-500/60 flex items-center gap-3 animate-pulse pointer-events-none">
+              <div className="w-3 h-3 rounded-full bg-indigo-400 animate-ping shrink-0" />
+              <div>
+                <p className="text-xs font-black font-montserrat text-indigo-200">
+                  🎨 Pintando {selectionBounds.maxDay - selectionBounds.minDay + 1} días ({TIME_SLOTS[selectionBounds.minTime]} - {TIME_SLOTS[selectionBounds.maxTime]})
+                </p>
+                <p className="text-[10px] text-slate-300">
+                  Soltá el mouse para agendar o bloquear en lote
+                </p>
+              </div>
+            </div>
+          )}
+
         </div>
-      </div>
       ) : activeTab === 'TASKS' ? (
         /* ═══════════════════════════════════════════════════════════════
            PESTAÑA 2: AVISOS DE FIN DE CICLO & LISTA DE TAREAS
@@ -1022,6 +1678,199 @@ export const ProfessionalAgenda: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 🌟 4.5. MODAL: CONFIRMAR AGENDADO EN BLOQUE (DRAG-TO-SELECT MÚLTIPLES DÍAS) */}
+      <AnimatePresence>
+        {isMultiSelectModalOpen && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 font-lato"
+            >
+              {/* Encabezado del Modal */}
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center font-bold shadow-xs">
+                    <Sparkles size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black font-montserrat text-slate-900 dark:text-white uppercase tracking-wider">
+                      Agendar en Bloque Corrido
+                    </h3>
+                    <p className="text-[10px] text-slate-400 font-mono">
+                      {multiSelectData.selectedDays.length} días • {multiSelectData.timeStart} a {multiSelectData.timeEnd}
+                    </p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setIsMultiSelectModalOpen(false)} 
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-200 hover:bg-slate-100 dark:hover:bg-zinc-800 cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Chips de Días Seleccionados */}
+              <div className="flex flex-wrap gap-1.5 p-3 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-800/60">
+                {multiSelectData.selectedDays.map(d => (
+                  <span key={d.key} className="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-white dark:bg-zinc-800 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-zinc-700 shadow-2xs">
+                    {d.name} {d.dateStr}
+                  </span>
+                ))}
+              </div>
+
+              <form onSubmit={handleConfirmMultiBlock} className="space-y-3.5">
+                {/* Selector de Modo: Turnos Diarios vs Bloqueo Continuo */}
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400 block mb-1.5">
+                    Modo de Asignación
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setMultiSelectData(prev => ({ ...prev, creationMode: 'INDIVIDUAL_DAYS' }))}
+                      className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
+                        multiSelectData.creationMode === 'INDIVIDUAL_DAYS'
+                          ? 'bg-indigo-50 dark:bg-indigo-950/60 border-indigo-500 ring-2 ring-indigo-500/20 text-indigo-950 dark:text-indigo-200'
+                          : 'bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-black font-montserrat">
+                        <CalendarDays size={13} className="text-indigo-600" />
+                        <span>Turnos Diarios</span>
+                      </div>
+                      <p className="text-[10px] mt-1 opacity-75 leading-tight">
+                        Crea una sesión individual para cada día seleccionado. (Recomendado)
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMultiSelectData(prev => ({ ...prev, creationMode: 'CONTINUOUS_BLOCK' }))}
+                      className={`p-2.5 rounded-2xl border text-left transition-all cursor-pointer ${
+                        multiSelectData.creationMode === 'CONTINUOUS_BLOCK'
+                          ? 'bg-purple-50 dark:bg-purple-950/60 border-purple-500 ring-2 ring-purple-500/20 text-purple-950 dark:text-purple-200'
+                          : 'bg-white dark:bg-zinc-800 border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-zinc-400 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 text-xs font-black font-montserrat">
+                        <Hourglass size={13} className="text-purple-600" />
+                        <span>Bloqueo Horario</span>
+                      </div>
+                      <p className="text-[10px] mt-1 opacity-75 leading-tight">
+                        Bloquea tu disponibilidad para workshop, capacitación o descanso.
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Título de la Sesión o Bloque */}
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400 block mb-1">
+                    Título o Motivo
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={multiTitle}
+                    onChange={e => setMultiTitle(e.target.value)}
+                    placeholder="Ej: Entrenamiento Físico / Evaluación Semanal"
+                    className="w-full px-3.5 py-2 rounded-xl text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 outline-none text-slate-900 dark:text-white font-medium"
+                  />
+                </div>
+
+                {/* Tipo de Servicio & Atleta */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 block mb-1">
+                      Tipo de Servicio
+                    </label>
+                    <select
+                      value={multiType}
+                      onChange={e => setMultiType(e.target.value)}
+                      className="w-full px-3.5 py-2 rounded-xl text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 outline-none text-slate-900 dark:text-white font-medium"
+                    >
+                      {serviceTypes.map(s => (
+                        <option key={s.id} value={s.id}>
+                          {s.emoji} {s.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 block mb-1">
+                      Atleta Asignado (Opcional)
+                    </label>
+                    <input
+                      type="text"
+                      value={multiAthlete}
+                      onChange={e => setMultiAthlete(e.target.value)}
+                      placeholder="Ej: Grupo Avanzado o Nombre"
+                      className="w-full px-3.5 py-2 rounded-xl text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 outline-none text-slate-900 dark:text-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Horarios Aplicados */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 block mb-1">Hora Inicio</label>
+                    <input
+                      type="time"
+                      value={multiSelectData.timeStart}
+                      onChange={e => setMultiSelectData(prev => ({ ...prev, timeStart: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 outline-none text-slate-900 dark:text-white font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-black uppercase text-slate-400 block mb-1">Hora Fin</label>
+                    <input
+                      type="time"
+                      value={multiSelectData.timeEnd}
+                      onChange={e => setMultiSelectData(prev => ({ ...prev, timeEnd: e.target.value }))}
+                      className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 outline-none text-slate-900 dark:text-white font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* Notas Adicionales */}
+                <div>
+                  <label className="text-[10px] font-black uppercase text-slate-400 block mb-1">Notas Adicionales</label>
+                  <input
+                    type="text"
+                    value={multiNotes}
+                    onChange={e => setMultiNotes(e.target.value)}
+                    placeholder="Ej: Traer hidratación, plan semanal replicado..."
+                    className="w-full px-3.5 py-2 rounded-xl text-xs bg-slate-50 dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 outline-none text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                {/* Botones de Acción */}
+                <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-zinc-800">
+                  <button
+                    type="button"
+                    onClick={() => setIsMultiSelectModalOpen(false)}
+                    className="py-2 px-4 rounded-xl bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 text-xs font-bold cursor-pointer hover:bg-slate-200"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    className="py-2 px-5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold font-montserrat shadow-xs active:scale-95 transition-all cursor-pointer"
+                  >
+                    {multiSelectData.creationMode === 'INDIVIDUAL_DAYS' 
+                      ? `Confirmar ${multiSelectData.selectedDays.length} Turnos` 
+                      : 'Confirmar Bloqueo'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* 🌟 5. MODAL: AGENDAR NUEVO TURNO (CON SERVICIOS PERSONALIZABLES) */}
       <AnimatePresence>
