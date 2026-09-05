@@ -91,7 +91,7 @@ export const CommandCenter: React.FC = () => {
             try {
                 // Labor Illusion steps
                 setTimeout(() => { if(isMounted) setLoadingMessage('Calculando ACWR de la cartera de clientes...'); }, 200);
-                setTimeout(() => { if(isMounted) setLoadingMessage('Optimizando Panel Principal...'); }, 400);
+                setTimeout(() => { if(isMounted) setLoadingMessage('Sincronizando resumen de Inicio...'); }, 400);
 
                 const data = await trainerApi.getDashboard();
                 if (isMounted) setDashboardData(data);
@@ -299,8 +299,8 @@ export const CommandCenter: React.FC = () => {
             <header className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-50">
                 <div className="flex items-center gap-4">
                     <div>
-                        <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>Panel Principal</h1>
-                        <p className={`mt-0.5 text-xs md:text-sm ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>Tu resumen del día</p>
+                        <h1 className={`text-2xl md:text-3xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>Inicio</h1>
+                        <p className={`mt-0.5 text-xs md:text-sm ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>Tu centro de control y resumen operativo</p>
                     </div>
                 </div>
 
@@ -310,8 +310,8 @@ export const CommandCenter: React.FC = () => {
                         onClick={() => setIsCreateOpen(!isCreateOpen)}
                         className={`flex items-center gap-2 font-black uppercase tracking-widest text-xs px-5 py-2.5 rounded-xl transition-all ${
                             isClinical 
-                                ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-md hover:shadow-lg' 
-                                : 'bg-indigo-500 hover:bg-indigo-400 text-black shadow-[0_0_20px_rgba(206,255,0,0.3)] hover:shadow-[0_0_30px_rgba(206,255,0,0.5)]'
+                                ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-sm hover:shadow-md' 
+                                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 hover:shadow-lg hover:shadow-indigo-600/30'
                         }`}
                     >
                         <Plus size={16} /> Nuevo <ChevronDown size={14} className="ml-1 opacity-70" />
@@ -459,12 +459,12 @@ export const CommandCenter: React.FC = () => {
                             <div>
                                 <div className="flex items-center gap-2 flex-wrap">
                                     <span className={`font-black text-sm ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                        {riskClients.length === 1 ? '1 Atleta requiere atención' : `${riskClients.length} Atletas requieren atención`}
+                                        {riskClients.length === 1 ? (isClinical ? '1 Paciente requiere atención' : '1 Alumno requiere atención') : `${riskClients.length} ${isClinical ? 'Pacientes' : 'Alumnos'} requieren atención`}
                                     </span>
-                                    <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                                    <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full ${
                                         isClinical ? 'bg-rose-100 text-rose-700' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                                     }`}>
-                                        Alerta Clínica / Carga
+                                        Prioridad Alta
                                     </span>
                                 </div>
                                 <p className={`text-xs mt-0.5 ${isClinical ? 'text-slate-600' : 'text-zinc-400'}`}>
@@ -479,7 +479,7 @@ export const CommandCenter: React.FC = () => {
                             className={`shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                                 isClinical 
                                     ? 'bg-rose-600 hover:bg-rose-700 text-white shadow-sm' 
-                                    : 'bg-rose-500 hover:bg-rose-400 text-black font-black shadow-lg shadow-rose-500/20'
+                                    : 'bg-rose-600 hover:bg-rose-500 text-white font-bold shadow-md shadow-rose-600/20'
                             }`}
                         >
                             Revisar Casos <ChevronRight size={14} />
@@ -490,10 +490,10 @@ export const CommandCenter: React.FC = () => {
 
             {/* 2. HERO CARDS OPERATIVOS: Revisiones, Agenda y Atletas en Seguimiento (Diseño Compacto & Prolijo) */}
             {(safeData.clients.length) > 0 && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     {/* Tarjeta 1: Revisiones (Video de Técnica & Fotos de Platos) */}
                     <motion.div 
-                        whileHover={{ y: -2, scale: 1.01 }}
+                        whileHover={{ y: -2 }}
                         whileTap={{ scale: 0.99 }}
                         onClick={() => {
                             if (swipeQueue.length > 0) {
@@ -502,41 +502,37 @@ export const CommandCenter: React.FC = () => {
                                 navigate('/validations');
                             }
                         }} 
-                        className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-4.5 flex flex-col justify-between ${
-                            swipeQueue.length > 0 
-                                ? (isClinical 
-                                    ? 'bg-gradient-to-br from-indigo-500/[0.07] via-white/95 to-purple-500/[0.03] border-indigo-200/90 shadow-[0_4px_20px_rgba(99,102,241,0.06)] hover:shadow-[0_8px_25px_rgba(99,102,241,0.12)] hover:border-indigo-400' 
-                                    : 'bg-gradient-to-br from-indigo-950/40 via-zinc-900/90 to-purple-950/20 border-indigo-500/30 hover:border-indigo-400/60 shadow-lg shadow-indigo-950/20')
-                                : (isClinical 
-                                    ? 'bg-gradient-to-br from-slate-50/80 via-white to-indigo-50/30 border-slate-200/80 hover:border-indigo-300 shadow-2xs hover:shadow-xs' 
-                                    : 'bg-zinc-900/90 border-zinc-800 hover:border-zinc-700')
+                        className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-5 flex flex-col justify-between backdrop-blur-xl ${
+                            isClinical 
+                                ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_25px_rgba(99,102,241,0.08)] hover:border-indigo-300' 
+                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:border-indigo-500/40'
                         }`}
                     >
-                        {/* Specular Top Rim Light */}
-                        <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent pointer-events-none" />
+                        {/* Specular Cut-Glass Edge Light */}
+                        <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-indigo-400/30 dark:via-indigo-400/20 to-transparent pointer-events-none" />
 
                         {/* Top Row: Icon Capsule + Status Badge */}
-                        <div className="flex items-center justify-between mb-2.5">
-                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 duration-300 shadow-sm ${
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 duration-200 shadow-xs border ${
                                 swipeQueue.length > 0 
-                                    ? 'bg-gradient-to-tr from-indigo-600 to-purple-600 text-white shadow-indigo-500/20' 
-                                    : (isClinical ? 'bg-indigo-50 text-indigo-600 border border-indigo-200/60' : 'bg-indigo-500/20 text-indigo-400')
+                                    ? (isClinical ? 'bg-indigo-50 text-indigo-600 border-indigo-200/80' : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40') 
+                                    : (isClinical ? 'bg-slate-100/70 text-slate-600 border-slate-200/60' : 'bg-white/5 text-zinc-400 border-white/5')
                             }`}>
                                 <Video size={18} />
                                 {swipeQueue.length > 0 && (
-                                    <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-rose-500 border-2 border-white dark:border-zinc-900 rounded-full animate-ping" />
+                                    <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-rose-500 border-2 border-white dark:border-zinc-900 rounded-full" />
                                 )}
                             </div>
 
-                            <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition-all flex items-center gap-1.5 ${
+                            <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition-all flex items-center gap-1.5 ${
                                 swipeQueue.length > 0
-                                    ? 'bg-indigo-100/90 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-200/80 dark:border-indigo-800/60 shadow-2xs'
-                                    : 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60'
+                                    ? (isClinical ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30')
+                                    : (isClinical ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30')
                             }`}>
                                 {swipeQueue.length > 0 ? (
                                     <>
                                         <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 dark:bg-indigo-400 animate-pulse" />
-                                        Triaje Activo
+                                        Prioridad Media
                                     </>
                                 ) : (
                                     <>
@@ -550,16 +546,16 @@ export const CommandCenter: React.FC = () => {
                         {/* Middle/Bottom: KPI & Action */}
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-400 mb-0.5">
-                                Revisiones (Video / Foto)
+                                Revisiones Pendientes
                             </p>
                             <h3 className={`text-xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                {swipeQueue.length > 0 ? `${swipeQueue.length} Pendientes` : 'Bandeja al Día'}
+                                {swipeQueue.length > 0 ? `${swipeQueue.length} por validar` : 'Bandeja al día'}
                             </h3>
-                            <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-slate-100 dark:border-white/5">
+                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <p className={`text-[11px] font-bold flex items-center gap-1 ${
                                     swipeQueue.length > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-emerald-600 dark:text-emerald-400'
                                 }`}>
-                                    <span>{swipeQueue.length > 0 ? 'Tocar para validar técnica' : 'Sin videos pendientes'}</span>
+                                    <span>{swipeQueue.length > 0 ? 'Validar técnica y fotos' : 'Sin videos pendientes'}</span>
                                 </p>
                                 <div className="text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all">
                                     <ChevronRight size={14} />
@@ -568,28 +564,32 @@ export const CommandCenter: React.FC = () => {
                         </div>
                     </motion.div>
 
-                    {/* Tarjeta 2: Agenda & Turnos del Día */}
+                    {/* Tarjeta 2: Agenda de Hoy */}
                     <motion.div 
-                        whileHover={{ y: -2, scale: 1.01 }}
+                        whileHover={{ y: -2 }}
                         whileTap={{ scale: 0.99 }}
                         onClick={() => navigate('/calendar')} 
-                        className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-4.5 flex flex-col justify-between ${
+                        className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-5 flex flex-col justify-between backdrop-blur-xl ${
                             isClinical 
-                                ? 'bg-gradient-to-br from-purple-500/[0.07] via-white/95 to-pink-500/[0.03] border-purple-200/90 shadow-[0_4px_20px_rgba(168,85,247,0.06)] hover:shadow-[0_8px_25px_rgba(168,85,247,0.12)] hover:border-purple-400' 
-                                : 'bg-gradient-to-br from-purple-950/40 via-zinc-900/90 to-pink-950/20 border-purple-500/30 hover:border-purple-400/60 shadow-lg shadow-purple-950/20'
+                                ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_25px_rgba(168,85,247,0.08)] hover:border-purple-300' 
+                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:border-purple-500/40'
                         }`}
                     >
-                        {/* Specular Top Rim Light */}
-                        <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-purple-400/40 to-transparent pointer-events-none" />
+                        {/* Specular Cut-Glass Edge Light */}
+                        <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-purple-400/30 dark:via-purple-400/20 to-transparent pointer-events-none" />
 
                         {/* Top Row: Icon Capsule + Status Badge */}
-                        <div className="flex items-center justify-between mb-2.5">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-purple-500 to-pink-500 text-white shadow-sm shadow-purple-500/20 flex items-center justify-center transition-transform group-hover:scale-105 duration-300">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 duration-200 shadow-xs border ${
+                                isClinical ? 'bg-purple-50 text-purple-600 border-purple-200/80' : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                            }`}>
                                 <CalendarIcon size={18} />
                             </div>
 
-                            <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-purple-100/90 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60 flex items-center gap-1.5 shadow-2xs">
-                                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 dark:bg-purple-400 animate-ping" />
+                            <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition-all flex items-center gap-1.5 ${
+                                isClinical ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+                            }`}>
+                                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 dark:bg-purple-400 animate-pulse" />
                                 En 45 min
                             </span>
                         </div>
@@ -600,11 +600,11 @@ export const CommandCenter: React.FC = () => {
                                 Agenda de Hoy
                             </p>
                             <h3 className={`text-xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                2 Turnos Hoy
+                                2 Turnos Programados
                             </h3>
-                            <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-slate-100 dark:border-white/5">
+                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <p className="text-[11px] font-bold text-purple-600 dark:text-purple-400">
-                                    Próxima: Fuerza Funcional
+                                    Próximo: Fuerza Funcional
                                 </p>
                                 <div className="text-slate-400 group-hover:text-purple-600 group-hover:translate-x-1 transition-all">
                                     <ChevronRight size={14} />
@@ -613,27 +613,31 @@ export const CommandCenter: React.FC = () => {
                         </div>
                     </motion.div>
 
-                    {/* Tarjeta 3: Atletas en Seguimiento */}
+                    {/* Tarjeta 3: Alumnos / Pacientes Activos */}
                     <motion.div 
-                        whileHover={{ y: -2, scale: 1.01 }}
+                        whileHover={{ y: -2 }}
                         whileTap={{ scale: 0.99 }}
                         onClick={() => navigate('/roster')} 
-                        className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-4.5 flex flex-col justify-between ${
+                        className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-5 flex flex-col justify-between backdrop-blur-xl ${
                             isClinical 
-                                ? 'bg-gradient-to-br from-emerald-500/[0.07] via-white/95 to-teal-500/[0.03] border-emerald-200/90 shadow-[0_4px_20px_rgba(16,185,129,0.06)] hover:shadow-[0_8px_25px_rgba(16,185,129,0.12)] hover:border-emerald-400' 
-                                : 'bg-gradient-to-br from-emerald-950/40 via-zinc-900/90 to-teal-950/20 border-emerald-500/30 hover:border-emerald-400/60 shadow-lg shadow-emerald-950/20'
+                                ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:border-emerald-300' 
+                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:border-emerald-500/40'
                         }`}
                     >
-                        {/* Specular Top Rim Light */}
-                        <div className="absolute top-0 inset-x-0 h-[1.5px] bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent pointer-events-none" />
+                        {/* Specular Cut-Glass Edge Light */}
+                        <div className="absolute top-0 inset-x-0 h-[1px] bg-gradient-to-r from-transparent via-emerald-400/30 dark:via-emerald-400/20 to-transparent pointer-events-none" />
 
                         {/* Top Row: Icon Capsule + Status Badge */}
-                        <div className="flex items-center justify-between mb-2.5">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-500 to-emerald-500 text-white shadow-sm shadow-emerald-500/20 flex items-center justify-center transition-transform group-hover:scale-105 duration-300">
+                        <div className="flex items-center justify-between mb-3">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-105 duration-200 shadow-xs border ${
+                                isClinical ? 'bg-emerald-50 text-emerald-600 border-emerald-200/80' : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                            }`}>
                                 <Users size={18} />
                             </div>
 
-                            <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100/90 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center gap-1.5 shadow-2xs">
+                            <span className={`text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full border transition-all flex items-center gap-1.5 ${
+                                isClinical ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+                            }`}>
                                 <CheckCircle2 size={11} />
                                 100% al día
                             </span>
@@ -642,12 +646,12 @@ export const CommandCenter: React.FC = () => {
                         {/* Middle/Bottom: KPI & Action */}
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-400 mb-0.5">
-                                Atletas en Seguimiento
+                                {isClinical ? 'Pacientes en Seguimiento' : 'Alumnos en Seguimiento'}
                             </p>
                             <h3 className={`text-xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                {safeData.clients.length} {safeData.clients.length === 1 ? 'Activo' : 'Activos'}
+                                {safeData.clients.length} {safeData.clients.length === 1 ? (isClinical ? 'Paciente' : 'Alumno') : (isClinical ? 'Pacientes' : 'Alumnos')}
                             </h3>
-                            <div className="flex items-center justify-between mt-1.5 pt-1.5 border-t border-slate-100 dark:border-white/5">
+                            <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
                                     Todos con plan asignado
                                 </p>
@@ -668,69 +672,69 @@ export const CommandCenter: React.FC = () => {
                    first macro-conversion: inviting their first client.
                    ═══════════════════════════════════════════════════════════════ */
                 <motion.div 
-                    initial={{ opacity: 0, y: 30 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                    className={`rounded-3xl border-2 border-dashed p-12 md:p-16 text-center mb-12 ${
+                    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    className={`rounded-3xl border p-10 md:p-14 text-center mb-12 relative overflow-hidden backdrop-blur-2xl ${
                         isClinical 
-                        ? 'border-slate-200 bg-gradient-to-b from-white to-slate-50' 
-                        : 'border-zinc-800 bg-gradient-to-b from-zinc-900 to-zinc-950'
+                        ? 'border-slate-200/90 bg-gradient-to-b from-white via-slate-50/70 to-indigo-50/20 shadow-[0_8px_32px_rgba(15,23,42,0.04)]' 
+                        : 'border-white/10 bg-gradient-to-b from-zinc-900/90 via-zinc-900/60 to-zinc-950 shadow-2xl'
                     }`}
                 >
-                    {/* Animated Icon */}
-                    <motion.div 
-                        initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: 'spring', damping: 15, stiffness: 100, delay: 0.2 }}
-                        className={`mx-auto w-20 h-20 rounded-full flex items-center justify-center mb-8 ${
-                            isClinical 
-                            ? 'bg-indigo-50 shadow-lg shadow-indigo-100' 
-                            : 'bg-indigo-500/10 shadow-lg shadow-indigo-500/5'
-                        }`}
-                    >
-                        <Users className={`w-10 h-10 ${isClinical ? 'text-indigo-600' : 'text-indigo-400'}`} />
-                    </motion.div>
+                    {/* Ambient Glow */}
+                    <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-indigo-500/[0.06] dark:bg-indigo-500/10 blur-3xl" />
+
+                    {/* Geometric Habits Mandala Line Art */}
+                    <div className="relative mx-auto w-24 h-24 mb-6 flex items-center justify-center">
+                        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500/15 via-purple-500/10 to-amber-500/10 blur-xl" />
+                        <svg viewBox="0 0 100 100" className="w-20 h-20 text-indigo-600 dark:text-indigo-400 stroke-current fill-none">
+                            <circle cx="50" cy="50" r="42" strokeWidth="1.2" strokeDasharray="3 3" className="opacity-40" />
+                            <circle cx="50" cy="50" r="28" strokeWidth="1.5" className="opacity-60" />
+                            <path d="M50 18 C62 34, 78 40, 78 56 C78 72, 62 82, 50 82 C38 82, 22 72, 22 56 C22 40, 38 34, 50 18 Z" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="opacity-90" />
+                            <circle cx="50" cy="50" r="4" className="fill-indigo-600 dark:fill-indigo-400" />
+                        </svg>
+                    </div>
 
                     {/* Copy */}
-                    <h3 className={`text-2xl md:text-3xl font-black mb-4 tracking-tight ${
+                    <h3 className={`text-2xl md:text-3xl font-black mb-3 tracking-tight ${
                         isClinical ? 'text-slate-900' : 'text-white'
                     }`}>
-                        Tu plataforma está lista
+                        Comienza a construir hábitos con tus {isClinical ? 'pacientes' : 'alumnos'}
                     </h3>
-                    <p className={`text-lg max-w-md mx-auto leading-relaxed mb-10 ${
-                        isClinical ? 'text-slate-500' : 'text-zinc-400'
+                    <p className={`text-sm md:text-base max-w-lg mx-auto leading-relaxed mb-8 ${
+                        isClinical ? 'text-slate-600' : 'text-zinc-400'
                     }`}>
-                        Hacela cobrar vida invitando a tu primer cliente. Le va a llegar un enlace para descargar la app y conectarse con vos.
+                        Tu plataforma está configurada y lista. Invita a tu primer {isClinical ? 'paciente' : 'alumno'} para enviar planes, coordinar turnos y acompañar su progreso en tiempo real.
                     </p>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
                         <motion.button
-                            whileHover={{ scale: 1.04, y: -2 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={() => {
-                                setIsCreateOpen(true);
-                            }}
-                            className="px-8 py-4 rounded-2xl font-black text-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-xl shadow-indigo-500/25 flex items-center gap-3 transition-colors"
+                            whileHover={{ scale: 1.03 }}
+                            whileTap={{ scale: 0.98 }}
+                            onClick={() => setIsCreateOpen(true)}
+                            className="px-7 py-3.5 rounded-xl font-bold text-sm text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/25 flex items-center gap-2.5 transition-all"
                         >
-                            <Plus className="w-5 h-5" /> Invitar primer cliente
+                            <Plus className="w-4 h-4" /> Invitar {isClinical ? 'primer paciente' : 'primer alumno'}
                         </motion.button>
                         <button
                             onClick={() => navigate('/roster')}
-                            className={`px-6 py-4 rounded-2xl font-bold text-sm transition-colors ${
+                            className={`px-5 py-3.5 rounded-xl font-bold text-xs transition-colors ${
                                 isClinical 
-                                ? 'text-slate-500 hover:bg-slate-100 hover:text-slate-700' 
-                                : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300'
+                                ? 'text-slate-600 hover:bg-slate-100 hover:text-slate-900' 
+                                : 'text-zinc-400 hover:bg-white/5 hover:text-white'
                             }`}
                         >
-                            Ver contactos →
+                            Ver lista completa →
                         </button>
                     </div>
 
-                    {/* Trust Signal */}
-                    <p className={`text-xs mt-8 ${isClinical ? 'text-slate-400' : 'text-zinc-600'}`}>
-                        Tu cliente podrá registrar hábitos, ver su plan y comunicarse contigo desde su celular.
-                    </p>
+                    {/* Trust Signals */}
+                    <div className="flex items-center justify-center gap-6 mt-8 pt-6 border-t border-slate-100 dark:border-white/5 text-[11px] font-medium text-slate-400 dark:text-zinc-500 flex-wrap">
+                        <span className="flex items-center gap-1.5">⚡ Asignación ágil en 1-click</span>
+                        <span className="flex items-center gap-1.5">🔒 Expediente privado Zero-Trust</span>
+                        <span className="flex items-center gap-1.5">📈 Métricas de carga y adherencia</span>
+                    </div>
                 </motion.div>
             ) : (
                 /* ═══════════════════════════════════════════════════════════════
@@ -755,7 +759,9 @@ export const CommandCenter: React.FC = () => {
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
-                                <h3 className={`text-base font-bold ${isClinical ? 'text-slate-900' : 'text-white'}`}>Contactos Recientes</h3>
+                                <h3 className={`text-base font-bold ${isClinical ? 'text-slate-900' : 'text-white'}`}>
+                                    {isClinical ? 'Pacientes Recientes' : 'Alumnos Recientes'}
+                                </h3>
                                 <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${isClinical ? 'bg-slate-200/70 text-slate-700' : 'bg-zinc-800 text-zinc-300'}`}>
                                     {safeData.clients.length}
                                 </span>
@@ -1015,12 +1021,19 @@ export const CommandCenter: React.FC = () => {
                 </div>
                 <div className={`divide-y flex-1 overflow-y-auto ${isClinical ? 'divide-slate-100' : 'divide-zinc-800'}`}>
                     {/* Activity Feed Empty State */}
-                    <div className="flex flex-col items-center justify-center p-8 text-center">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-3 ${isClinical ? 'bg-slate-100' : 'bg-zinc-800'}`}>
-                            <Zap size={24} className={isClinical ? 'text-slate-400' : 'text-zinc-500'} />
+                    <div className="flex flex-col items-center justify-center p-8 text-center my-auto min-h-[220px]">
+                        <div className="relative w-16 h-16 mb-4 flex items-center justify-center">
+                            <div className="absolute inset-0 rounded-full bg-indigo-500/10 blur-lg" />
+                            <svg viewBox="0 0 64 64" className="w-12 h-12 text-indigo-600 dark:text-indigo-400 stroke-current fill-none">
+                                <circle cx="32" cy="32" r="26" strokeWidth="1.2" strokeDasharray="3 3" className="opacity-40" />
+                                <path d="M16 33 L24 33 L28 22 L36 42 L40 33 L48 33" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                                <circle cx="32" cy="32" r="2.5" className="fill-indigo-600 dark:fill-indigo-400" />
+                            </svg>
                         </div>
-                        <p className={`text-sm font-bold ${isClinical ? 'text-slate-600' : 'text-zinc-400'}`}>Sin Actividad Reciente</p>
-                        <p className={`text-xs mt-1 ${isClinical ? 'text-slate-500' : 'text-zinc-500'}`}>La actividad de tus clientes aparecerá aquí.</p>
+                        <p className={`text-sm font-bold ${isClinical ? 'text-slate-800' : 'text-zinc-200'}`}>Bandeja al Día</p>
+                        <p className={`text-xs mt-1.5 max-w-[210px] leading-relaxed ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>
+                            Todo en orden. Las sesiones y registros de tus {isClinical ? 'pacientes' : 'alumnos'} aparecerán en vivo aquí.
+                        </p>
                     </div>
                 </div>
                 <div className={`p-4 border-t text-center mt-auto ${isClinical ? 'border-slate-100 bg-slate-50/30' : 'border-zinc-800 bg-zinc-900/30'}`}>
@@ -1269,47 +1282,51 @@ export const CommandCenter: React.FC = () => {
 
     return (
         <div className={`min-h-screen ${
-            isClinical ? 'bg-slate-50 text-slate-900' : 'bg-zinc-950 text-white'
-        } p-6 md:p-10 transition-colors duration-500`}>
-            
+            isClinical ? 'bg-[#f8fafc] text-slate-900' : 'bg-[#090d16] text-white'
+        } p-6 md:p-10 transition-colors duration-500 relative overflow-hidden`}>
+            {/* Ambient Soul Gradient Reflections - Soft warm brand presence */}
+            <div className="pointer-events-none absolute -top-48 right-1/4 w-[550px] h-[550px] rounded-full bg-indigo-500/[0.04] dark:bg-indigo-500/[0.06] blur-[140px]" />
+            <div className="pointer-events-none absolute top-1/3 -left-36 w-[450px] h-[450px] rounded-full bg-purple-500/[0.03] dark:bg-purple-500/[0.05] blur-[120px]" />
 
-            {activeTab !== 'OVERVIEW' && (
-                <div className="mb-6 animate-in slide-in-from-top-4 duration-300">
-                    <button 
-                        onClick={() => setActiveTab('OVERVIEW')}
-                        className={`flex items-center gap-2 font-bold px-4 py-2 rounded-xl transition-colors ${
-                            isClinical 
-                                ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm' 
-                                : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 shadow-sm'
-                        }`}
-                    >
-                        <ArrowLeft size={16} /> Volver al Panel Principal
-                    </button>
-                </div>
-            )}
+            <div className="relative z-10">
+                {activeTab !== 'OVERVIEW' && (
+                    <div className="mb-6 animate-in slide-in-from-top-4 duration-300">
+                        <button 
+                            onClick={() => setActiveTab('OVERVIEW')}
+                            className={`flex items-center gap-2 font-bold px-4 py-2 rounded-xl transition-colors ${
+                                isClinical 
+                                    ? 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm' 
+                                    : 'bg-zinc-900 border border-zinc-800 text-zinc-300 hover:bg-zinc-800 shadow-sm'
+                            }`}
+                        >
+                            <ArrowLeft size={16} /> Volver al Inicio
+                        </button>
+                    </div>
+                )}
 
-            {activeTab === 'OVERVIEW' && (activeWorkspace === 'B2B' ? renderB2BOverview() : renderOverview())}
-            {activeTab === 'RADAR' && <AnalyticalRadar />}
-            {activeTab === 'VALIDATION_SWIPE' && (
-                <ValidationTinderPanel 
-                    onComplete={() => {
-                        setSwipeQueue([]);
-                        setActiveTab('OVERVIEW');
-                    }} 
+                {activeTab === 'OVERVIEW' && (activeWorkspace === 'B2B' ? renderB2BOverview() : renderOverview())}
+                {activeTab === 'RADAR' && <AnalyticalRadar />}
+                {activeTab === 'VALIDATION_SWIPE' && (
+                    <ValidationTinderPanel 
+                        onComplete={() => {
+                            setSwipeQueue([]);
+                            setActiveTab('OVERVIEW');
+                        }} 
+                    />
+                )}
+                {activeTab === 'AGENDA' && <SmartCalendar />}
+                {/* Modal de Creación de Clases / Grupos en el Dashboard Principal */}
+                <CreateClassGroupModal
+                    isOpen={isCreateClassModalOpen}
+                    onClose={() => setIsCreateClassModalOpen(false)}
+                    onClassCreated={(newAudience) => {
+                        toast.success(`¡Clase "${newAudience.name}" creada exitosamente!`, {
+                            icon: '🎉',
+                            style: { background: '#18181b', color: '#a855f7', border: '1px solid #7e22ce' }
+                        });
+                    }}
                 />
-            )}
-            {activeTab === 'AGENDA' && <SmartCalendar />}
-            {/* Modal de Creación de Clases / Grupos en el Dashboard Principal */}
-            <CreateClassGroupModal
-                isOpen={isCreateClassModalOpen}
-                onClose={() => setIsCreateClassModalOpen(false)}
-                onClassCreated={(newAudience) => {
-                    toast.success(`¡Clase "${newAudience.name}" creada exitosamente!`, {
-                        icon: '🎉',
-                        style: { background: '#18181b', color: '#a855f7', border: '1px solid #7e22ce' }
-                    });
-                }}
-            />
+            </div>
         </div>
     );
 };

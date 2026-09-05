@@ -19,7 +19,7 @@ export const translations = {
         },
         // Module Names
         modules: {
-            dashboard: 'Panel Principal',
+            dashboard: 'Inicio',
             roster: 'Watchtower',
             analytics: 'Bio-Síntesis',
             inbox: 'Inbox Contextual',
@@ -47,7 +47,7 @@ export const translations = {
         },
         // Dashboard
         dashboard: {
-            title: 'Panel Principal',
+            title: 'Inicio',
             morningBrief: 'RESUMEN MATINAL',
             urgentClinical: 'Clínico Urgente',
             pendingCheckins: 'Check-ins Pendientes',

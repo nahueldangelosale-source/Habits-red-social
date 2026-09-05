@@ -228,47 +228,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         return (
             <motion.button
-                layout
-                className={`group relative w-full flex items-center gap-2.5 px-3 py-2 rounded-2xl transition-all duration-300 overflow-hidden select-none ${
+                className={`group relative w-full flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 overflow-hidden select-none ${
                     isActive
-                        ? (isClinicalTheme ? 'habits-active-liquid' : 'bg-white/10 text-white shadow-md')
-                        : (isClinicalTheme ? 'text-slate-700 hover:bg-white/80 hover:text-slate-950 shadow-2xs hover:shadow-sm' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-200')
+                        ? (isClinicalTheme ? 'habits-active-liquid' : 'bg-white/10 text-white shadow-xs')
+                        : (isClinicalTheme ? 'text-slate-600 hover:bg-slate-100/70 hover:text-slate-950' : 'text-zinc-400 hover:bg-white/5 hover:text-zinc-100')
                 }`}
                 onClick={() => handleViewChange(view)}
                 onMouseEnter={prefetchView}
-                whileHover={{ scale: 1.015, x: 2 }}
-                whileTap={{ scale: 0.985 }}
+                whileHover={{ x: 1 }}
+                whileTap={{ scale: 0.99 }}
             >
+                {/* Subtle, Static Left Indicator - No constant motion */}
                 {isActive && (
-                    <motion.div
-                        layoutId="activePill"
-                        className="absolute left-0 top-1/2 -translate-y-1/2 h-7 w-1.5 rounded-r-full bg-gradient-to-b from-amber-400 via-rose-500 to-indigo-600 shadow-[0_0_12px_rgba(244,63,94,0.6)]"
-                    />
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-indigo-600 dark:bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
                 )}
 
-                {/* Chromatic Icon Capsule */}
-                <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-xl shrink-0 transition-all duration-300 ${
+                {/* Metalized Liquid Glass Icon Capsule */}
+                <div className={`relative z-10 flex items-center justify-center w-8 h-8 rounded-xl shrink-0 transition-all duration-200 ${
                     isActive 
-                        ? (isClinicalTheme ? 'bg-white shadow-xs border border-indigo-200/90' : 'bg-white/10') 
-                        : (isClinicalTheme ? `${themeStyle.iconBoxBg} group-hover:scale-110` : 'bg-white/5')
+                        ? (isClinicalTheme ? 'bg-white shadow-xs border border-indigo-200/90 text-indigo-600' : 'bg-white/15 text-white') 
+                        : (isClinicalTheme ? 'bg-slate-100/70 text-slate-500 border border-slate-200/50 group-hover:bg-slate-200/60 group-hover:text-slate-800' : 'bg-white/5 text-zinc-400 group-hover:text-white')
                 }`}>
                     <Icon
                         size={isCollapsed ? 20 : 17}
                         strokeWidth={isActive ? 2.5 : 2}
-                        className={`transition-colors duration-300 ${
+                        className={`transition-colors duration-200 ${
                             isActive 
-                                ? themeStyle.activeIcon 
-                                : (isClinicalTheme ? themeStyle.inactiveIcon : 'text-zinc-400 group-hover:text-white')
+                                ? (isClinicalTheme ? 'text-indigo-600' : 'text-white') 
+                                : (isClinicalTheme ? 'text-slate-500 group-hover:text-slate-900' : 'text-zinc-400 group-hover:text-white')
                         }`}
                     />
                 </div>
 
                 {!isCollapsed && (
-                    <motion.div
-                        initial={{ opacity: 0, x: -8 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="relative z-10 flex-1 text-left flex items-center justify-between min-w-0"
-                    >
+                    <div className="relative z-10 flex-1 text-left flex items-center justify-between min-w-0">
                         <span className={`sidebar-item-text text-[13px] transition-colors ${
                             isActive ? 'font-black text-slate-950 dark:text-white' : 'font-semibold text-slate-700 dark:text-zinc-300'
                         }`}>
@@ -279,13 +272,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                 badgeColor === 'red' 
                                     ? 'bg-rose-500 text-white border-rose-600 animate-pulse shadow-[0_0_10px_rgba(244,63,94,0.5)]' 
                                     : (isClinicalTheme 
-                                        ? themeStyle.badgeBg
+                                        ? 'bg-slate-100 text-slate-700 border-slate-200' 
                                         : 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30')
                             }`}>
                                 {badge}
                             </span>
                         )}
-                    </motion.div>
+                    </div>
                 )}
 
                 {/* Tooltip for collapsed mode */}
@@ -385,26 +378,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {/* VISTA 1: COACH / ENTRENADOR */}
                     {!isNutriWorkspace && (
                         <div className="space-y-1">
-                            <MenuItem view="trainer" icon={Dumbbell} label={lang === 'es' ? 'Panel Principal' : 'Main Panel'} badge="CORE" color="indigo" />
-                            <MenuItem view="calendar" icon={CalendarDays} label={lang === 'es' ? 'Agenda & Turnos' : 'Calendar & Appointments'} color="purple" />
-                            <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Contactos Totales' : 'Total Contacts'} color="sky" />
+                            <MenuItem view="trainer" icon={Dumbbell} label={lang === 'es' ? 'Inicio' : 'Home'} badge="CORE" color="indigo" />
+                            <MenuItem view="calendar" icon={CalendarDays} label={lang === 'es' ? 'Agenda' : 'Calendar'} color="purple" />
+                            <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Alumnos' : 'Clients'} color="sky" />
                             <MenuItem view="finance" icon={CreditCard} label={lang === 'es' ? 'Finanzas' : 'Finance'} badge="MRR" color="emerald" />
                             <MenuItem view="library" icon={Database} label={lang === 'es' ? 'Biblioteca' : 'Library'} color="amber" />
-                            <MenuItem view="inbox" icon={MessageSquare} label="Mensajes & Validaciones" badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
-                            <MenuItem view="gamification" icon={Swords} label={lang === 'es' ? 'Grupos & Retos' : 'Groups & Challenges'} color="fuchsia" />
+                            <MenuItem view="inbox" icon={MessageSquare} label={lang === 'es' ? 'Mensajes' : 'Messages'} badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
+                            <MenuItem view="gamification" icon={Swords} label={lang === 'es' ? 'Comunidad' : 'Community'} color="fuchsia" />
                         </div>
                     )}
 
                     {/* VISTA 2: NUTRICIÓN & CLÍNICA */}
                     {isNutriWorkspace && (
                         <div className="space-y-1">
-                            <MenuItem view="nutricionista" icon={Activity} label="Consultorio Médico" color="teal" />
-                            <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Pacientes Totales' : 'Total Patients'} color="sky" />
+                            <MenuItem view="nutricionista" icon={Activity} label={lang === 'es' ? 'Inicio' : 'Home'} color="teal" />
+                            <MenuItem view="roster" icon={Users} label={lang === 'es' ? 'Pacientes' : 'Patients'} color="sky" />
                             <MenuItem view="dietqa" icon={Stethoscope} label="DietQA" badge="MOTOR" color="emerald" />
                             <MenuItem view="library" icon={Database} label={lang === 'es' ? 'Biblioteca' : 'Library'} color="amber" />
-                            <MenuItem view="inbox" icon={MessageSquare} label="Mensajes & Validaciones" badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
-                            <MenuItem view="smartlab" icon={FlaskConical} label="Smart Lab (Bio-Sync)" color="cyan" />
-                            <MenuItem view="calendar" icon={CalendarDays} label="Smart Calendar" color="purple" />
+                            <MenuItem view="inbox" icon={MessageSquare} label={lang === 'es' ? 'Mensajes' : 'Messages'} badge={pendingInboxCount > 0 ? pendingInboxCount.toString() : undefined} color="rose" />
+                            <MenuItem view="smartlab" icon={FlaskConical} label="Smart Lab" color="cyan" />
+                            <MenuItem view="calendar" icon={CalendarDays} label={lang === 'es' ? 'Agenda' : 'Calendar'} color="purple" />
                         </div>
                     )}
 
