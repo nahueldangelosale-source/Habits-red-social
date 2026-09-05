@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-    Search, ChevronRight, ChevronDown, Target, CreditCard, 
+    Search, ChevronRight, ChevronDown, CreditCard, 
     UserPlus, Dumbbell, CheckCircle2, Clock, AlertCircle, 
     Users, BarChart3, Calendar, MessageSquare, Flame
 } from 'lucide-react';
@@ -25,9 +25,8 @@ export const TrainerRoster: React.FC = () => {
     // Menú desplegable de estadísticas (CERRADO POR DEFECTO para evitar scroll forzado)
     const [isStatsOpen, setIsStatsOpen] = useState(false);
     
-    // Filtros
+    // Filtros (Plan, Cuota) - Filtro Objetivo eliminado por requerimiento de usuario
     const [searchQuery, setSearchQuery] = useState('');
-    const [objectiveFilter, setObjectiveFilter] = useState<'ALL' | 'HYPERTROPHY' | 'REHAB'>('ALL');
     const [planFilter, setPlanFilter] = useState<'ALL' | 'ACTIVE' | 'DRAFT'>('ALL');
     const [paymentFilter, setPaymentFilter] = useState<'ALL' | 'PAID' | 'DUE'>('ALL');
 
@@ -67,14 +66,6 @@ export const TrainerRoster: React.FC = () => {
             // Buscador
             const matchesSearch = client.name.toLowerCase().includes(searchQuery.toLowerCase());
             
-            // Objetivo
-            const isRehab = client.painAreas && client.painAreas.length > 0;
-            const matchesObjective = objectiveFilter === 'ALL' 
-                ? true 
-                : objectiveFilter === 'REHAB' 
-                    ? isRehab 
-                    : !isRehab;
-            
             // Estado de Plan
             const isDraft = (client as any).planStatus === 'DRAFT';
             const matchesPlan = planFilter === 'ALL'
@@ -91,19 +82,17 @@ export const TrainerRoster: React.FC = () => {
                     ? isPastDue
                     : !isPastDue;
             
-            return matchesSearch && matchesObjective && matchesPlan && matchesPayment;
+            return matchesSearch && matchesPlan && matchesPayment;
         });
-    }, [dashboardData, searchQuery, objectiveFilter, planFilter, paymentFilter]);
+    }, [dashboardData, searchQuery, planFilter, paymentFilter]);
 
-    // Métricas globales reactivas
+    // Métricas globales reactivas (Planes y Cuotas)
     const metrics = useMemo(() => {
         if (!dashboardData?.clients) {
-            return { rehab: 0, hypertrophy: 0, total: 0, alDia: 0, enMora: 0, activePlans: 0, pendingPlans: 0 };
+            return { total: 0, alDia: 0, enMora: 0, activePlans: 0, pendingPlans: 0 };
         }
         const clients = dashboardData.clients;
         const total = clients.length;
-        const rehab = clients.filter(c => c.painAreas && c.painAreas.length > 0).length;
-        const hypertrophy = total - rehab;
         const alDia = clients.filter(c => (c as any).paymentStatus !== 'past_due').length;
         const enMora = total - alDia;
         const pendingPlans = clients.filter(c => (c as any).planStatus === 'DRAFT').length;
@@ -111,8 +100,6 @@ export const TrainerRoster: React.FC = () => {
 
         return {
             total,
-            rehab,
-            hypertrophy,
             alDia,
             enMora,
             activePlans,
@@ -260,7 +247,7 @@ export const TrainerRoster: React.FC = () => {
             </header>
 
             {/* ═══════════════════════════════════════════════════════════════
-                BARRA DE BÚSQUEDA Y FILTROS CLAROS
+                BARRA DE BÚSQUEDA Y FILTROS CLAROS (PLAN Y CUOTA)
                ═══════════════════════════════════════════════════════════════ */}
             <div className={`border rounded-3xl p-4 md:p-5 mb-4 shadow-xs ${
                 isClinical ? 'bg-white/90 border-slate-200/80 backdrop-blur-sm' : 'bg-zinc-900 border-zinc-800'
@@ -285,37 +272,7 @@ export const TrainerRoster: React.FC = () => {
                     {/* Filtros */}
                     <div className="flex flex-wrap gap-4 items-center">
                         
-                        {/* Filtro 1: Objetivo */}
-                        <div className="flex items-center gap-2">
-                            <span className={`text-[10px] font-black font-montserrat uppercase tracking-wider ${
-                                isClinical ? 'text-slate-400' : 'text-zinc-500'
-                            }`}>
-                                Objetivo:
-                            </span>
-                            <div className={`flex rounded-xl p-0.5 border ${
-                                isClinical ? 'bg-slate-50 border-slate-200/80' : 'bg-zinc-950 border-zinc-800'
-                            }`}>
-                                {[
-                                    { id: 'ALL', label: 'Todos' },
-                                    { id: 'HYPERTROPHY', label: 'Fuerza/Hip' },
-                                    { id: 'REHAB', label: 'Rehab' }
-                                ].map((obj) => (
-                                    <button
-                                        key={obj.id}
-                                        onClick={() => setObjectiveFilter(obj.id as any)}
-                                        className={`px-3 py-1 rounded-lg text-[11px] font-bold transition-all ${
-                                            objectiveFilter === obj.id
-                                                ? (isClinical ? 'bg-indigo-600 text-white shadow-xs' : 'bg-zinc-800 text-white shadow-xs')
-                                                : (isClinical ? 'text-slate-600 hover:text-slate-900' : 'text-zinc-400 hover:text-zinc-200')
-                                        }`}
-                                    >
-                                        {obj.label}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Filtro 2: Estado de Plan */}
+                        {/* Filtro: Estado de Plan */}
                         <div className="flex items-center gap-2">
                             <span className={`text-[10px] font-black font-montserrat uppercase tracking-wider ${
                                 isClinical ? 'text-slate-400' : 'text-zinc-500'
@@ -345,7 +302,7 @@ export const TrainerRoster: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Filtro 3: Cuota */}
+                        {/* Filtro: Cuota */}
                         <div className="flex items-center gap-2">
                             <span className={`text-[10px] font-black font-montserrat uppercase tracking-wider ${
                                 isClinical ? 'text-slate-400' : 'text-zinc-500'
@@ -413,18 +370,13 @@ export const TrainerRoster: React.FC = () => {
                             </div>
                             <p className="text-[11px] text-slate-400 font-medium">
                                 {isStatsOpen 
-                                    ? 'Métricas de objetivos, planes y cuotas desplegadas' 
-                                    : 'Haz clic para ver métricas de objetivos, planes asignados y estado de cuotas'}
+                                    ? 'Métricas de planes y cuotas desplegadas' 
+                                    : 'Haz clic para ver métricas de planes asignados y estado de cuotas'}
                             </p>
                         </div>
 
                         {/* Micro-pills visibles incluso cuando el menú está cerrado */}
                         <div className="hidden lg:flex items-center gap-2 ml-2">
-                            <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
-                                isClinical ? 'bg-indigo-50/70 border-indigo-200/60 text-indigo-700' : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-300'
-                            }`}>
-                                🎯 {metrics.hypertrophy} Fuerza · {metrics.rehab} Rehab
-                            </span>
                             <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg border ${
                                 isClinical ? 'bg-sky-50/70 border-sky-200/60 text-sky-700' : 'bg-sky-500/10 border-sky-500/20 text-sky-300'
                             }`}>
@@ -457,7 +409,7 @@ export const TrainerRoster: React.FC = () => {
                     </div>
                 </button>
 
-                {/* CONTENIDO DESPLEGABLE CON LAS 3 TARJETAS PEDAGÓGICAS */}
+                {/* CONTENIDO DESPLEGABLE CON LAS 2 TARJETAS PEDAGÓGICAS (PLANES Y CUOTAS) */}
                 <AnimatePresence>
                     {isStatsOpen && (
                         <motion.div
@@ -467,51 +419,9 @@ export const TrainerRoster: React.FC = () => {
                             transition={{ duration: 0.3, ease: 'easeInOut' }}
                             className="overflow-hidden"
                         >
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pt-4 pb-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pt-4 pb-2">
                                 
-                                {/* 1. DISTRIBUCIÓN POR OBJETIVO */}
-                                <div className={`p-5 md:p-6 rounded-3xl border shadow-xs flex flex-row items-center justify-between transition-all ${
-                                    isClinical ? 'bg-white/90 border-slate-200/80 backdrop-blur-sm' : 'bg-zinc-900 border-zinc-800'
-                                }`}>
-                                    <div className="flex flex-col gap-2">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <div className={`p-2 rounded-xl ${isClinical ? 'bg-indigo-50 text-indigo-600' : 'bg-indigo-500/20 text-indigo-400'}`}>
-                                                <Target size={16} />
-                                            </div>
-                                            <div>
-                                                <h3 className={`text-xs font-black font-montserrat uppercase tracking-wider ${isClinical ? 'text-slate-800' : 'text-white'}`}>
-                                                    Objetivos
-                                                </h3>
-                                                <p className="text-[11px] text-slate-400 font-medium">Enfoque de entrenamiento</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex flex-col text-xs font-bold gap-1.5 mt-1">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2.5 h-2.5 rounded-full bg-indigo-600" />
-                                                <span className={isClinical ? 'text-slate-600' : 'text-zinc-400'}>
-                                                    {metrics.hypertrophy} Fuerza / Hipertrofia
-                                                </span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-                                                <span className={isClinical ? 'text-slate-600' : 'text-zinc-400'}>
-                                                    {metrics.rehab} Rehabilitación / Salud
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="w-18 h-18 relative shrink-0">
-                                        <svg viewBox="0 0 36 36" className="w-full h-full transform -rotate-90">
-                                            <path className={isClinical ? 'text-slate-100' : 'text-zinc-800'} d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="3.5" />
-                                            <path className="text-indigo-600" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" strokeDasharray={`${(metrics.hypertrophy / (metrics.total || 1)) * 100}, 100`} />
-                                            {metrics.rehab > 0 && (
-                                                <path className="text-rose-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" strokeWidth="4" strokeDasharray={`${(metrics.rehab / (metrics.total || 1)) * 100}, 100`} strokeDashoffset={`-${(metrics.hypertrophy / (metrics.total || 1)) * 100}`} />
-                                            )}
-                                        </svg>
-                                    </div>
-                                </div>
-
-                                {/* 2. ESTADO DE PLANES Y RUTINAS */}
+                                {/* 1. ESTADO DE PLANES Y RUTINAS */}
                                 <div className={`p-5 md:p-6 rounded-3xl border shadow-xs flex flex-row items-center justify-between transition-all ${
                                     isClinical ? 'bg-white/90 border-slate-200/80 backdrop-blur-sm' : 'bg-zinc-900 border-zinc-800'
                                 }`}>
@@ -553,7 +463,7 @@ export const TrainerRoster: React.FC = () => {
                                     </div>
                                 </div>
 
-                                {/* 3. ESTADO DE CUOTAS Y FINANZAS */}
+                                {/* 2. ESTADO DE CUOTAS Y FINANZAS */}
                                 <div className={`p-5 md:p-6 rounded-3xl border shadow-xs flex flex-row items-center justify-between transition-all ${
                                     isClinical ? 'bg-white/90 border-slate-200/80 backdrop-blur-sm' : 'bg-zinc-900 border-zinc-800'
                                 }`}>
@@ -638,7 +548,7 @@ export const TrainerRoster: React.FC = () => {
                                     onClick={() => navigate(`/trainer/athlete/${client.id}`)}
                                     className="p-4 sm:p-5 md:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-all duration-200 cursor-pointer group hover:bg-slate-50/80 dark:hover:bg-zinc-800/60"
                                 >
-                                    {/* LADO IZQUIERDO: AVATAR, DATOS VITALES Y OBJETIVOS */}
+                                    {/* LADO IZQUIERDO: AVATAR Y DATOS VITALES */}
                                     <div className="flex items-center gap-4 flex-1 min-w-0">
                                         {/* Avatar con indicador de mensaje interno no leído */}
                                         <div className="relative shrink-0">
@@ -697,13 +607,6 @@ export const TrainerRoster: React.FC = () => {
                                             </div>
 
                                             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-                                                <p className={`truncate flex items-center gap-1.5 ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>
-                                                    <span className="font-black text-[10px] font-montserrat uppercase tracking-wider text-slate-400">Objetivo:</span>
-                                                    <span className={`font-semibold truncate ${isClinical ? 'text-slate-700' : 'text-zinc-300'}`}>
-                                                        {client.painAreas?.length ? 'Rehabilitación y Readaptación' : 'Fuerza Máxima e Hipertrofia'}
-                                                    </span>
-                                                </p>
-                                                <span className="text-slate-300 dark:text-zinc-700 hidden sm:inline">•</span>
                                                 <p className={`text-[11px] font-medium ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>
                                                     {client.lastWorkout ? `Último entreno: ${client.lastWorkout}` : 'Sin entrenos aún'}
                                                 </p>
