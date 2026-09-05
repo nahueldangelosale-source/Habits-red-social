@@ -535,3 +535,51 @@ A lo largo de estos 12 meses (24 Sprints de 2 semanas cada uno), la evolución d
   - Detección de correo existente con intento de login automático o botón de acción directa *"Ir a Iniciar Sesión"*.
 - **Liquid Glass & Ergonomía Móvil:**
   - Adaptabilidad edge-to-edge en pantallas móviles y card centrada flotante con física 3D en escritorio.
+
+### Fase 194: Blindaje de Identidad, Aislamiento de Roles y Purga de Contactos de Prueba (COMPLETADA ✅)
+- **Aislamiento Estricto de Rutas por Rol (`AuthContext.tsx`, `App.tsx`):**
+  - Enrutamiento defensivo reactivo para usuarios con rol `ATHLETE`: navegación garantizada hacia el entorno del alumno (`/athlete`), impidiendo fugas o accesos no autorizados a vistas exclusivas de entrenadores como `/dashboard` o `/triaje`.
+- **Higiene de Datos de Producción:**
+  - Purga de contactos y atletas de prueba residuales en el estado local y stores, asegurando que nuevas instancias operen en modo plataforma virgen (*clean slate*).
+- **Depuración Estética de Video de Introducción (`IntroPage.tsx`):**
+  - Eliminación de filtros de oscurecimiento artificial y viñetas para reproducir el video en sus colores 100% naturales, acompañado de un botón discreto *"Saltar Intro"*.
+
+### Fase 195: Planificación Ágil de Agenda: Drag-to-Select Estilo Google Calendar & Replicación Semanal (COMPLETADA ✅)
+- **Mecánica Drag-to-Select en Cuadrícula Semanal (`ProfessionalAgenda.tsx`):**
+  - Selección continua de múltiples días y franjas horarias arrastrando el ratón (`onMouseDown`, `onMouseEnter`, listener global de `window.mouseup`).
+  - Feedback visual táctil en el eje Z: elevación física (`scale-[1.01] z-20 shadow-md ring-2 ring-indigo-500`) y fondo índigo translúcido en celdas seleccionadas.
+  - Píldora inferior flotante reactiva en tiempo real (*"Pintando X días (HH:MM - HH:MM) • Soltá el mouse para agendar o bloquear"*).
+- **Modal Contextual de Creación en Lote:**
+  - Doble modalidad: *Turnos Diarios Separados* (crea citas independientes para cada día seleccionado en el mismo horario) o *Bloqueo Horario Completo* (reserva todo el intervalo para eventos, descansos o evaluaciones).
+- **Replicación de Semana con 1 Clic (`Replicar Semana`):**
+  - Clona todos los turnos y actividades confirmadas de la semana visualizada a la semana siguiente (+7 días) y avanza automáticamente a ella con toast de éxito.
+- **Navegación Semanal Ilimitada:**
+  - Botones `<` y `>` para desplazarse sin límite entre semanas, con badge indicador (`+1 sem`, `+2 sem`) y botón contextual `[ ⟲ Hoy ]` para regresar de inmediato.
+
+### Fase 196: Microinteracciones Sonoras Neuroestéticas (Web Audio API) & Celebración Dopaminérgica (COMPLETADA ✅)
+- **Motor Sintetizado de Audio Nativo (`web/src/utils/audioEffects.ts`):**
+  - Implementación con Web Audio API pura, sin archivos externos, cero dependencias, funcionamiento offline y latencia cero:
+    - `playDopamineChime()`: Arpegio armónico ascendente dulce (F#5 $\rightarrow$ A#5 $\rightarrow$ C#6) con caída exponencial al completar tareas o consolidar hábitos.
+    - `playSubtlePop()`: Pop acústico sutil y nítido para la creación instantánea de tareas (tecla Enter) o desmarcado.
+    - `playCelebrationChord()`: Acorde mayor brillante (E5, G#5, B5, E6) para la duplicación de semana y confirmación de bloques en lote.
+- **Microinteracciones Visuales en Checkboxes:**
+  - Botón circular interactivo con animación de tilde spring (`motion.div`), rebote y tachado dinámico en verde esmeralda (`transition-all duration-300 line-through decoration-emerald-500/70`).
+
+### Fase 197: Reducción de Carga Cognitiva, Pedagogía Visual y Rediseño Integral del Panel "To DO" (COMPLETADA ✅)
+- **Erradicación de Sobrecarga Mental y Jerga Técnica (`ProfessionalAgenda.tsx`):**
+  - Reducción de nombres largos a etiquetas concisas y humanas: `Semana`, `Tareas`, `Hoy`.
+  - Reemplazo de botones dispersos por jerarquía limpia: acción primaria `+ Agendar Cita` y selector `To DO (X)`.
+  - Tarjetas Bento compactas de un vistazo (`Citas Hoy`, `Por Vencer`, `Pendientes`, `Completadas`) que funcionan como atajos clicables de navegación.
+- **Onboarding Pedagógico Visual No Invasivo:**
+  - Cápsula introductoria sutil: *"Planificación ágil: Arrastrá el mouse sobre los días para agendar en bloque. Cada tarea completada suena para celebrar tu avance."* con botón *"Entendido"* y persistencia permanente en `localStorage` (`habits_agenda_quicktip_dismissed`).
+- **Rediseño del Panel Lateral "To DO":**
+  - Renombrado oficial a **`To DO`** con contador gramaticalmente correcto (`X pendientes`).
+  - Input unificado de una sola línea horizontal (`+ [Nueva tarea... (Enter)]`) con micro-pills de prioridad directa (`Alta`, `Media`, `Baja`) eliminando el bloque vertical de dos pisos y la etiqueta pesada *"PRIORIDAD"*.
+  - Eliminación de anglicismos crudos (`MEDIUM`, `HIGH`, `LOW` $\rightarrow$ `• Alta`, `• Media`, `• Baja`).
+  - Píldoras de filtro compactas sin desbordes (`Todas`, `Importantes`, `Hábitos`, `Ciclos`).
+  - Checkbox circular de alto contraste (`border-2 border-slate-300 dark:border-zinc-500 bg-white dark:bg-zinc-800`) con tilde animada en verde esmeralda y feedback dopaminérgico.
+- **Reubicación Ergonómica a la Izquierda:**
+  - Reubicación del panel lateral **To DO** al **lado izquierdo** de la cuadrícula semanal en escritorio (`xl:order-1`), respetando el patrón de lectura visual occidental (revisar pendientes $\rightarrow$ agendar/bloquear en el calendario a la derecha).
+- **Verificación de Compilación Integral:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
+
