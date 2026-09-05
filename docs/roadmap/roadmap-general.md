@@ -608,3 +608,33 @@ A lo largo de estos 12 meses (24 Sprints de 2 semanas cada uno), la evolución d
 - **Sincronización Global de Idioma:** Actualizada la clave canónica `'Inicio'` en `LanguageContext.tsx` y botón *"Volver al Inicio"*.
 - **Verificación de Compilación Integral:**
   - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
+
+### Fase 200: Ficha del Atleta Quiet Luxury, Arquitectura en Eje Z, Semáforo Biomecánico y Correlación SNC (COMPLETADA ✅)
+- **El Héroe de los 3 Segundos (Claridad Inmediata - Modelo LIFT):**
+  - Cabecera rediseñada en `AthleteDetailView.tsx` para contestar en 3 segundos si el atleta puede entrenar seguro y si su plan tiene continuidad.
+  - **Semáforo Biomecánico:** Chip de diagnóstico clínico: `🟢 Apto para Entrenar` (esmeralda translúcido `bg-emerald-500/10`) vs. `⚠️ Molestia activa` (alerta preventiva en caso de lesión o dolor reportado).
+  - **Estado de Continuidad:** `⚡ Rutina Activa` (con detalle del día asignado) vs. `⏳ Sin Rutina Asignada` (alerta para mitigar churn y reactivar atleta).
+  - Píldoras Quiet Luxury al 10% de opacidad para tier de membresía (`PRO TIER`) y estado financiero (`Cobro al Día` con pulso esmeralda).
+- **Arquitectura en Eje Z (Tangibilidad Táctil):**
+  - Tarjetas flotantes con profundidad espacial `shadow-[0_8px_30px_rgba(0,0,0,0.03)]`, esquinas `rounded-3xl` y desenfoque óptico `backdrop-blur-xl`.
+  - Tratamiento visual diferenciado para modo clínico (`bg-white/95 border-slate-200/90`) y modo oscuro atlético (`bg-zinc-950/95 border-zinc-800`).
+  - Tipografía jerárquica con Montserrat (`font-black`) en encabezados y métricas baseline.
+- **Barra de Acciones Rápidas (Jerarquía LIFT):**
+  - Acción primaria de alto contraste: `[ + Crear Rutina / Modificar Rutina ]` con relleno índigo sólido y sombra suave.
+  - Acciones secundarias en botones ghost: `[ Desde Plantilla ]`, `[ Plan Alimentario ]`, `[ Asignar Hábito ]`.
+  - Divisor vertical aislador para métricas clínicas (`[ Registrar Medidas ]`) y chat contextual (`[ Chat Interno ]`).
+- **Radar Nutricional con Gradiente Radial & Correlación SNC (Container Transform):**
+  - Gradiente radial `<radialGradient id="radarRadialGrad">` con tono esmeralda/índigo translúcido que elimina la rigidez geométrica.
+  - Micro-píldoras de síntesis de macronutrientes: Proteínas (93%), Agua (2.8L) y Adherencia (88%).
+  - Container transform desplegable con resorte físico `[ Fatiga SNC ]`: correlación neuroendocrina que educa sobre caídas en adherencia nutricional (-18%) ante picos de fatiga SNC (ACWR > 1.30).
+  - Empty state amigable y pedagógico de marcas de fuerza con botón directo `[ + Registrar 1RM Base ]`.
+- **Pedagogía Empática en Acordeones:**
+  - Sustitución de mayúsculas agresivas de marketing (`POR QUÉ IMPORTA...`) por micro-insights pedagógicos empáticos (`💡 Insight Clínico`, `💡 Punto de Partida`, `💡 Dosificación`, `💡 Sustrato Recuperativo`).
+- **Fotos de Progreso e Historial Gestalt:**
+  - Micro-elevación elástica en fotos de progreso (`whileHover={{ y: -2, scale: 1.03 }}`).
+  - Historial de sesiones agrupado por espacio negativo Gestalt, suprimiendo líneas divisorias duras.
+  - Navegación de pestañas fluida mediante `motion.div layoutId="activeAthleteTab"` y transición `<AnimatePresence mode="wait">`.
+- **Widget Cruzado ACWR vs. Nutrición (`NutritionACWRCrossView.tsx`):**
+  - Elevación a Quiet Luxury: `rounded-3xl`, Montserrat, chip dinámico `Sweet Spot (1.0 - 1.3)` vs `Zona de Riesgo` y gradientes de área.
+- **Verificación de Compilación Integral:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.

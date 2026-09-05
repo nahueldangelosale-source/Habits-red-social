@@ -1967,3 +1967,37 @@ Se construyó el sistema completo de creacin y edicin de bloques cronometrados (
   - **Empty States Pedagógicos con Arte Vectorial:** Mandala geométrico de Habits en SVG vectorial con copy pedagógico e inspirador y trust pills de agilidad y seguridad. Feed de actividad con ilustración vectorial de latido y estado positivo *"Bandeja al Día"*.
   - **Sincronización Canónica de Traducción:** `LanguageContext.tsx` actualizado con `'Inicio'`.
 - **Smoke Tests E2E & Compilación:** Frontend build con 0 errores (Exit code 0).
+
+## Control de Calidad Operativo - Fase 200: Ficha del Atleta Quiet Luxury, Arquitectura en Eje Z, Semáforo Biomecánico y Correlación SNC (`AthleteDetailView.tsx`, `NutritionACWRCrossView.tsx`)
+- **El Héroe de los 3 Segundos (Claridad Inmediata - Modelo LIFT):**
+  - **Semáforo Biomecánico:** Diagnóstico primario inmediato en la cabecera del atleta: `🟢 Apto para Entrenar` (esmeralda translúcido `bg-emerald-500/10`) vs. `⚠️ Molestia activa` (alerta preventiva en caso de dolor o patología declarada en onboarding o anamnesis).
+  - **Estado de Continuidad de Planificación:** `⚡ Rutina Activa` (con detalle del día asignado) vs. `⏳ Sin Rutina Asignada` (alerta para evitar deserción del atleta).
+  - **Píldoras Quiet Luxury:** Píldoras con 10% de opacidad y degradado sutil para el tier (`PRO TIER`) y estado financiero (`Cobro al Día` con dot esmeralda pulsante).
+- **Arquitectura de la Información en el Eje Z (Tangibilidad Táctil):**
+  - Reemplazo de bordes rígidos y tarjetas planas por superficies flotantes con elevación táctil `shadow-[0_8px_30px_rgba(0,0,0,0.03)]`, esquinas `rounded-3xl` y desenfoque `backdrop-blur-xl`.
+  - Diferenciación armónica entre modo clínico (`bg-white/95 border-slate-200/90`) y modo oscuro atlético (`bg-zinc-950/95 border-zinc-800`).
+  - Jerarquía tipográfica sólida con Montserrat en títulos y métricas (`font-montserrat font-black tracking-tight`).
+- **Barra de Acciones Rápidas con Jerarquía LIFT:**
+  - **Acción Primaria Dominante:** Botón sólido con relieve y sombra suave `[ + Crear Rutina / Modificar Rutina ]` en índigo intenso (`bg-indigo-600 shadow-indigo-600/25`).
+  - **Acciones Secundarias Ghost:** `[ Desde Plantilla ]`, `[ Plan Alimentario ]`, `[ Asignar Hábito ]` en botones traslúcidos.
+  - **Divisor Aislador:** Separador vertical que aísla visualmente el registro de métricas (`[ Registrar Medidas ]`) y la comunicación (`[ Chat Interno ]`).
+- **Radar Nutricional con Gradiente Radial & Correlación de Fatiga SNC (Container Transform):**
+  - Incorporación de `<radialGradient id="radarRadialGrad">` que elimina la planitud geométrica del gráfico de radar con un resplandor translúcido orgánico.
+  - Micro-píldoras de síntesis inmediata: `Proteínas (93%)`, `Agua (2.8L)` y `Adherencia (88%)`.
+  - **Container Transform Interactivo:** Botón interactivo `[ Fatiga SNC ]` que despliega con resorte físico un módulo de correlación neuroendocrina:
+    *"Cuando el ACWR supera 1.30 (fatiga SNC acumulada), la ingesta de micronutrientes y recuperación proteica desciende típicamente un 18% por sobrecarga cognitiva."*
+  - **Empty State de Fuerza Amigable:** Tarjeta minimalista de 1RM con icono índigo y botón directo `[ + Registrar 1RM Base ]`.
+- **Pedagogía Clínica Empática en Acordeones:**
+  - Erradicación de mayúsculas agresivas de marketing (`POR QUÉ IMPORTA...`) por micro-insights pedagógicos empáticos:
+    - 💡 *Insight Clínico: Identificar fuentes de estrés o dolencias previas previene abandonos en las primeras 4 semanas.*
+    - 💡 *Punto de Partida: Referencia baseline para contrastar las reevaluaciones periódicas.*
+    - 💡 *Dosificación: Determina la tasa de sobrecarga progresiva y tolerancia al volumen semanal.*
+    - 💡 *Sustrato Recuperativo: Calidad de sueño y estrés modulan hasta un 60% la síntesis de colágeno y glucógeno.*
+- **Fotos de Progreso e Historial Gestalt:**
+  - Micro-elevación elástica en fotos de progreso (`whileHover={{ y: -2, scale: 1.03 }}`).
+  - Historial reciente con espacio negativo Gestalt, suprimiendo líneas divisorias rígidas en favor de tarjetas flotantes individuales con contraste suave.
+  - Navegación de pestañas con indicador líquido (`motion.div layoutId="activeAthleteTab"`) y transiciones de pantalla con `<AnimatePresence mode="wait">`.
+- **Widget Cruzado ACWR vs. Nutrición (`NutritionACWRCrossView.tsx`):**
+  - Elevado a Quiet Luxury: `rounded-3xl border shadow-[0_8px_30px_rgba(0,0,0,0.03)] backdrop-blur-xl`.
+  - Badge dinámico `Sweet Spot (1.0 - 1.3)` vs `Zona de Riesgo`, gráficos duales de área con gradientes suaves y callouts pedagógicos.
+- **Smoke Tests E2E & Compilación:** Frontend build con 0 errores (Exit code 0).

@@ -222,6 +222,18 @@
 | S-SWAP-01| Motor Smart Swap con 4 Macros & Dominancia | ✅ Done | `src/utils/smartSwapEngine.ts` | Detección CARBS/PROT/FAT + equivalencia + medidas caseras |
 | S-USDA-01| Ingesta & Traducción USDA Foundation (834 alimentos) | ✅ Done | `data/SARA_Master_Database.json` | +363 alimentos traducidos con análisis de laboratorio |
 
+### Sprint de Elevación Neuroestética: Ficha de Atleta Quiet Luxury, Eje Z & Correlación SNC (Fase 200 - Septiembre 2026)
+
+| ID | Tarea | Estado | Archivo / Módulo | Notas |
+|----|-------|:------:|------------------|-------|
+| S-ATH-HERO | Semáforo Biomecánico & Continuidad en 3 Segundos | ✅ Done | `web/src/components/drilldown/AthleteDetailView.tsx` | Chip de aptitud física (`🟢 Apto` / `⚠️ Molestia`) + estado de rutina activa / sin plan en cabecera |
+| S-ATH-ZAXIS| Tangibilidad Eje Z & Jerarquía LIFT en Acciones | ✅ Done | `web/src/components/drilldown/AthleteDetailView.tsx` | Tarjetas flotantes `rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.03)] backdrop-blur-xl` + botón primario dominante índigo |
+| S-ATH-RADAR| Radar Nutricional & Container Transform SNC | ✅ Done | `web/src/components/drilldown/AthleteDetailView.tsx` | `<radialGradient id="radarRadialGrad">` + desplegable animado con resorte de fatiga SNC vs micronutrientes (-18%) |
+| S-ATH-CLIN | Acordeones Pedagógicos Empáticos con Micro-Insights | ✅ Done | `web/src/components/drilldown/AthleteDetailView.tsx` | Reemplazo de mayúsculas agresivas por `💡 Insight Clínico`, `💡 Punto de Partida`, `💡 Dosificación` y `💡 Sustrato` |
+| S-ATH-GEST | Fotos de Progreso Elásticas e Historial Gestalt | ✅ Done | `web/src/components/drilldown/AthleteDetailView.tsx` | Micro-elevación `whileHover={{ y: -2, scale: 1.03 }}` y tarjetas de sesiones flotantes por espacio negativo |
+| S-ATH-TABS | Pestañas con Indicador Líquido y Transición Suave | ✅ Done | `web/src/components/drilldown/AthleteDetailView.tsx` | Píldora deslizante `layoutId="activeAthleteTab"` y transición `<AnimatePresence mode="wait">` |
+| S-ATH-CROSS| Elevación Quiet Luxury de Widget ACWR vs Nutrición | ✅ Done | `web/src/components/drilldown/NutritionACWRCrossView.tsx` | Contenedor `rounded-3xl`, tipografía Montserrat, Sweet Spot chip y gradientes suaves |
+
 ---
 
 ## ⚡ Próximo Sprint — Post-MVP: Motor de Hidratación & Carbos Peri-Entreno
