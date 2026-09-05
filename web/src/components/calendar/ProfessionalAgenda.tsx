@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { playDopamineChime, playSubtlePop, playCelebrationChord } from '../../utils/audioEffects';
 
 export interface ServiceTypeOption {
   id: string;
@@ -317,12 +318,17 @@ export const ProfessionalAgenda: React.FC = () => {
     toast.success('¡Turno guardado con éxito!', { icon: '📅' });
   };
 
-  // Marcar Tarea como completada
+  // Marcar Tarea como completada con recompensa sonora dopaminérgica
   const handleToggleTask = (id: string) => {
     setTasks(prev => prev.map(t => {
       if (t.id === id) {
         const nextState = !t.completed;
-        if (nextState) toast.success('¡Tarea completada!', { icon: '🎉', duration: 1500 });
+        if (nextState) {
+          playDopamineChime();
+          toast.success('¡Hábito/Tarea completada!', { icon: '🎉', duration: 1500 });
+        } else {
+          playSubtlePop();
+        }
         return { ...t, completed: nextState };
       }
       return t;
@@ -334,6 +340,7 @@ export const ProfessionalAgenda: React.FC = () => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
 
+    playSubtlePop();
     const created: CoachTask = {
       id: `task-${Date.now()}`,
       title: newTaskTitle.trim(),
@@ -375,6 +382,7 @@ export const ProfessionalAgenda: React.FC = () => {
 
     setAppointments(prev => [...prev, ...nextWeekApts]);
     setWeekOffset(prev => prev + 1);
+    playCelebrationChord();
     toast.success(`¡Semana replicada! Se copiaron ${nextWeekApts.length} turnos a la próxima semana.`, {
       icon: '🔁',
       duration: 4000
@@ -492,6 +500,7 @@ export const ProfessionalAgenda: React.FC = () => {
       }));
 
       setAppointments(prev => [...prev, ...newApts]);
+      playCelebrationChord();
       toast.success(`¡${newApts.length} turnos agendados con éxito!`, { icon: '🎨' });
     } else {
       const newApts: Appointment[] = multiSelectData.selectedDays.map((day, idx) => ({
@@ -512,6 +521,7 @@ export const ProfessionalAgenda: React.FC = () => {
       }));
 
       setAppointments(prev => [...prev, ...newApts]);
+      playCelebrationChord();
       toast.success(`¡Bloque fijado para ${newApts.length} días!`, { icon: '🛡️' });
     }
 
@@ -526,6 +536,7 @@ export const ProfessionalAgenda: React.FC = () => {
   const handleAddQuickTodo = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && quickTodoInput.trim()) {
       e.preventDefault();
+      playSubtlePop();
       const newTask: CoachTask = {
         id: `task-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
         title: quickTodoInput.trim(),
@@ -1078,7 +1089,7 @@ export const ProfessionalAgenda: React.FC = () => {
                                 onMouseUp={handleGridMouseUp}
                                 className={`p-1 border-r border-slate-100 dark:border-zinc-900 last:border-r-0 select-none transition-all ${
                                   isSelected 
-                                    ? 'bg-indigo-600/30 ring-2 ring-indigo-500 shadow-md z-10' 
+                                    ? 'bg-indigo-600/30 ring-2 ring-indigo-500 shadow-md z-20 scale-[1.01]' 
                                     : 'bg-indigo-50/40 dark:bg-indigo-950/20'
                                 }`}
                               >
@@ -1099,7 +1110,7 @@ export const ProfessionalAgenda: React.FC = () => {
                             );
                           }
 
-                          // Celda Libre Intercativa para Drag o Clic Único
+                          // Celda Libre Interactiva para Drag o Clic Único (con elevación z-20 y scale-[1.01])
                           return (
                             <div
                               key={day.key}
@@ -1113,13 +1124,13 @@ export const ProfessionalAgenda: React.FC = () => {
                               }}
                               className={`p-1 border-r border-slate-100 dark:border-zinc-900 last:border-r-0 group cursor-pointer select-none transition-all ${
                                 isSelected 
-                                  ? 'bg-indigo-500/25 ring-2 ring-indigo-500 ring-inset shadow-inner z-10 scale-[0.98]' 
+                                  ? 'bg-indigo-500/25 dark:bg-indigo-600/30 ring-2 ring-indigo-500 ring-inset shadow-md z-20 scale-[1.01]' 
                                   : 'hover:bg-emerald-50/40 dark:hover:bg-emerald-950/20'
                               }`}
                             >
                               <div className={`h-full w-full rounded-xl border flex items-center justify-center transition-all p-1 ${
                                 isSelected 
-                                  ? 'border-indigo-500 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs' 
+                                  ? 'border-indigo-500 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-bold shadow-xs scale-[1.01]' 
                                   : 'border-dashed border-slate-200/80 dark:border-zinc-800 group-hover:border-emerald-400 dark:group-hover:border-emerald-600'
                               }`}>
                                 {isSelected ? (
@@ -1297,25 +1308,36 @@ export const ProfessionalAgenda: React.FC = () => {
                             : 'bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 shadow-2xs hover:border-indigo-400'
                         }`}
                       >
-                        {/* Checkbox Circular */}
+                        {/* Checkbox Circular con Microinteracción */}
                         <div className="flex items-start gap-2.5 min-w-0 flex-1">
                           <button
                             type="button"
                             onClick={() => handleToggleTask(task.id)}
-                            className={`w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center transition-all cursor-pointer ${
+                            className={`w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center transition-all duration-200 cursor-pointer ${
                               task.completed
-                                ? 'bg-emerald-500 text-white'
-                                : 'border-2 border-slate-300 dark:border-zinc-600 hover:border-emerald-500'
+                                ? 'bg-emerald-500 text-white scale-105 shadow-xs ring-2 ring-emerald-400/50'
+                                : 'border-2 border-slate-300 dark:border-zinc-600 hover:border-emerald-500 hover:scale-105'
                             }`}
                             title={task.completed ? "Desmarcar" : "Completar"}
                           >
-                            {task.completed && <Check size={11} className="stroke-[3]" />}
+                            <AnimatePresence>
+                              {task.completed && (
+                                <motion.div
+                                  initial={{ scale: 0, rotate: -45 }}
+                                  animate={{ scale: 1, rotate: 0 }}
+                                  exit={{ scale: 0, rotate: 45 }}
+                                  transition={{ type: 'spring', stiffness: 600, damping: 25 }}
+                                >
+                                  <Check size={11} className="stroke-[3]" />
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
                           </button>
 
                           <div className="min-w-0 flex-1">
-                            <h4 className={`text-xs font-bold font-montserrat leading-snug break-words ${
+                            <h4 className={`text-xs font-bold font-montserrat leading-snug break-words transition-all duration-300 ${
                               task.completed 
-                                ? 'line-through text-slate-400 dark:text-zinc-500' 
+                                ? 'line-through text-slate-400 dark:text-zinc-500 decoration-emerald-500/70 decoration-2' 
                                 : 'text-slate-800 dark:text-zinc-200'
                             }`}>
                               {task.title}
@@ -1495,18 +1517,33 @@ export const ProfessionalAgenda: React.FC = () => {
                 >
                   <div className="flex items-center gap-3.5">
                     <button
-                      className={`w-6 h-6 rounded-lg flex items-center justify-center transition-all ${
+                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 cursor-pointer ${
                         task.completed
-                          ? 'bg-emerald-500 text-white'
-                          : 'border-2 border-slate-300 dark:border-zinc-700 hover:border-emerald-500'
+                          ? 'bg-emerald-500 text-white scale-105 shadow-xs ring-2 ring-emerald-400/50'
+                          : 'border-2 border-slate-300 dark:border-zinc-700 hover:border-emerald-500 hover:scale-105'
                       }`}
                     >
-                      {task.completed && <CheckCircle2 size={16} />}
+                      <AnimatePresence>
+                        {task.completed && (
+                          <motion.div
+                            initial={{ scale: 0, rotate: -45 }}
+                            animate={{ scale: 1, rotate: 0 }}
+                            exit={{ scale: 0, rotate: 45 }}
+                            transition={{ type: 'spring', stiffness: 600, damping: 25 }}
+                          >
+                            <Check size={13} className="stroke-[3]" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </button>
 
                     <div>
                       <div className="flex items-center gap-2">
-                        <h4 className={`text-xs font-bold font-montserrat ${task.completed ? 'line-through text-slate-400' : 'text-slate-900 dark:text-white'}`}>
+                        <h4 className={`text-xs font-bold font-montserrat transition-all duration-300 ${
+                          task.completed 
+                            ? 'line-through text-slate-400 dark:text-zinc-500 decoration-emerald-500/70 decoration-2' 
+                            : 'text-slate-900 dark:text-white'
+                        }`}>
                           {task.title}
                         </h4>
                         {task.isAutoGenerated && (
