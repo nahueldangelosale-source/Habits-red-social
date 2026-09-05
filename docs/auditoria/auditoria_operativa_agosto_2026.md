@@ -1936,12 +1936,16 @@ Se construyó el sistema completo de creacin y edicin de bloques cronometrados (
   - Reubicación del panel lateral **To DO** al **lado izquierdo** de la cuadrícula semanal en escritorio (`xl:order-1`), respetando el patrón de lectura visual occidental (revisar pendientes $\rightarrow$ agendar/bloquear en el calendario a la derecha).
 
 ## Control de Calidad Operativo - Fase 198: Estadísticas Desplegables Bajo Filtros y Acciones Rápidas a 1 Clic en Roster de Contactos (`TrainerRoster.tsx`)
-- **Arquitectura de Información & Eliminación de Scroll Forzado:**
-  - Reubicación de las 3 tarjetas de métricas pedagógicas (*Objetivos / Enfoque de entrenamiento*, *Planes Asignados / Cobertura de rutinas*, *Estado de Cuotas / Cobros y membresías*) dentro de un menú desplegable **cerrado por defecto** (`isStatsOpen = false`) ubicado inmediatamente debajo de la barra de búsqueda y filtros.
+- **Arquitectura de Información, Cero Scroll & Máxima Síntesis Cognitiva:**
+  - Reubicación de las métricas pedagógicas dentro de un menú desplegable **cerrado por defecto** (`isStatsOpen = false`) ubicado inmediatamente debajo de la barra de búsqueda y filtros.
+  - **Eliminación Estratégica del Filtro y Métricas de Objetivo:** Se depuró el filtro "Objetivo" (`[Todos] [Fuerza/Hip] [Rehab]`) y la tarjeta estadística de "Objetivos (Fuerza / Rehabilitación)" para descongestionar el encabezado y enfocar la vista exclusivamente en la gestión de rutinas activas y finanzas.
   - Al ingresar a `/roster`, el profesional visualiza de inmediato su lista de clientes sin fricción visual.
-  - Botón disparador con estética *liquid glass*, micro-pills con resumen numérico en vivo visible incluso cerrado (`🎯 X Fuerza · Y Rehab`, `📋 Z Planes Activos`, `💳 W Al Día`) y chevron interactivo animado 180° (`framer-motion`).
+  - Botón disparador con estética *liquid glass*, micro-pills con resumen numérico en vivo visible incluso cerrado (`📋 Z Planes Activos`, `💳 W Al Día`) y chevron interactivo animado 180° (`framer-motion`).
+  - Acordeón interno con cuadrícula limpia de 2 columnas (`grid-cols-1 md:grid-cols-2`) para:
+    1. *Planes Asignados / Cobertura de rutinas* (Plan Activo vs Pendiente/Borrador + donut SVG).
+    2. *Estado de Cuotas / Cobros y membresías* (Al Día vs En Mora/Pendiente + donut SVG).
 - **Tarjeta de Alumno Prémium con Visibilidad de Estados a Simple Vista:**
-  - Visualización clara y compacta de información vital: Nombre, Badge `Nuevo`, Racha (`🔥 Xd racha`), Último entrenamiento, Enfoque (`Fuerza Máxima e Hipertrofia` / `Rehabilitación y Readaptación`) y tags de advertencia biomecánica.
+  - Visualización clara y compacta de información vital: Nombre, Badge `Nuevo`, Racha (`🔥 Xd racha`), Último entrenamiento y tags de advertencia biomecánica.
   - **Indicador de Mensajería Interna No Leída:** Punto de pulso ámbar (`bg-amber-500 animate-pulse`) en el avatar del alumno cuando posee mensajes pendientes en la mensajería interna propia de la plataforma.
 - **Micro-Toolbar de Acciones Rápidas a 1 Clic con `e.stopPropagation()`:**
   - `📅 Agendar Turno`: Apertura y precarga de calendario para el atleta sin ingresar a la ficha general.

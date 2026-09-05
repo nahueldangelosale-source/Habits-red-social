@@ -585,10 +585,11 @@ A lo largo de estos 12 meses (24 Sprints de 2 semanas cada uno), la evolución d
 
 ### Fase 198: Estadísticas Desplegables Bajo Filtros y Acciones Rápidas a 1 Clic en Roster de Contactos (COMPLETADA ✅)
 - **Eliminación de Scroll Forzado y Menú Desplegable Cerrado (`TrainerRoster.tsx`):**
-  - Reubicación de las 3 tarjetas estadísticas (*Objetivos*, *Planes Asignados*, *Estado de Cuotas*) dentro de un menú desplegable colapsable **cerrado por defecto** (`isStatsOpen = false`) ubicado inmediatamente debajo de los filtros.
-  - Gatillo liquid glass con micro-pills resumen en vivo (`🎯 Fuerza/Rehab`, `📋 Planes`, `💳 Cuotas`) y chevron interactivo animado 180°.
+  - Reubicación de las tarjetas estadísticas (*Planes Asignados*, *Estado de Cuotas*) dentro de un menú desplegable colapsable **cerrado por defecto** (`isStatsOpen = false`) ubicado inmediatamente debajo de los filtros.
+  - **Depuración de Objetivo:** Se eliminó el filtro "Objetivo" y la tarjeta estadística correspondiente para reducir la carga cognitiva y maximizar el enfoque operativo.
+  - Gatillo liquid glass con micro-pills resumen en vivo (`📋 Planes`, `💳 Cuotas`) y chevron interactivo animado 180°.
 - **Tarjeta de Alumno Prémium con Visibilidad Instantánea:**
-  - Exposición de datos esenciales a simple vista: Nombre, Badge `Nuevo`, Racha, Último entrenamiento, Enfoque y Etiquetas críticas.
+  - Exposición de datos esenciales a simple vista: Nombre, Badge `Nuevo`, Racha, Último entrenamiento y Etiquetas críticas.
   - **Indicador de Mensajería Interna No Leída:** Punto de pulso ámbar (`bg-amber-500 animate-pulse`) en el avatar para alertar sobre mensajes pendientes en el chat interno propio.
 - **Micro-Toolbar de Acciones Rápidas a 1 Clic con `stopPropagation()`:**
   - Atajos directos a 1 clic para: `📅 Agendar Turno`, `🏋️ Ver/Diseñar Rutina`, `💬 Mensajería Interna`, `💳 Alternar Cuota` (conmutación en memoria optimista con toast reactivo) y `➡️ Perfil Completo`.

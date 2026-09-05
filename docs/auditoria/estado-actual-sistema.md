@@ -1057,10 +1057,12 @@ graph TD
 
 ## 117. Estadísticas Desplegables Bajo Filtros y Acciones Rápidas a 1 Clic en Roster de Contactos (Fase 198)
 - **Eliminación de Carga Cognitiva y Scroll Superior en `/roster`:**
-  - `TrainerRoster.tsx` reestructurado para albergar las 3 tarjetas de métricas pedagógicas (*Objetivos/Enfoque*, *Planes Asignados/Cobertura*, *Estado de Cuotas/Finanzas*) dentro de un acordeón desplegable **cerrado por defecto** (`isStatsOpen = false`) posicionado debajo de la barra de búsqueda y filtros.
-  - Gatillo liquid glass interactivo con micro-pills informativas visibles incluso cuando está cerrado (`🎯 X Fuerza · Y Rehab`, `📋 Z Activos`, `💳 W Al Día`) y chevron con rotación fluida 180°.
+  - `TrainerRoster.tsx` reestructurado para albergar las tarjetas de métricas pedagógicas (*Planes Asignados/Cobertura*, *Estado de Cuotas/Finanzas*) dentro de un acordeón desplegable **cerrado por defecto** (`isStatsOpen = false`) posicionado debajo de la barra de búsqueda y filtros.
+  - **Depuración de Métricas y Filtro "Objetivo":** Eliminación completa del selector de filtro `Objetivo` y de la tarjeta estadística correspondiente, permitiendo que la barra de búsqueda y los selectores de `Plan` y `Cuota` respiren con máxima legibilidad.
+  - Gatillo liquid glass interactivo con micro-pills informativas visibles incluso cuando está cerrado (`📋 Z Activos`, `💳 W Al Día`) y chevron con rotación fluida 180°.
+  - Despliegue en 2 columnas armoniosas con gráficos SVG donut.
 - **Tarjeta de Alumno con Visibilidad Total a Simple Vista:**
-  - Visualización sin esfuerzo de estados esenciales: Objetivo, Racha, Último entrenamiento, Plan activo/pendiente y Cuota al día/en mora.
+  - Visualización sin esfuerzo de estados esenciales: Racha, Último entrenamiento, Plan activo/pendiente y Cuota al día/en mora.
   - **Indicador de Mensajería Interna No Leída:** Punto de pulso ámbar animado (`bg-amber-500 animate-pulse`) en el avatar del alumno si este posee mensajes no leídos en la mensajería interna propia de la plataforma.
 - **Barra de Acciones Rápidas a 1 Clic (`e.stopPropagation()`):**
   - Botones dedicados para:
