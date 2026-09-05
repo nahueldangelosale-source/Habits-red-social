@@ -1074,4 +1074,17 @@ graph TD
 - **Validación de Compilación:**
   - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
 
-
+## 118. Optimización de Sidebar a Liquid Glass Metalizado y Dashboard de Inicio con Alma y Baja Carga Cognitiva (Fase 199)
+- **Sidebar Prémium y Minimalista (`Sidebar.tsx`, `Sidebar.css`):**
+  - **Eliminación de Distracciones en Movimiento:** Se eliminó la píldora animada `layoutId="activePill"` que volaba entre pestañas y los degradados policromáticos.
+  - Indicador arquitectónico sutil y estacionario a la izquierda (`h-5 w-1 rounded-r-full bg-indigo-600 dark:bg-indigo-400 shadow-[0_0_8px_rgba(99,102,241,0.4)]`).
+  - **Estética Liquid Glass Metalizado:** Reemplazado el borde derecho arcoíris de 5 colores por un bisel de corte de vidrio especular de 1px puro en `Sidebar.css`. Fondo platino translúcido con desenfoque de 28px (`backdrop-filter: blur(28px)`).
+  - **Simplificación del Lenguaje (LIFT Clarity):** Menú directo: `Inicio`, `Agenda`, `Alumnos`/`Pacientes`, `Mensajes`, `Comunidad`, `Smart Lab`.
+  - Cápsulas de iconos pulidas y neutras (`bg-slate-100/70` / `bg-white/5`) que se iluminan elegantemente al activarse.
+- **Dashboard de Inicio con Alma y Calidez (`CommandCenter.tsx`, `LanguageContext.tsx`):**
+  - **Atmósfera y Color Grading:** Fondo platino perla suave (`bg-[#f8fafc]` / `bg-[#090d16]`) con auras radiales de luz orgánica cálida (`blur-[140px]`).
+  - **Hero Cards de Acción Inmediata:** Tarjetas liquid glass con biseles especulares y badges estandarizados de prioridad (`Prioridad Alta`, `Prioridad Media`, `Al Día`).
+  - **Empty States Pedagógicos y Vector Line Art:** Mandala geométrico de Habits en SVG vectorial puro con copy inspirador y trust pills de agilidad y seguridad. Feed de actividad con ilustración vectorial de latido y estado positivo *"Bandeja al Día"*.
+  - **Sincronización Canónica de Traducción:** `LanguageContext.tsx` actualizado con `'Inicio'`.
+- **Validación de Compilación:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.

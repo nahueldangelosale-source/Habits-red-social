@@ -596,4 +596,15 @@ A lo largo de estos 12 meses (24 Sprints de 2 semanas cada uno), la evolución d
 - **Verificación de Compilación Integral:**
   - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
 
-
+### Fase 199: Optimización de Sidebar a Liquid Glass Metalizado y Dashboard de Inicio con Alma y Baja Carga Cognitiva (COMPLETADA ✅)
+- **Sidebar Prémium y Minimalista (`Sidebar.tsx`, `Sidebar.css`):**
+  - **Eliminación del Movimiento Constante:** Removida la barra/píldora móvil `layoutId="activePill"` y los degradados de color dinámicos. Sustituida por un indicador sutil estático de 1px a la izquierda (`h-5 w-1 rounded-r-full bg-indigo-600 shadow-sm`) y respuesta magnética suave (`whileHover={{ x: 1 }}`).
+  - **Liquid Glass Metalizado:** Borde biselado especular de corte de vidrio de 1px (`rgba(255,255,255,0.9)` a `rgba(226,232,240,0.7)`), reemplazando el borde arcoíris de 5 colores. Fondo platino translúcido con desenfoque óptico (`backdrop-filter: blur(28px) saturate(160%)`).
+  - **Claridad del Lenguaje (Modelo LIFT):** Simplificación de etiquetas en menú: `Panel Principal` $\rightarrow$ **`Inicio`**, `Agenda & Turnos` $\rightarrow$ **`Agenda`**, `Contactos Totales` $\rightarrow$ **`Alumnos`** (o **`Pacientes`** en workspace clínico), `Mensajes & Validaciones` $\rightarrow$ **`Mensajes`**, `Grupos & Retos` $\rightarrow$ **`Comunidad`**, `Smart Lab (Bio-Sync)` $\rightarrow$ **`Smart Lab`**.
+- **Dashboard de Inicio con Alma y Calidez (`CommandCenter.tsx`, `LanguageContext.tsx`):**
+  - **Inyección de Alma y Color Grading:** Fondo platino perla (`bg-[#f8fafc]` / `bg-[#090d16]`) enriquecido con auras radiales de luz ambiental cálida (`blur-[140px]` e índigo/púrpura al 4%) que dotan de profundidad orgánica al espacio.
+  - **Hero Cards de Acción Inmediata:** Tarjetas liquid glass con borde especular biselado, badges estandarizados de prioridad (`Prioridad Alta`, `Prioridad Media`, `Al Día`) y acceso directo en 1 clic a sesiones y revisiones.
+  - **Empty States Pedagógicos con Arte Vectorial:** Ilustración geométrica vector SVG **Mándala Habits** con copy inspirador y trust pills (`⚡ Agendado en 1 clic`, `🛡️ Seguridad Zero-Trust`, `📊 Telemetría en vivo`). Feed de actividad con ilustración vectorial de latido y estado positivo *"Bandeja al Día"*.
+- **Sincronización Global de Idioma:** Actualizada la clave canónica `'Inicio'` en `LanguageContext.tsx` y botón *"Volver al Inicio"*.
+- **Verificación de Compilación Integral:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
