@@ -5,7 +5,8 @@ import {
     Activity, Dumbbell, ShieldAlert, Video, BrainCircuit, 
     ArrowUpRight, HeartPulse, Shield, MessageSquare, Plus,
     X, Check, FastForward, PlayCircle, Mic, RotateCcw,
-    Users, Calendar, BatteryWarning, ChevronRight, Calendar as CalendarIcon, LayoutDashboard, Lock, ChevronDown, Zap, FileText, CreditCard, ActivitySquare, ArrowLeft, CheckCircle2, MessageCircle, ClipboardEdit, Trash2
+    Users, Calendar, BatteryWarning, ChevronRight, Calendar as CalendarIcon, LayoutDashboard, Lock, ChevronDown, Zap, FileText, CreditCard, ActivitySquare, ArrowLeft, CheckCircle2, MessageCircle, ClipboardEdit, Trash2,
+    Flame, Clock, AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
@@ -94,7 +95,18 @@ export const CommandCenter: React.FC = () => {
                 setTimeout(() => { if(isMounted) setLoadingMessage('Sincronizando resumen de Inicio...'); }, 400);
 
                 const data = await trainerApi.getDashboard();
-                if (isMounted) setDashboardData(data);
+                if (isMounted) {
+                    if (data && data.clients) {
+                        data.clients = data.clients.map((c, idx) => ({
+                            ...c,
+                            planStatus: (c as any).planStatus || 'ACTIVE',
+                            paymentStatus: (c as any).paymentStatus || 'paid',
+                            hasUnreadMessage: (c as any).hasUnreadMessage ?? (idx === 0),
+                            unreadMessagesCount: (c as any).unreadMessagesCount ?? (idx === 0 ? 1 : 0)
+                        }));
+                    }
+                    setDashboardData(data);
+                }
             } catch (e) {
                 console.error(e);
             } finally {
@@ -104,6 +116,97 @@ export const CommandCenter: React.FC = () => {
         fetchDashboard();
         return () => { isMounted = false; };
     }, []);
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // ACCIONES RÁPIDAS A 1 CLIC (CON e.stopPropagation())
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // 1 Clic: Alternar Cuota (Al Día <-> En Mora)
+    const handleTogglePaymentStatus = (clientId: string, clientName: string) => {
+        setDashboardData(prev => {
+            if (!prev) return prev;
+            let updatedStatus = 'paid';
+            const updatedClients = prev.clients.map(c => {
+                if (c.id === clientId) {
+                    const currentStatus = (c as any).paymentStatus || 'paid';
+                    const newStatus = currentStatus === 'paid' ? 'past_due' : 'paid';
+                    updatedStatus = newStatus;
+                    return { ...c, paymentStatus: newStatus };
+                }
+                return c;
+            });
+
+            if (updatedStatus === 'paid') {
+                toast.success(`Cuota de ${clientName}: Marcada Al Día ✅`, {
+                    icon: '💳',
+                    duration: 3000
+                });
+            } else {
+                toast.error(`Cuota de ${clientName}: Marcada En Mora ⚠️`, {
+                    icon: '⚠️',
+                    duration: 3000
+                });
+            }
+
+            return { ...prev, clients: updatedClients };
+        });
+    };
+
+    // 1 Clic: Alternar Estado de Plan (Activo <-> Pendiente)
+    const handleTogglePlanStatus = (clientId: string, clientName: string) => {
+        setDashboardData(prev => {
+            if (!prev) return prev;
+            let updatedPlan = 'ACTIVE';
+            const updatedClients = prev.clients.map(c => {
+                if (c.id === clientId) {
+                    const currentStatus = (c as any).planStatus || 'ACTIVE';
+                    const newStatus = currentStatus === 'ACTIVE' ? 'DRAFT' : 'ACTIVE';
+                    updatedPlan = newStatus;
+                    return { ...c, planStatus: newStatus };
+                }
+                return c;
+            });
+
+            if (updatedPlan === 'ACTIVE') {
+                toast.success(`Plan de ${clientName}: Activado ✅`, {
+                    icon: '🏋️',
+                    duration: 3000
+                });
+            } else {
+                toast.success(`Plan de ${clientName}: En Borrador / Pendiente ⏳`, {
+                    icon: '📝',
+                    duration: 3000
+                });
+            }
+
+            return { ...prev, clients: updatedClients };
+        });
+    };
+
+    // 1 Clic: Agendar Turno en Calendario
+    const handleQuickSchedule = (clientId: string, clientName: string) => {
+        toast.success(`Abriendo agenda para ${clientName}...`, { icon: '📅' });
+        navigate(`/calendar?athlete=${clientId}&name=${encodeURIComponent(clientName)}`);
+    };
+
+    // 1 Clic: Diseñar / Ver Rutina en Plan Builder
+    const handleQuickPlan = (clientId: string, clientName: string) => {
+        toast.success(`Cargando diseñador de rutinas para ${clientName}...`, { icon: '🏋️' });
+        navigate(`/plan-builder?athleteId=${clientId}`);
+    };
+
+    // 1 Clic: Mensajería Interna Propia de la Plataforma
+    const handleQuickInternalChat = (clientId: string, clientName: string) => {
+        setDashboardData(prev => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                clients: prev.clients.map(c => c.id === clientId ? { ...c, hasUnreadMessage: false, unreadMessagesCount: 0 } : c)
+            };
+        });
+        toast.success(`Abriendo mensajería interna con ${clientName}...`, { icon: '💬' });
+        navigate(`/inbox?athlete=${clientId}`);
+    };
 
     const { queue: swipeQueue, approveTask, rejectTask } = useValidationsStore();
     const pendingValidationsCount = swipeQueue.length;
@@ -304,11 +407,13 @@ export const CommandCenter: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Botón superior de Nuevo siempre visible */}
-                <div className="relative">
+                {/* Botón superior de Nuevo siempre visible con sutil glow cálido */}
+                <div className="relative group/newbtn">
+                    {/* Sutil glow cálido imperceptible detrás del botón principal oscuro [+ NUEVO] (Regla del 3% neuroestética) */}
+                    <div className="pointer-events-none absolute -inset-1 rounded-2xl bg-gradient-to-r from-amber-500/20 via-rose-500/15 to-indigo-500/20 blur-md opacity-60 group-hover/newbtn:opacity-100 transition-opacity duration-500" />
                     <button 
                         onClick={() => setIsCreateOpen(!isCreateOpen)}
-                        className={`flex items-center gap-2 font-black uppercase tracking-widest text-xs px-5 py-2.5 rounded-xl transition-all ${
+                        className={`relative flex items-center gap-2 font-black uppercase tracking-widest text-xs px-5 py-2.5 rounded-xl transition-all ${
                             isClinical 
                                 ? 'bg-slate-900 hover:bg-slate-800 text-white shadow-sm hover:shadow-md' 
                                 : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/20 hover:shadow-lg hover:shadow-indigo-600/30'
@@ -493,8 +598,9 @@ export const CommandCenter: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     {/* Tarjeta 1: Revisiones (Video de Técnica & Fotos de Platos) */}
                     <motion.div 
-                        whileHover={{ y: -2 }}
+                        whileHover={{ y: -3, scale: 1.008 }}
                         whileTap={{ scale: 0.99 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         onClick={() => {
                             if (swipeQueue.length > 0) {
                                 setActiveTab('VALIDATION_SWIPE');
@@ -504,8 +610,8 @@ export const CommandCenter: React.FC = () => {
                         }} 
                         className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-5 flex flex-col justify-between backdrop-blur-xl ${
                             isClinical 
-                                ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_25px_rgba(99,102,241,0.08)] hover:border-indigo-300' 
-                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:border-indigo-500/40'
+                                ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_12px_28px_rgba(99,102,241,0.1)] hover:border-indigo-300' 
+                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:shadow-[0_12px_28px_rgba(99,102,241,0.15)] hover:border-indigo-500/40'
                         }`}
                     >
                         {/* Specular Cut-Glass Edge Light */}
@@ -543,14 +649,21 @@ export const CommandCenter: React.FC = () => {
                             </span>
                         </div>
 
-                        {/* Middle/Bottom: KPI & Action */}
+                        {/* Middle/Bottom: KPI & Action (Bold Number Contrast CRO/LIFT) */}
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-400 mb-0.5">
                                 Revisiones Pendientes
                             </p>
-                            <h3 className={`text-xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                {swipeQueue.length > 0 ? `${swipeQueue.length} por validar` : 'Bandeja al día'}
-                            </h3>
+                            {swipeQueue.length > 0 ? (
+                                <h3 className={`text-2xl font-black tracking-tight flex items-baseline gap-1.5 ${isClinical ? 'text-slate-950' : 'text-white'}`}>
+                                    <span className="text-2xl font-black font-montserrat tracking-tighter text-indigo-600 dark:text-indigo-400">{swipeQueue.length}</span>
+                                    <span className="text-sm font-bold text-slate-700 dark:text-zinc-300">por validar</span>
+                                </h3>
+                            ) : (
+                                <h3 className={`text-xl font-black tracking-tight ${isClinical ? 'text-slate-950' : 'text-white'}`}>
+                                    Bandeja al día
+                                </h3>
+                            )}
                             <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <p className={`text-[11px] font-bold flex items-center gap-1 ${
                                     swipeQueue.length > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-emerald-600 dark:text-emerald-400'
@@ -566,13 +679,14 @@ export const CommandCenter: React.FC = () => {
 
                     {/* Tarjeta 2: Agenda de Hoy */}
                     <motion.div 
-                        whileHover={{ y: -2 }}
+                        whileHover={{ y: -3, scale: 1.008 }}
                         whileTap={{ scale: 0.99 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         onClick={() => navigate('/calendar')} 
                         className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-5 flex flex-col justify-between backdrop-blur-xl ${
                             isClinical 
-                                ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_25px_rgba(168,85,247,0.08)] hover:border-purple-300' 
-                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:border-purple-500/40'
+                                ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_12px_28px_rgba(168,85,247,0.1)] hover:border-purple-300' 
+                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:shadow-[0_12px_28px_rgba(168,85,247,0.15)] hover:border-purple-500/40'
                         }`}
                     >
                         {/* Specular Cut-Glass Edge Light */}
@@ -594,13 +708,14 @@ export const CommandCenter: React.FC = () => {
                             </span>
                         </div>
 
-                        {/* Middle/Bottom: KPI & Action */}
+                        {/* Middle/Bottom: KPI & Action (Bold Number Contrast CRO/LIFT) */}
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-400 mb-0.5">
                                 Agenda de Hoy
                             </p>
-                            <h3 className={`text-xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                2 Turnos Programados
+                            <h3 className={`text-2xl font-black tracking-tight flex items-baseline gap-1.5 ${isClinical ? 'text-slate-950' : 'text-white'}`}>
+                                <span className="text-2xl font-black font-montserrat tracking-tighter text-purple-600 dark:text-purple-400">2</span>
+                                <span className="text-sm font-bold text-slate-700 dark:text-zinc-300">Turnos Programados</span>
                             </h3>
                             <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <p className="text-[11px] font-bold text-purple-600 dark:text-purple-400">
@@ -615,13 +730,14 @@ export const CommandCenter: React.FC = () => {
 
                     {/* Tarjeta 3: Alumnos / Pacientes Activos */}
                     <motion.div 
-                        whileHover={{ y: -2 }}
+                        whileHover={{ y: -3, scale: 1.008 }}
                         whileTap={{ scale: 0.99 }}
+                        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                         onClick={() => navigate('/roster')} 
                         className={`relative overflow-hidden rounded-2xl border transition-all duration-300 cursor-pointer group p-4 sm:p-5 flex flex-col justify-between backdrop-blur-xl ${
                             isClinical 
                                 ? 'bg-white/90 border-slate-200/80 shadow-[0_4px_20px_rgba(15,23,42,0.03)] hover:shadow-[0_8px_25px_rgba(16,185,129,0.08)] hover:border-emerald-300' 
-                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:border-emerald-500/40'
+                                : 'bg-zinc-900/80 border-white/10 shadow-lg hover:shadow-[0_8px_25px_rgba(16,185,129,0.15)] hover:border-emerald-500/40'
                         }`}
                     >
                         {/* Specular Cut-Glass Edge Light */}
@@ -643,13 +759,14 @@ export const CommandCenter: React.FC = () => {
                             </span>
                         </div>
 
-                        {/* Middle/Bottom: KPI & Action */}
+                        {/* Middle/Bottom: KPI & Action (Bold Number Contrast CRO/LIFT) */}
                         <div>
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-zinc-400 mb-0.5">
                                 {isClinical ? 'Pacientes en Seguimiento' : 'Alumnos en Seguimiento'}
                             </p>
-                            <h3 className={`text-xl font-black tracking-tight ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                {safeData.clients.length} {safeData.clients.length === 1 ? (isClinical ? 'Paciente' : 'Alumno') : (isClinical ? 'Pacientes' : 'Alumnos')}
+                            <h3 className={`text-2xl font-black tracking-tight flex items-baseline gap-1.5 ${isClinical ? 'text-slate-950' : 'text-white'}`}>
+                                <span className="text-2xl font-black font-montserrat tracking-tighter text-emerald-600 dark:text-emerald-400">{safeData.clients.length}</span>
+                                <span className="text-sm font-bold text-slate-700 dark:text-zinc-300">{safeData.clients.length === 1 ? (isClinical ? 'Paciente' : 'Alumno') : (isClinical ? 'Pacientes' : 'Alumnos')}</span>
                             </h3>
                             <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <p className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
@@ -684,15 +801,37 @@ export const CommandCenter: React.FC = () => {
                     {/* Ambient Glow */}
                     <div className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full bg-indigo-500/[0.06] dark:bg-indigo-500/10 blur-3xl" />
 
-                    {/* Geometric Habits Mandala Line Art */}
+                    {/* Geometric Habits Mandala Line Art con animación en bucle orgánico lento (8s) */}
                     <div className="relative mx-auto w-24 h-24 mb-6 flex items-center justify-center">
-                        <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500/15 via-purple-500/10 to-amber-500/10 blur-xl" />
-                        <svg viewBox="0 0 100 100" className="w-20 h-20 text-indigo-600 dark:text-indigo-400 stroke-current fill-none">
+                        <motion.div 
+                            animate={{
+                                scale: [0.95, 1.25, 0.95],
+                                opacity: [0.2, 0.45, 0.2]
+                            }}
+                            transition={{
+                                duration: 8,
+                                repeat: Infinity,
+                                ease: 'easeInOut'
+                            }}
+                            className="absolute inset-0 rounded-full bg-gradient-to-tr from-indigo-500/20 via-purple-500/15 to-amber-500/15 blur-xl" 
+                        />
+                        <motion.svg 
+                            animate={{
+                                scale: [1, 1.03, 1]
+                            }}
+                            transition={{
+                                duration: 8,
+                                repeat: Infinity,
+                                ease: 'easeInOut'
+                            }}
+                            viewBox="0 0 100 100" 
+                            className="w-20 h-20 text-indigo-600 dark:text-indigo-400 stroke-current fill-none relative z-10"
+                        >
                             <circle cx="50" cy="50" r="42" strokeWidth="1.2" strokeDasharray="3 3" className="opacity-40" />
                             <circle cx="50" cy="50" r="28" strokeWidth="1.5" className="opacity-60" />
                             <path d="M50 18 C62 34, 78 40, 78 56 C78 72, 62 82, 50 82 C38 82, 22 72, 22 56 C22 40, 38 34, 50 18 Z" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="opacity-90" />
                             <circle cx="50" cy="50" r="4" className="fill-indigo-600 dark:fill-indigo-400" />
-                        </svg>
+                        </motion.svg>
                     </div>
 
                     {/* Copy */}
@@ -791,55 +930,90 @@ export const CommandCenter: React.FC = () => {
                             ))}
                         </div>
                     ) : (
-                        safeData.clients.map((client) => (
-                            <div 
-                                key={client.id}
-                                onClick={() => navigate(`/trainer/athlete/${client.id}`)}
-                                className={`p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-all duration-200 cursor-pointer group hover:bg-slate-50/90 dark:hover:bg-zinc-800/70 relative z-0 hover:z-10 ${
-                                isClinical ? 'border-transparent' : 'border-transparent'
-                            }`}>
-                                {/* LEFT SIDE - ATHLETE INFO */}
-                                <div className="flex items-center gap-3.5 flex-1 min-w-0">
-                                    <div className="relative shrink-0">
-                                        {client.photoUrl ? (
-                                            <img src={client.photoUrl} alt={client.name} className="w-11 h-11 rounded-2xl object-cover ring-2 ring-slate-100 dark:ring-zinc-800" />
-                                        ) : (
-                                            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center font-black text-sm shadow-xs ${
-                                                isClinical ? 'bg-gradient-to-tr from-indigo-500 to-purple-600 text-white' : 'bg-gradient-to-tr from-indigo-600 to-purple-700 text-white'
-                                            }`}>
-                                                {client.name.substring(0, 2).toUpperCase()}
-                                            </div>
-                                        )}
-                                        <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-zinc-900" />
-                                    </div>
+                        safeData.clients.map((client) => {
+                            const hasUnread = (client as any).hasUnreadMessage;
+                            const isPaid = (client as any).paymentStatus !== 'past_due';
+                            const isPlanActive = (client as any).planStatus !== 'DRAFT';
 
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-0.5">
-                                            <h4 className={`font-bold text-sm tracking-tight truncate group-hover:text-indigo-600 transition-colors ${isClinical ? 'text-slate-900' : 'text-white'}`}>
-                                                {client.name}
-                                            </h4>
-                                            {!client.lastWorkout && (
-                                                <span className={`shrink-0 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
-                                                    isClinical ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            return (
+                                <div 
+                                    key={client.id}
+                                    onClick={() => navigate(`/trainer/athlete/${client.id}`)}
+                                    className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4 transition-all duration-200 cursor-pointer group hover:bg-slate-50/80 dark:hover:bg-zinc-800/60"
+                                >
+                                    {/* LADO IZQUIERDO: AVATAR Y DATOS VITALES */}
+                                    <div className="flex items-center gap-4 flex-1 min-w-0">
+                                        {/* Avatar con indicador de mensaje interno no leído */}
+                                        <div className="relative shrink-0">
+                                            {client.photoUrl ? (
+                                                <img 
+                                                    src={client.photoUrl} 
+                                                    alt={client.name} 
+                                                    className="w-12 h-12 rounded-full object-cover border-2 border-indigo-100 dark:border-zinc-700" 
+                                                />
+                                            ) : (
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-montserrat font-black text-sm ${
+                                                    isClinical 
+                                                        ? 'bg-indigo-100 text-indigo-700 border-2 border-indigo-200/70' 
+                                                        : 'bg-indigo-500/20 text-indigo-400 border-2 border-indigo-500/30'
                                                 }`}>
-                                                    Nuevo
-                                                </span>
+                                                    {client.name.substring(0, 2).toUpperCase()}
+                                                </div>
+                                            )}
+
+                                            {/* Indicador de Mensajería Interna No Leída (Punto Ámbar Pulso) */}
+                                            {hasUnread && (
+                                                <span 
+                                                    className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-amber-500 rounded-full border-2 border-white dark:border-zinc-900 animate-pulse shadow-xs" 
+                                                    title="Mensaje interno sin leer en la plataforma"
+                                                />
                                             )}
                                         </div>
-                                        <div className="flex items-center gap-2 flex-wrap">
-                                            <span className={`text-xs truncate flex items-center gap-1.5 ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>
-                                                <span className="opacity-70">🎯</span>
-                                                <span className={`font-medium ${isClinical ? 'text-slate-600' : 'text-zinc-300'}`}>
-                                                    {client.painAreas?.length ? 'Rehabilitación y Adaptación' : 'Fuerza Máxima e Hipertrofia'}
-                                                </span>
-                                            </span>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                                                <h4 className={`font-black font-montserrat text-sm truncate ${
+                                                    isClinical ? 'text-slate-900 group-hover:text-indigo-600' : 'text-white group-hover:text-indigo-400'
+                                                } transition-colors`}>
+                                                    {client.name}
+                                                </h4>
+                                                {!client.lastWorkout && (
+                                                    <span className={`shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full ${
+                                                        isClinical ? 'bg-emerald-100 text-emerald-700' : 'bg-emerald-500/20 text-emerald-400'
+                                                    }`}>
+                                                        Nuevo
+                                                    </span>
+                                                )}
+                                                {(client.streak ?? 0) > 0 && (
+                                                    <span className={`shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full inline-flex items-center gap-1 ${
+                                                        isClinical ? 'bg-amber-100 text-amber-700' : 'bg-amber-500/20 text-amber-400'
+                                                    }`}>
+                                                        <Flame size={10} />
+                                                        {client.streak}d racha
+                                                    </span>
+                                                )}
+                                                {hasUnread && (
+                                                    <span className="shrink-0 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400">
+                                                        Mensaje pendiente
+                                                    </span>
+                                                )}
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+                                                <p className={`text-[11px] font-medium ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>
+                                                    {client.lastWorkout 
+                                                        ? `${isClinical ? 'Última sesión' : 'Último entreno'}: ${client.lastWorkout}` 
+                                                        : (isClinical ? 'Sin sesiones aún' : 'Sin entrenos aún')}
+                                                </p>
+                                            </div>
+
                                             {client.criticalTags && client.criticalTags.length > 0 && (
-                                                <div className="flex items-center gap-1">
+                                                <div className="flex flex-wrap gap-1.5 mt-2">
                                                     {client.criticalTags.map(tag => (
-                                                        <span key={tag} className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                                                        <span key={tag} className={`text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full whitespace-nowrap border ${
                                                             client.riskLevel === 'RED'
-                                                                ? 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
-                                                                : 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                                                                ? isClinical ? 'bg-rose-50 text-rose-600 border-rose-200' : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                                                                : isClinical ? 'bg-amber-50 text-amber-600 border-amber-200' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
                                                         }`}>
                                                             {tag}
                                                         </span>
@@ -848,188 +1022,199 @@ export const CommandCenter: React.FC = () => {
                                             )}
                                         </div>
                                     </div>
-                                </div>
-                                
-                                {/* RIGHT SIDE - COMPREHENSIVE METRIC BADGES */}
-                                <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-6 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-zinc-800">
-                                    {/* 1. Plan */}
-                                    <div className="flex flex-col sm:items-end">
-                                        <span className={`text-[9px] font-black uppercase tracking-wider mb-1 ${isClinical ? 'text-slate-400' : 'text-zinc-500'}`}>
-                                            Plan Activo
-                                        </span>
-                                        <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border whitespace-nowrap inline-flex items-center gap-1 ${
-                                            (client as any).planStatus === 'DRAFT' 
-                                                ? (isClinical ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-amber-500/15 text-amber-300 border-amber-500/30')
-                                                : (isClinical ? 'bg-indigo-50/90 text-indigo-700 border-indigo-200/70 shadow-2xs' : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30')
-                                        }`}>
-                                            {(client as any).planStatus === 'DRAFT' ? '📝 Borrador' : '⚡ Activo'}
-                                        </span>
-                                    </div>
                                     
-                                    {/* 2. Finanzas */}
-                                    <div className="flex flex-col sm:items-end">
-                                        <span className={`text-[9px] font-black uppercase tracking-wider mb-1 ${isClinical ? 'text-slate-400' : 'text-zinc-500'}`}>
-                                            Finanzas
-                                        </span>
-                                        <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border whitespace-nowrap inline-flex items-center gap-1 ${
-                                            (client as any).paymentStatus === 'past_due' 
-                                                ? (isClinical ? 'bg-rose-50 text-rose-800 border-rose-200' : 'bg-rose-500/15 text-rose-300 border-rose-500/30')
-                                                : (isClinical ? 'bg-emerald-50/90 text-emerald-700 border-emerald-200/70' : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30')
+                                    {/* LADO DERECHO: ESTADOS A SIMPLE VISTA Y BARRA DE ACCIONES A 1 CLIC */}
+                                    <div className="flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 md:gap-6 shrink-0 self-start lg:self-auto ml-16 lg:ml-0">
+                                        
+                                        {/* Estado del Plan (Interactivo a 1 clic para alternar) */}
+                                        <div className="text-right">
+                                            <p className={`text-[10px] font-black font-montserrat uppercase tracking-widest mb-1 ${isClinical ? 'text-slate-400' : 'text-zinc-500'}`}>
+                                                Plan
+                                            </p>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleTogglePlanStatus(client.id, client.name);
+                                                }}
+                                                title="Clic para alternar estado de plan (Activo / Pendiente)"
+                                                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap inline-flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                                                    isPlanActive 
+                                                        ? (isClinical ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/80 hover:bg-indigo-100' : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 hover:bg-indigo-500/30')
+                                                        : (isClinical ? 'bg-amber-50 text-amber-700 border border-amber-200/80 hover:bg-amber-100' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30 hover:bg-amber-500/30')
+                                                }`}
+                                            >
+                                                {isPlanActive ? (
+                                                    <>
+                                                        <CheckCircle2 size={11} className="text-indigo-600 dark:text-indigo-400" />
+                                                        <span>Activo</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Clock size={11} className="text-amber-500" />
+                                                        <span>Pendiente</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+                                        
+                                        {/* Estado de Cuota (Interactivo a 1 clic para alternar) */}
+                                        <div className="text-right">
+                                            <p className={`text-[10px] font-black font-montserrat uppercase tracking-widest mb-1 ${isClinical ? 'text-slate-400' : 'text-zinc-500'}`}>
+                                                Cuota
+                                            </p>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleTogglePaymentStatus(client.id, client.name);
+                                                }}
+                                                title="Clic para alternar cuota (Al Día / En Mora)"
+                                                className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full whitespace-nowrap inline-flex items-center gap-1.5 transition-all cursor-pointer hover:scale-105 active:scale-95 ${
+                                                    isPaid 
+                                                        ? (isClinical ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-100' : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/30')
+                                                        : (isClinical ? 'bg-rose-50 text-rose-700 border border-rose-200/80 hover:bg-rose-100' : 'bg-rose-500/20 text-rose-400 border border-rose-500/30 hover:bg-rose-500/30')
+                                                }`}
+                                            >
+                                                {isPaid ? (
+                                                    <>
+                                                        <CheckCircle2 size={11} className="text-emerald-500" />
+                                                        <span>Al Día</span>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <AlertCircle size={11} className="text-rose-500" />
+                                                        <span>En Mora</span>
+                                                    </>
+                                                )}
+                                            </button>
+                                        </div>
+
+                                        {/* ═══════════════════════════════════════════════════════════════
+                                            MICRO-TOOLBAR DE ACCIONES RÁPIDAS A 1 CLIC
+                                           ═══════════════════════════════════════════════════════════════ */}
+                                        <div className={`flex items-center gap-1.5 p-1 rounded-2xl border transition-all ${
+                                            isClinical ? 'bg-slate-100/80 border-slate-200/80' : 'bg-zinc-950/70 border-zinc-800'
                                         }`}>
-                                            {(client as any).paymentStatus === 'past_due' ? '⚠️ En Mora' : '✓ Al Día'}
-                                        </span>
-                                    </div>
+                                            {/* Acción 1: 📅 Agendar Turno */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleQuickSchedule(client.id, client.name);
+                                                }}
+                                                title="📅 Agendar Turno en Calendario"
+                                                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                                                    isClinical 
+                                                        ? 'hover:bg-white text-slate-600 hover:text-indigo-600 hover:shadow-xs' 
+                                                        : 'hover:bg-zinc-800 text-zinc-400 hover:text-indigo-400'
+                                                }`}
+                                            >
+                                                <Calendar size={15} />
+                                            </button>
 
-                                    {/* 3. ACWR - Cansancio / Recuperación */}
-                                    <div className="flex flex-col sm:items-end">
-                                        <span className={`text-[9px] font-black uppercase tracking-wider mb-1 ${isClinical ? 'text-slate-400' : 'text-zinc-500'}`}>
-                                            Recuperación
-                                        </span>
-                                        {client.acwrStatus === 'CALCULATING' ? (
-                                            <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border animate-pulse whitespace-nowrap inline-flex items-center ${
-                                                isClinical ? 'bg-slate-100 text-slate-500 border-slate-200' : 'bg-zinc-800 text-zinc-400 border-zinc-700'
-                                            }`}>
-                                                Calculando...
-                                            </span>
-                                        ) : (
-                                            <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border whitespace-nowrap inline-flex items-center gap-1 ${
-                                                client.acwrStatus === 'DANGER_ZONE' 
-                                                    ? (isClinical ? 'bg-rose-50 text-rose-700 border-rose-200 shadow-2xs' : 'bg-rose-500/20 text-rose-300 border-rose-500/30')
-                                                : client.acwrStatus === 'SWEET_SPOT'
-                                                    ? (isClinical ? 'bg-emerald-50/90 text-emerald-700 border-emerald-200/70' : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30')
-                                                    : (isClinical ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-amber-500/15 text-amber-300 border-amber-500/30')
-                                            }`}>
-                                                {client.acwrStatus === 'DANGER_ZONE' ? '🔴 Alerta Carga' : 
-                                                 client.acwrStatus === 'SWEET_SPOT' ? '🟢 Óptimo' : 
-                                                 client.acwrStatus === 'FATIGUE_ACCUMULATION' ? '🟡 Atención' : 
-                                                 client.acwrStatus === 'UNDER_TRAINING' ? '⚪ Baja Carga' : '🟢 Óptimo'}
-                                            </span>
-                                        )}
-                                    </div>
+                                            {/* Acción 2: 🏋️ Diseñar / Ver Rutina */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleQuickPlan(client.id, client.name);
+                                                }}
+                                                title={isClinical ? "📋 Diseñar o Ver Plan Nutricional / Clínico" : "🏋️ Diseñar o Ver Plan de Entrenamiento"}
+                                                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                                                    isClinical 
+                                                        ? 'hover:bg-white text-slate-600 hover:text-sky-600 hover:shadow-xs' 
+                                                        : 'hover:bg-zinc-800 text-zinc-400 hover:text-sky-400'
+                                                }`}
+                                            >
+                                                <Dumbbell size={15} />
+                                            </button>
 
-                                    {/* Action Buttons Group */}
-                                    <div className="flex items-center gap-1 sm:ml-2">
-                                        <button 
-                                            onClick={(e) => { 
-                                                e.preventDefault();
-                                                e.stopPropagation(); 
-                                                navigate(`/communication?athleteId=${client.id}`); 
-                                            }}
-                                            className={`p-2 rounded-xl transition-all ${
-                                                isClinical ? 'hover:bg-indigo-50 text-slate-400 hover:text-indigo-600' : 'hover:bg-indigo-500/10 text-zinc-500 hover:text-indigo-400'
-                                            }`}
-                                            title="Enviar Mensaje"
-                                        >
-                                            <MessageCircle size={17} />
-                                        </button>
-                                        <button 
-                                            onClick={(e) => { 
-                                                e.preventDefault();
-                                                e.stopPropagation(); 
-                                                const [firstName, ...lastNameParts] = client.name.split(' ');
-                                                useOnboardingPTStore.getState().setIdentity({
-                                                    first_name: firstName,
-                                                    last_name: lastNameParts.join(' '),
-                                                    payment_status: (client as any).paymentStatus === 'past_due' ? 'PAST_DUE' : 'ACTIVE'
-                                                });
-                                                useOnboardingPTStore.getState().setCreatedAthleteId(client.id);
-                                                navigate(`/plan-builder/${client.id}`); 
-                                            }}
-                                            className={`p-2 rounded-xl transition-all ${
-                                                isClinical ? 'hover:bg-emerald-50 text-slate-400 hover:text-emerald-600' : 'hover:bg-emerald-500/10 text-zinc-500 hover:text-emerald-400'
-                                            }`}
-                                            title="Asignar / Editar Plan"
-                                        >
-                                            <ClipboardEdit size={17} />
-                                        </button>
-                                        <button 
-                                            onClick={async (e) => { 
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                toast((t) => (
-                                                    <div className={`${t.visible ? 'animate-enter' : 'animate-leave'} max-w-md w-full shadow-2xl rounded-2xl pointer-events-auto flex flex-col ring-1 ${isClinical ? 'bg-white ring-slate-200' : 'bg-zinc-900 ring-white/10'} overflow-hidden`}>
-                                                        <div className={`p-5 bg-gradient-to-br ${isClinical ? 'from-rose-50 to-white' : 'from-rose-500/10 to-zinc-900'}`}>
-                                                            <div className="flex items-start">
-                                                                <div className="flex-1">
-                                                                    <h3 className={`font-bold text-lg mb-1 ${isClinical ? 'text-slate-900' : 'text-white'}`}>¿Eliminar a {client.name}?</h3>
-                                                                    <p className={`text-sm ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>Esta acción es permanente y eliminará todos sus datos. ¿Deseas continuar?</p>
-                                                                </div>
-                                                            </div>
-                                                            <div className="mt-6 flex gap-3">
-                                                                <button 
-                                                                    onClick={() => toast.dismiss(t.id)}
-                                                                    className={`flex-1 px-4 py-2 text-sm font-bold rounded-xl transition-colors ${isClinical ? 'bg-slate-100 hover:bg-slate-200 text-slate-700' : 'bg-white/5 hover:bg-white/10 text-white'}`}
-                                                                >
-                                                                    Cancelar
-                                                                </button>
-                                                                <button 
-                                                                    onClick={async () => {
-                                                                        toast.dismiss(t.id);
-                                                                        setDashboardData(prev => {
-                                                                            if (!prev) return prev;
-                                                                            return {
-                                                                                ...prev,
-                                                                                clients: prev.clients.filter(c => c.id !== client.id)
-                                                                            };
-                                                                        });
-                                                                        toast.success(`${client.name} eliminado.`, { icon: '🗑️' });
-                                                                        
-                                                                        try {
-                                                                            const { api } = await import('../api/client');
-                                                                            await api.delete(`/api/v1/patients/${client.id}`);
-                                                                        } catch (err) {
-                                                                            console.error('Delete failed, re-fetching...', err);
-                                                                            const freshData = await trainerApi.getDashboard();
-                                                                            setDashboardData(freshData);
-                                                                            toast.error('Error al eliminar. Los datos se han restaurado.');
-                                                                        }
-                                                                    }}
-                                                                    className="flex-1 px-4 py-2 bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-400 hover:to-rose-500 text-white text-sm font-bold rounded-xl shadow-lg shadow-rose-500/25 transition-all"
-                                                                >
-                                                                    Eliminar
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                ), { duration: Infinity, position: 'top-center' });
-                                            }}
-                                            className={`p-2 rounded-xl transition-all ${
-                                                isClinical ? 'hover:bg-rose-50 text-slate-400 hover:text-rose-600' : 'hover:bg-rose-500/10 text-zinc-500 hover:text-rose-400'
-                                            }`}
-                                            title="Eliminar Contacto"
-                                        >
-                                            <Trash2 size={17} />
-                                        </button>
-                                        <div className={`p-1.5 transition-transform group-hover:translate-x-1 ${isClinical ? 'text-slate-300 group-hover:text-indigo-600' : 'text-zinc-600 group-hover:text-indigo-400'}`}>
-                                            <ChevronRight size={16} />
+                                            {/* Acción 3: 💬 Mensajería Interna de la Plataforma */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleQuickInternalChat(client.id, client.name);
+                                                }}
+                                                title={hasUnread ? "💬 Tienes un mensaje interno sin leer" : "💬 Enviar Mensaje Interno (Chat Propio)"}
+                                                className={`p-2 rounded-xl transition-all cursor-pointer relative ${
+                                                    isClinical 
+                                                        ? 'hover:bg-white text-slate-600 hover:text-emerald-600 hover:shadow-xs' 
+                                                        : 'hover:bg-zinc-800 text-zinc-400 hover:text-emerald-400'
+                                                }`}
+                                            >
+                                                <MessageSquare size={15} />
+                                                {hasUnread && (
+                                                    <span className="absolute top-1 right-1 w-2 h-2 bg-amber-500 rounded-full animate-ping" />
+                                                )}
+                                            </button>
+
+                                            {/* Acción 4: 💳 Alternar Cuota */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleTogglePaymentStatus(client.id, client.name);
+                                                }}
+                                                title={isPaid ? "💳 Cuota al día (clic para marcar mora)" : "💳 Cuota en mora (clic para registrar cobro)"}
+                                                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                                                    isClinical 
+                                                        ? 'hover:bg-white text-slate-600 hover:text-emerald-600 hover:shadow-xs' 
+                                                        : 'hover:bg-zinc-800 text-zinc-400 hover:text-emerald-400'
+                                                }`}
+                                            >
+                                                <CreditCard size={15} />
+                                            </button>
+
+                                            {/* Acción 5: ➡️ Ficha Completa del Atleta */}
+                                            <button
+                                                onClick={() => navigate(`/trainer/athlete/${client.id}`)}
+                                                title={isClinical ? "Ver Expediente Completo del Paciente" : "Ver Ficha Completa del Alumno"}
+                                                className={`p-2 rounded-xl transition-all cursor-pointer ${
+                                                    isClinical 
+                                                        ? 'bg-white text-slate-700 hover:bg-indigo-600 hover:text-white shadow-2xs' 
+                                                        : 'bg-zinc-800 text-zinc-300 hover:bg-indigo-500 hover:text-white'
+                                                }`}
+                                            >
+                                                <ChevronRight size={15} />
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
             </div>
         </div>
         
         {/* 4. Actividad Reciente */}
-        <div className="xl:col-span-1">
-            <div className={`rounded-3xl border shadow-sm overflow-hidden ${isClinical ? 'bg-white border-slate-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.02)]' : 'bg-zinc-900 border-zinc-800'}`}>
+        <div className="xl:col-span-1 relative group/activity">
+            {/* Sutil glow cálido imperceptible detrás de la tarjeta de Actividad Reciente (Regla del 3% neuroestética) */}
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-indigo-500/10 rounded-3xl blur-xl opacity-60 group-hover/activity:opacity-90 transition-opacity duration-700 pointer-events-none" />
+            
+            <div className={`relative rounded-3xl border shadow-sm overflow-hidden ${isClinical ? 'bg-white border-slate-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.02)]' : 'bg-zinc-900 border-zinc-800'}`}>
                 <div className={`px-6 py-5 border-b flex justify-between items-center ${isClinical ? 'border-slate-100 bg-slate-50/50' : 'border-zinc-800 bg-zinc-900'}`}>
                     <h3 className={`text-base font-bold ${isClinical ? 'text-slate-900' : 'text-white'}`}>Actividad Reciente</h3>
                     <Zap size={16} className={isClinical ? 'text-indigo-500' : 'text-indigo-400'} />
                 </div>
                 <div className={`divide-y flex-1 overflow-y-auto ${isClinical ? 'divide-slate-100' : 'divide-zinc-800'}`}>
-                    {/* Activity Feed Empty State */}
+                    {/* Activity Feed Empty State con respiración orgánica de 6s */}
                     <div className="flex flex-col items-center justify-center p-8 text-center my-auto min-h-[220px]">
-                        <div className="relative w-16 h-16 mb-4 flex items-center justify-center">
-                            <div className="absolute inset-0 rounded-full bg-indigo-500/10 blur-lg" />
+                        <motion.div 
+                            animate={{
+                                scale: [1, 1.025, 1],
+                                opacity: [0.92, 1, 0.92]
+                            }}
+                            transition={{
+                                duration: 6,
+                                repeat: Infinity,
+                                ease: "easeInOut"
+                            }}
+                            className="relative w-16 h-16 mb-4 flex items-center justify-center"
+                        >
+                            <div className="absolute inset-0 rounded-full bg-gradient-to-tr from-amber-500/15 via-rose-500/10 to-indigo-500/15 blur-lg" />
                             <svg viewBox="0 0 64 64" className="w-12 h-12 text-indigo-600 dark:text-indigo-400 stroke-current fill-none">
                                 <circle cx="32" cy="32" r="26" strokeWidth="1.2" strokeDasharray="3 3" className="opacity-40" />
                                 <path d="M16 33 L24 33 L28 22 L36 42 L40 33 L48 33" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                                 <circle cx="32" cy="32" r="2.5" className="fill-indigo-600 dark:fill-indigo-400" />
                             </svg>
-                        </div>
+                        </motion.div>
                         <p className={`text-sm font-bold ${isClinical ? 'text-slate-800' : 'text-zinc-200'}`}>Bandeja al Día</p>
                         <p className={`text-xs mt-1.5 max-w-[210px] leading-relaxed ${isClinical ? 'text-slate-500' : 'text-zinc-400'}`}>
                             Todo en orden. Las sesiones y registros de tus {isClinical ? 'pacientes' : 'alumnos'} aparecerán en vivo aquí.

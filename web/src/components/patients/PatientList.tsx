@@ -166,15 +166,9 @@ const MOCK_PATIENTS: Patient[] = [
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export const PatientList: React.FC = () => {
-    const { token } = useAuth();
-    const { mode } = useTheme();
-    const { lang } = useLanguage();
-    const { activeWorkspace } = useRBAC();
-    const isClinical = mode === 'CLINICAL' || activeWorkspace === 'CLINICAL';
+    // Unificación integral: TrainerRoster maneja tanto Alumnos (PT) como Pacientes (Clínica) con quick actions y vista completa
+    return <TrainerRoster />;
 
-    if (activeWorkspace === 'PT') {
-        return <TrainerRoster />;
-    }
 
     // State
     const [dbPatients, setDbPatients] = useState<Patient[]>([]);
