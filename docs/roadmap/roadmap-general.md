@@ -583,3 +583,16 @@ A lo largo de estos 12 meses (24 Sprints de 2 semanas cada uno), la evolución d
 - **Verificación de Compilación Integral:**
   - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
 
+### Fase 198: Estadísticas Desplegables Bajo Filtros y Acciones Rápidas a 1 Clic en Roster de Contactos (COMPLETADA ✅)
+- **Eliminación de Scroll Forzado y Menú Desplegable Cerrado (`TrainerRoster.tsx`):**
+  - Reubicación de las 3 tarjetas estadísticas (*Objetivos*, *Planes Asignados*, *Estado de Cuotas*) dentro de un menú desplegable colapsable **cerrado por defecto** (`isStatsOpen = false`) ubicado inmediatamente debajo de los filtros.
+  - Gatillo liquid glass con micro-pills resumen en vivo (`🎯 Fuerza/Rehab`, `📋 Planes`, `💳 Cuotas`) y chevron interactivo animado 180°.
+- **Tarjeta de Alumno Prémium con Visibilidad Instantánea:**
+  - Exposición de datos esenciales a simple vista: Nombre, Badge `Nuevo`, Racha, Último entrenamiento, Enfoque y Etiquetas críticas.
+  - **Indicador de Mensajería Interna No Leída:** Punto de pulso ámbar (`bg-amber-500 animate-pulse`) en el avatar para alertar sobre mensajes pendientes en el chat interno propio.
+- **Micro-Toolbar de Acciones Rápidas a 1 Clic con `stopPropagation()`:**
+  - Atajos directos a 1 clic para: `📅 Agendar Turno`, `🏋️ Ver/Diseñar Rutina`, `💬 Mensajería Interna`, `💳 Alternar Cuota` (conmutación en memoria optimista con toast reactivo) y `➡️ Perfil Completo`.
+- **Verificación de Compilación Integral:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
+
+

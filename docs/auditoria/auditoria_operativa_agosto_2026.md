@@ -1935,4 +1935,21 @@ Se construyó el sistema completo de creacin y edicin de bloques cronometrados (
 - **Reubicación Ergonómica a la Izquierda:**
   - Reubicación del panel lateral **To DO** al **lado izquierdo** de la cuadrícula semanal en escritorio (`xl:order-1`), respetando el patrón de lectura visual occidental (revisar pendientes $\rightarrow$ agendar/bloquear en el calendario a la derecha).
 
+## Control de Calidad Operativo - Fase 198: Estadísticas Desplegables Bajo Filtros y Acciones Rápidas a 1 Clic en Roster de Contactos (`TrainerRoster.tsx`)
+- **Arquitectura de Información & Eliminación de Scroll Forzado:**
+  - Reubicación de las 3 tarjetas de métricas pedagógicas (*Objetivos / Enfoque de entrenamiento*, *Planes Asignados / Cobertura de rutinas*, *Estado de Cuotas / Cobros y membresías*) dentro de un menú desplegable **cerrado por defecto** (`isStatsOpen = false`) ubicado inmediatamente debajo de la barra de búsqueda y filtros.
+  - Al ingresar a `/roster`, el profesional visualiza de inmediato su lista de clientes sin fricción visual.
+  - Botón disparador con estética *liquid glass*, micro-pills con resumen numérico en vivo visible incluso cerrado (`🎯 X Fuerza · Y Rehab`, `📋 Z Planes Activos`, `💳 W Al Día`) y chevron interactivo animado 180° (`framer-motion`).
+- **Tarjeta de Alumno Prémium con Visibilidad de Estados a Simple Vista:**
+  - Visualización clara y compacta de información vital: Nombre, Badge `Nuevo`, Racha (`🔥 Xd racha`), Último entrenamiento, Enfoque (`Fuerza Máxima e Hipertrofia` / `Rehabilitación y Readaptación`) y tags de advertencia biomecánica.
+  - **Indicador de Mensajería Interna No Leída:** Punto de pulso ámbar (`bg-amber-500 animate-pulse`) en el avatar del alumno cuando posee mensajes pendientes en la mensajería interna propia de la plataforma.
+- **Micro-Toolbar de Acciones Rápidas a 1 Clic con `e.stopPropagation()`:**
+  - `📅 Agendar Turno`: Apertura y precarga de calendario para el atleta sin ingresar a la ficha general.
+  - `🏋️ Diseñar / Ver Rutina`: Enlace en 1 clic al Plan Builder con el atleta cargado.
+  - `💬 Mensajería Interna`: Apertura del chat propio de la plataforma (`/inbox?athlete=:id`), limpiando el indicador de no leído.
+  - `💳 Alternar Cuota`: Alterna con 1 solo clic entre `Al Día` y `En Mora` con actualización reactiva optimista instantánea y notificación toast.
+  - `➡️ Ficha Completa`: Navegación al cockpit del atleta.
+- **Smoke Tests E2E & Compilación:** Frontend build con 0 errores (Exit code 0).
+
+
 

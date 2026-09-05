@@ -1457,5 +1457,19 @@ Este roadmap estratégico traza la ruta crítica para llevar los Flujos de Valor
   - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
 
 
+## FASE 198: ESTADÍSTICAS DESPLEGABLES BAJO FILTROS Y ACCIONES RÁPIDAS A 1 CLIC EN ROSTER DE CONTACTOS (COMPLETADA ✅)
+- **Eliminación de Scroll Vertical y Menú Colapsable (`TrainerRoster.tsx`):**
+  - Reubicación de las 3 tarjetas pedagógicas (*Objetivos/Enfoque*, *Planes Asignados/Cobertura*, *Estado de Cuotas/Finanzas*) dentro de un menú desplegable **cerrado por defecto** (`isStatsOpen = false`) ubicado inmediatamente debajo de la barra de búsqueda y filtros.
+  - Gatillo liquid glass con micro-pills resumen en vivo (`🎯 X Fuerza · Y Rehab`, `📋 Z Activos`, `💳 W Al Día`) y chevron interactivo animado 180° (`framer-motion`).
+- **Tarjeta de Alumno Prémium con Visibilidad Instantánea:**
+  - Exposición de datos vitales a simple vista: Nombre, Badge `Nuevo`, Racha (`🔥 Xd racha`), Último entrenamiento, Enfoque de entrenamiento (`Fuerza Máxima e Hipertrofia` / `Rehabilitación y Readaptación`) y tags de advertencia biomecánica.
+  - **Indicador de Mensajería Interna No Leída:** Punto de pulso ámbar (`bg-amber-500 animate-pulse`) en el avatar del alumno cuando posee mensajes pendientes en la plataforma propia, centralizando la comunicación sin depender de herramientas externas.
+- **Micro-Toolbar de Acciones Rápidas a 1 Clic con `stopPropagation()`:**
+  - Atajos directos para: `📅 Agendar Turno`, `🏋️ Diseñar / Ver Rutina`, `💬 Mensajería Interna Propia`, `💳 Alternar Cuota` (conmutación en memoria con toast reactivo) y `➡️ Ficha Completa`.
+- **Verificación de Compilación Integral:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
+
+
+
 
 

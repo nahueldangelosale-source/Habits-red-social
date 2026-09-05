@@ -1055,3 +1055,21 @@ graph TD
 - **Validación de Compilación:**
   - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
 
+## 117. Estadísticas Desplegables Bajo Filtros y Acciones Rápidas a 1 Clic en Roster de Contactos (Fase 198)
+- **Eliminación de Carga Cognitiva y Scroll Superior en `/roster`:**
+  - `TrainerRoster.tsx` reestructurado para albergar las 3 tarjetas de métricas pedagógicas (*Objetivos/Enfoque*, *Planes Asignados/Cobertura*, *Estado de Cuotas/Finanzas*) dentro de un acordeón desplegable **cerrado por defecto** (`isStatsOpen = false`) posicionado debajo de la barra de búsqueda y filtros.
+  - Gatillo liquid glass interactivo con micro-pills informativas visibles incluso cuando está cerrado (`🎯 X Fuerza · Y Rehab`, `📋 Z Activos`, `💳 W Al Día`) y chevron con rotación fluida 180°.
+- **Tarjeta de Alumno con Visibilidad Total a Simple Vista:**
+  - Visualización sin esfuerzo de estados esenciales: Objetivo, Racha, Último entrenamiento, Plan activo/pendiente y Cuota al día/en mora.
+  - **Indicador de Mensajería Interna No Leída:** Punto de pulso ámbar animado (`bg-amber-500 animate-pulse`) en el avatar del alumno si este posee mensajes no leídos en la mensajería interna propia de la plataforma.
+- **Barra de Acciones Rápidas a 1 Clic (`e.stopPropagation()`):**
+  - Botones dedicados para:
+    1. `📅 Agendar Turno`: Vincula y abre la agenda para ese alumno.
+    2. `🏋️ Rutina / Plan`: Acceso directo al constructor de rutinas (`/plan-builder`).
+    3. `💬 Mensajería Interna`: Acceso directo al chat propio de la plataforma (`/inbox`).
+    4. `💳 Alternar Cuota`: Conmutación instantánea entre *Al Día* y *En Mora* con actualización optimista de métricas y toast reactivo.
+    5. `➡️ Ficha Completa`: Navegación al perfil detallado del atleta.
+- **Validación de Compilación:**
+  - Frontend: `npm run build` $\rightarrow$ **0 errores (Exit code 0)**.
+
+
