@@ -677,7 +677,7 @@ export const ProfessionalAgenda: React.FC = () => {
             title="Abrir o cerrar panel de tareas"
           >
             <ListTodo size={14} className="shrink-0" />
-            <span>Tareas ({stats.pendingTasksCount})</span>
+            <span>To DO ({stats.pendingTasksCount})</span>
           </button>
 
           <button
@@ -1168,20 +1168,20 @@ export const ProfessionalAgenda: React.FC = () => {
 
             {/* ═══ COLUMNA LATERAL: PANEL MICROSOFT TO DO ═══ */}
             {isToDoOpen && (
-              <div className="w-full xl:w-80 shrink-0 bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-4">
-                {/* Cabecera del To Do */}
+              <div className="w-full xl:w-80 shrink-0 bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-3.5">
+                {/* Cabecera del To DO */}
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 pb-3">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center shadow-xs">
-                      <ListTodo size={16} />
+                    <div className="w-7 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-800/60 shadow-2xs">
+                      <ListTodo size={15} />
                     </div>
-                    <div>
-                      <h3 className="text-xs font-black font-montserrat text-slate-900 dark:text-white uppercase tracking-wider">
-                        Microsoft To Do
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-black font-montserrat text-slate-900 dark:text-white tracking-tight">
+                        To DO
                       </h3>
-                      <p className="text-[10px] text-slate-400">
-                        {toDoFilteredTasks.filter(t => !t.completed).length} pendientes
-                      </p>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 font-mono">
+                        {toDoFilteredTasks.filter(t => !t.completed).length} {toDoFilteredTasks.filter(t => !t.completed).length === 1 ? 'pendiente' : 'pendientes'}
+                      </span>
                     </div>
                   </div>
                   <button
@@ -1193,66 +1193,60 @@ export const ProfessionalAgenda: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Input de Adición Rápida (Estilo Microsoft To Do) */}
-                <div className="space-y-2 p-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800">
-                  <div className="flex items-center gap-2">
-                    <Plus size={14} className="text-indigo-500 shrink-0" />
-                    <input
-                      type="text"
-                      placeholder="Agregar tarea... (Enter)"
-                      value={quickTodoInput}
-                      onChange={e => setQuickTodoInput(e.target.value)}
-                      onKeyDown={handleAddQuickTodo}
-                      className="w-full text-xs bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
-                    />
-                  </div>
-
-                  {/* Selector rápido de prioridad para la tarea */}
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-zinc-800">
-                    <span className="text-[9px] font-bold uppercase text-slate-400">Prioridad</span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => setQuickTodoPriority('HIGH')}
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-all ${
-                          quickTodoPriority === 'HIGH' 
-                            ? 'bg-rose-100 dark:bg-rose-950 text-rose-600 font-black ring-1 ring-rose-400' 
-                            : 'text-slate-400 hover:text-rose-500'
-                        }`}
-                        title="Prioridad Alta"
-                      >
-                        🔴 Alta
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQuickTodoPriority('MEDIUM')}
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-all ${
-                          quickTodoPriority === 'MEDIUM' 
-                            ? 'bg-amber-100 dark:bg-amber-950 text-amber-600 font-black ring-1 ring-amber-400' 
-                            : 'text-slate-400 hover:text-amber-500'
-                        }`}
-                        title="Prioridad Media"
-                      >
-                        🟡 Media
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setQuickTodoPriority('LOW')}
-                        className={`text-[9px] font-bold px-1.5 py-0.5 rounded cursor-pointer transition-all ${
-                          quickTodoPriority === 'LOW' 
-                            ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-600 font-black ring-1 ring-emerald-400' 
-                            : 'text-slate-400 hover:text-emerald-500'
-                        }`}
-                        title="Prioridad Baja"
-                      >
-                        🟢 Baja
-                      </button>
-                    </div>
+                {/* Input Ágil de 1 Sola Línea (Menor Carga Cognitiva) */}
+                <div className="flex items-center gap-2 p-1.5 pl-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                  <Plus size={14} className="text-indigo-500 shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Nueva tarea... (Enter)"
+                    value={quickTodoInput}
+                    onChange={e => setQuickTodoInput(e.target.value)}
+                    onKeyDown={handleAddQuickTodo}
+                    className="w-full text-xs bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                  />
+                  {/* Selector Rápido de Prioridad en la Misma Fila */}
+                  <div className="flex items-center gap-0.5 shrink-0 bg-white dark:bg-zinc-800/80 p-0.5 rounded-xl border border-slate-200/60 dark:border-zinc-700/60 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => setQuickTodoPriority('HIGH')}
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
+                        quickTodoPriority === 'HIGH' 
+                          ? 'bg-rose-500 text-white shadow-2xs' 
+                          : 'text-slate-400 hover:text-rose-500'
+                      }`}
+                      title="Prioridad Alta"
+                    >
+                      Alta
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuickTodoPriority('MEDIUM')}
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
+                        quickTodoPriority === 'MEDIUM' 
+                          ? 'bg-amber-500 text-white shadow-2xs' 
+                          : 'text-slate-400 hover:text-amber-500'
+                      }`}
+                      title="Prioridad Media"
+                    >
+                      Media
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuickTodoPriority('LOW')}
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
+                        quickTodoPriority === 'LOW' 
+                          ? 'bg-emerald-500 text-white shadow-2xs' 
+                          : 'text-slate-400 hover:text-emerald-500'
+                      }`}
+                      title="Prioridad Baja"
+                    >
+                      Baja
+                    </button>
                   </div>
                 </div>
 
-                {/* Filtros de Categorías de To Do */}
-                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-1">
+                {/* Filtros de Categorías */}
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
                   <button
                     onClick={() => setToDoCategoryFilter('ALL')}
                     className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer ${
@@ -1294,11 +1288,11 @@ export const ProfessionalAgenda: React.FC = () => {
                     }`}
                   >
                     <Hourglass size={10} />
-                    <span>Ciclos ({stats.expiringCyclesCount})</span>
+                    <span>Ciclos{stats.expiringCyclesCount > 0 ? ` (${stats.expiringCyclesCount})` : ''}</span>
                   </button>
                 </div>
 
-                {/* Lista de Tareas con Check Circular y Agendado con 1 Clic */}
+                {/* Lista de Tareas con Check Circular Inconfundible y Agendado con 1 Clic */}
                 <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
                   {toDoFilteredTasks.length === 0 ? (
                     <div className="py-8 px-4 text-center rounded-2xl bg-slate-50 dark:bg-zinc-900/40 border border-slate-100 dark:border-zinc-800 text-slate-400 space-y-1.5">
@@ -1310,13 +1304,13 @@ export const ProfessionalAgenda: React.FC = () => {
                     toDoFilteredTasks.map((task) => (
                       <div
                         key={task.id}
-                        className={`p-2.5 rounded-2xl border transition-all flex items-start justify-between gap-2 group ${
+                        className={`p-2.5 rounded-2xl border transition-all flex items-start justify-between gap-2.5 group ${
                           task.completed
                             ? 'bg-slate-50/60 dark:bg-zinc-900/30 border-slate-200/50 dark:border-zinc-800/40 opacity-60'
                             : 'bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 shadow-2xs hover:border-indigo-400'
                         }`}
                       >
-                        {/* Checkbox Circular con Microinteracción */}
+                        {/* Checkbox Circular con Contraste Nítido y Microinteracción */}
                         <div className="flex items-start gap-2.5 min-w-0 flex-1">
                           <button
                             type="button"
@@ -1324,12 +1318,12 @@ export const ProfessionalAgenda: React.FC = () => {
                             className={`w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center transition-all duration-200 cursor-pointer ${
                               task.completed
                                 ? 'bg-emerald-500 text-white scale-105 shadow-xs ring-2 ring-emerald-400/50'
-                                : 'border-2 border-slate-300 dark:border-zinc-600 hover:border-emerald-500 hover:scale-105'
+                                : 'border-2 border-slate-300 dark:border-zinc-500 bg-white dark:bg-zinc-800 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:scale-105'
                             }`}
                             title={task.completed ? "Desmarcar" : "Completar"}
                           >
-                            <AnimatePresence>
-                              {task.completed && (
+                            {task.completed ? (
+                              <AnimatePresence>
                                 <motion.div
                                   initial={{ scale: 0, rotate: -45 }}
                                   animate={{ scale: 1, rotate: 0 }}
@@ -1338,8 +1332,10 @@ export const ProfessionalAgenda: React.FC = () => {
                                 >
                                   <Check size={11} className="stroke-[3]" />
                                 </motion.div>
-                              )}
-                            </AnimatePresence>
+                              </AnimatePresence>
+                            ) : (
+                              <Check size={9} className="opacity-0 group-hover:opacity-40 text-emerald-600 transition-opacity" />
+                            )}
                           </button>
 
                           <div className="min-w-0 flex-1">
@@ -1352,18 +1348,19 @@ export const ProfessionalAgenda: React.FC = () => {
                             </h4>
 
                             <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                              <span className={`text-[8px] font-black uppercase px-1.5 py-0.2 rounded ${
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-1 ${
                                 task.priority === 'HIGH'
-                                  ? 'bg-rose-50 dark:bg-rose-950 text-rose-600'
+                                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/40'
                                   : task.priority === 'MEDIUM'
-                                    ? 'bg-amber-50 dark:bg-amber-950 text-amber-600'
-                                    : 'bg-slate-100 dark:bg-zinc-800 text-slate-500'
+                                    ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/40'
+                                    : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
                               }`}>
-                                {task.priority}
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: task.priority === 'HIGH' ? '#e11d48' : task.priority === 'MEDIUM' ? '#d97706' : '#10b981' }} />
+                                <span>{task.priority === 'HIGH' ? 'Alta' : task.priority === 'MEDIUM' ? 'Media' : 'Baja'}</span>
                               </span>
 
                               {task.category === 'CYCLE_RENEWAL' && (
-                                <span className="text-[8px] font-bold px-1.5 py-0.2 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-400 uppercase">
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
                                   ⏳ Ciclo
                                 </span>
                               )}
@@ -1378,7 +1375,7 @@ export const ProfessionalAgenda: React.FC = () => {
                               type="button"
                               onClick={() => handleScheduleTaskToCalendar(task)}
                               className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors cursor-pointer"
-                              title="Agendar al calendario con 1 clic"
+                              title="Fijar en el calendario con 1 clic"
                             >
                               <CalendarIcon size={12} />
                             </button>
@@ -1570,14 +1567,15 @@ export const ProfessionalAgenda: React.FC = () => {
                   </div>
 
                   <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${
+                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1 ${
                       task.priority === 'HIGH'
-                        ? 'bg-rose-50 dark:bg-rose-950 text-rose-600'
+                        ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'
                         : task.priority === 'MEDIUM'
-                          ? 'bg-amber-50 dark:bg-amber-950 text-amber-600'
-                          : 'bg-slate-100 dark:bg-zinc-800 text-slate-500'
+                          ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400'
+                          : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
                     }`}>
-                      {task.priority}
+                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: task.priority === 'HIGH' ? '#e11d48' : task.priority === 'MEDIUM' ? '#d97706' : '#10b981' }} />
+                      <span>{task.priority === 'HIGH' ? 'Alta' : task.priority === 'MEDIUM' ? 'Media' : 'Baja'}</span>
                     </span>
 
                     {task.actionRoute && (
