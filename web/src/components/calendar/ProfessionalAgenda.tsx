@@ -930,11 +930,241 @@ export const ProfessionalAgenda: React.FC = () => {
             </div>
           </div>
 
-          {/* CONTENEDOR FLEX: CALENDARIO + PANEL MICROSOFT TO DO */}
+          {/* CONTENEDOR FLEX: PANEL TO DO (A LA IZQUIERDA) + CUADRÍCULA DEL CALENDARIO */}
           <div className="flex flex-col xl:flex-row gap-5 items-start">
             
-            {/* ═══ COLUMNA PRINCIPAL: CUADRÍCULA DEL CALENDARIO ═══ */}
-            <div className="flex-1 w-full min-w-0 space-y-3">
+            {/* ═══ COLUMNA LATERAL: PANEL TO DO (IZQUIERDA) ═══ */}
+            {isToDoOpen && (
+              <div className="w-full xl:w-80 shrink-0 order-2 xl:order-1 bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-3.5">
+                {/* Cabecera del To DO */}
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-800/60 shadow-2xs">
+                      <ListTodo size={15} />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-sm font-black font-montserrat text-slate-900 dark:text-white tracking-tight">
+                        To DO
+                      </h3>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 font-mono">
+                        {toDoFilteredTasks.filter(t => !t.completed).length} {toDoFilteredTasks.filter(t => !t.completed).length === 1 ? 'pendiente' : 'pendientes'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setIsToDoOpen(false)}
+                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+                    title="Cerrar panel lateral"
+                  >
+                    <X size={15} />
+                  </button>
+                </div>
+
+                {/* Input Ágil de 1 Sola Línea (Menor Carga Cognitiva) */}
+                <div className="flex items-center gap-2 p-1.5 pl-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
+                  <Plus size={14} className="text-indigo-500 shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Nueva tarea... (Enter)"
+                    value={quickTodoInput}
+                    onChange={e => setQuickTodoInput(e.target.value)}
+                    onKeyDown={handleAddQuickTodo}
+                    className="w-full text-xs bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
+                  />
+                  {/* Selector Rápido de Prioridad en la Misma Fila */}
+                  <div className="flex items-center gap-0.5 shrink-0 bg-white dark:bg-zinc-800/80 p-0.5 rounded-xl border border-slate-200/60 dark:border-zinc-700/60 shadow-2xs">
+                    <button
+                      type="button"
+                      onClick={() => setQuickTodoPriority('HIGH')}
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
+                        quickTodoPriority === 'HIGH' 
+                          ? 'bg-rose-500 text-white shadow-2xs' 
+                          : 'text-slate-400 hover:text-rose-500'
+                      }`}
+                      title="Prioridad Alta"
+                    >
+                      Alta
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuickTodoPriority('MEDIUM')}
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
+                        quickTodoPriority === 'MEDIUM' 
+                          ? 'bg-amber-500 text-white shadow-2xs' 
+                          : 'text-slate-400 hover:text-amber-500'
+                      }`}
+                      title="Prioridad Media"
+                    >
+                      Media
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setQuickTodoPriority('LOW')}
+                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
+                        quickTodoPriority === 'LOW' 
+                          ? 'bg-emerald-500 text-white shadow-2xs' 
+                          : 'text-slate-400 hover:text-emerald-500'
+                      }`}
+                      title="Prioridad Baja"
+                    >
+                      Baja
+                    </button>
+                  </div>
+                </div>
+
+                {/* Filtros de Categorías */}
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
+                  <button
+                    onClick={() => setToDoCategoryFilter('ALL')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer ${
+                      toDoCategoryFilter === 'ALL'
+                        ? 'bg-indigo-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    Todas ({tasks.length})
+                  </button>
+                  <button
+                    onClick={() => setToDoCategoryFilter('IMPORTANT')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      toDoCategoryFilter === 'IMPORTANT'
+                        ? 'bg-rose-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Star size={10} />
+                    <span>Importantes</span>
+                  </button>
+                  <button
+                    onClick={() => setToDoCategoryFilter('HABITS')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      toDoCategoryFilter === 'HABITS'
+                        ? 'bg-emerald-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Flame size={10} />
+                    <span>Hábitos</span>
+                  </button>
+                  <button
+                    onClick={() => setToDoCategoryFilter('CYCLES')}
+                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
+                      toDoCategoryFilter === 'CYCLES'
+                        ? 'bg-amber-600 text-white shadow-2xs'
+                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Hourglass size={10} />
+                    <span>Ciclos{stats.expiringCyclesCount > 0 ? ` (${stats.expiringCyclesCount})` : ''}</span>
+                  </button>
+                </div>
+
+                {/* Lista de Tareas con Check Circular Inconfundible y Agendado con 1 Clic */}
+                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                  {toDoFilteredTasks.length === 0 ? (
+                    <div className="py-8 px-4 text-center rounded-2xl bg-slate-50 dark:bg-zinc-900/40 border border-slate-100 dark:border-zinc-800 text-slate-400 space-y-1.5">
+                      <CheckCircle2 size={24} className="mx-auto text-emerald-500 opacity-60" />
+                      <p className="text-xs font-bold text-slate-700 dark:text-zinc-300">¡Todo al día!</p>
+                      <p className="text-[10px]">No hay tareas pendientes en este filtro.</p>
+                    </div>
+                  ) : (
+                    toDoFilteredTasks.map((task) => (
+                      <div
+                        key={task.id}
+                        className={`p-2.5 rounded-2xl border transition-all flex items-start justify-between gap-2.5 group ${
+                          task.completed
+                            ? 'bg-slate-50/60 dark:bg-zinc-900/30 border-slate-200/50 dark:border-zinc-800/40 opacity-60'
+                            : 'bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 shadow-2xs hover:border-indigo-400'
+                        }`}
+                      >
+                        {/* Checkbox Circular con Contraste Nítido y Microinteracción */}
+                        <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleTask(task.id)}
+                            className={`w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center transition-all duration-200 cursor-pointer ${
+                              task.completed
+                                ? 'bg-emerald-500 text-white scale-105 shadow-xs ring-2 ring-emerald-400/50'
+                                : 'border-2 border-slate-300 dark:border-zinc-500 bg-white dark:bg-zinc-800 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:scale-105'
+                            }`}
+                            title={task.completed ? "Desmarcar" : "Completar"}
+                          >
+                            {task.completed ? (
+                              <AnimatePresence>
+                                <motion.div
+                                  initial={{ scale: 0, rotate: -45 }}
+                                  animate={{ scale: 1, rotate: 0 }}
+                                  exit={{ scale: 0, rotate: 45 }}
+                                  transition={{ type: 'spring', stiffness: 600, damping: 25 }}
+                                >
+                                  <Check size={11} className="stroke-[3]" />
+                                </motion.div>
+                              </AnimatePresence>
+                            ) : (
+                              <Check size={9} className="opacity-0 group-hover:opacity-40 text-emerald-600 transition-opacity" />
+                            )}
+                          </button>
+
+                          <div className="min-w-0 flex-1">
+                            <h4 className={`text-xs font-bold font-montserrat leading-snug break-words transition-all duration-300 ${
+                              task.completed 
+                                ? 'line-through text-slate-400 dark:text-zinc-500 decoration-emerald-500/70 decoration-2' 
+                                : 'text-slate-800 dark:text-zinc-200'
+                            }`}>
+                              {task.title}
+                            </h4>
+
+                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-1 ${
+                                task.priority === 'HIGH'
+                                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/40'
+                                  : task.priority === 'MEDIUM'
+                                    ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/40'
+                                    : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
+                              }`}>
+                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: task.priority === 'HIGH' ? '#e11d48' : task.priority === 'MEDIUM' ? '#d97706' : '#10b981' }} />
+                                <span>{task.priority === 'HIGH' ? 'Alta' : task.priority === 'MEDIUM' ? 'Media' : 'Baja'}</span>
+                              </span>
+
+                              {task.category === 'CYCLE_RENEWAL' && (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+                                  ⏳ Ciclo
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Acciones de la Tarea: Agendar al Calendario o Borrar */}
+                        <div className="flex items-center gap-1 shrink-0">
+                          {!task.completed && (
+                            <button
+                              type="button"
+                              onClick={() => handleScheduleTaskToCalendar(task)}
+                              className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors cursor-pointer"
+                              title="Fijar en el calendario con 1 clic"
+                            >
+                              <CalendarIcon size={12} />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteTask(task.id)}
+                            className="p-1.5 rounded-lg text-slate-300 hover:text-rose-500 dark:text-zinc-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                            title="Eliminar tarea"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* ═══ COLUMNA PRINCIPAL: CUADRÍCULA DEL CALENDARIO (A LA DERECHA) ═══ */}
+            <div className="flex-1 w-full min-w-0 space-y-3 order-1 xl:order-2">
               
               {/* MÓVIL: Selector de Día Horizontal + Lista de Horas (< md) */}
               <div className="md:hidden space-y-3">
@@ -1166,235 +1396,6 @@ export const ProfessionalAgenda: React.FC = () => {
 
             </div>
 
-            {/* ═══ COLUMNA LATERAL: PANEL MICROSOFT TO DO ═══ */}
-            {isToDoOpen && (
-              <div className="w-full xl:w-80 shrink-0 bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 rounded-3xl p-4 shadow-xs space-y-3.5">
-                {/* Cabecera del To DO */}
-                <div className="flex items-center justify-between border-b border-slate-100 dark:border-zinc-800/80 pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-800/60 shadow-2xs">
-                      <ListTodo size={15} />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-black font-montserrat text-slate-900 dark:text-white tracking-tight">
-                        To DO
-                      </h3>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 font-mono">
-                        {toDoFilteredTasks.filter(t => !t.completed).length} {toDoFilteredTasks.filter(t => !t.completed).length === 1 ? 'pendiente' : 'pendientes'}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setIsToDoOpen(false)}
-                    className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-                    title="Cerrar panel lateral"
-                  >
-                    <X size={15} />
-                  </button>
-                </div>
-
-                {/* Input Ágil de 1 Sola Línea (Menor Carga Cognitiva) */}
-                <div className="flex items-center gap-2 p-1.5 pl-2.5 rounded-2xl bg-slate-50 dark:bg-zinc-900/60 border border-slate-200/80 dark:border-zinc-800 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-                  <Plus size={14} className="text-indigo-500 shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Nueva tarea... (Enter)"
-                    value={quickTodoInput}
-                    onChange={e => setQuickTodoInput(e.target.value)}
-                    onKeyDown={handleAddQuickTodo}
-                    className="w-full text-xs bg-transparent outline-none text-slate-900 dark:text-white placeholder:text-slate-400 font-medium"
-                  />
-                  {/* Selector Rápido de Prioridad en la Misma Fila */}
-                  <div className="flex items-center gap-0.5 shrink-0 bg-white dark:bg-zinc-800/80 p-0.5 rounded-xl border border-slate-200/60 dark:border-zinc-700/60 shadow-2xs">
-                    <button
-                      type="button"
-                      onClick={() => setQuickTodoPriority('HIGH')}
-                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
-                        quickTodoPriority === 'HIGH' 
-                          ? 'bg-rose-500 text-white shadow-2xs' 
-                          : 'text-slate-400 hover:text-rose-500'
-                      }`}
-                      title="Prioridad Alta"
-                    >
-                      Alta
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setQuickTodoPriority('MEDIUM')}
-                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
-                        quickTodoPriority === 'MEDIUM' 
-                          ? 'bg-amber-500 text-white shadow-2xs' 
-                          : 'text-slate-400 hover:text-amber-500'
-                      }`}
-                      title="Prioridad Media"
-                    >
-                      Media
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setQuickTodoPriority('LOW')}
-                      className={`text-[9px] font-bold px-1.5 py-0.5 rounded-lg cursor-pointer transition-all ${
-                        quickTodoPriority === 'LOW' 
-                          ? 'bg-emerald-500 text-white shadow-2xs' 
-                          : 'text-slate-400 hover:text-emerald-500'
-                      }`}
-                      title="Prioridad Baja"
-                    >
-                      Baja
-                    </button>
-                  </div>
-                </div>
-
-                {/* Filtros de Categorías */}
-                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5">
-                  <button
-                    onClick={() => setToDoCategoryFilter('ALL')}
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer ${
-                      toDoCategoryFilter === 'ALL'
-                        ? 'bg-indigo-600 text-white shadow-2xs'
-                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
-                    }`}
-                  >
-                    Todas ({tasks.length})
-                  </button>
-                  <button
-                    onClick={() => setToDoCategoryFilter('IMPORTANT')}
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
-                      toDoCategoryFilter === 'IMPORTANT'
-                        ? 'bg-rose-600 text-white shadow-2xs'
-                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
-                    }`}
-                  >
-                    <Star size={10} />
-                    <span>Importantes</span>
-                  </button>
-                  <button
-                    onClick={() => setToDoCategoryFilter('HABITS')}
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
-                      toDoCategoryFilter === 'HABITS'
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
-                    }`}
-                  >
-                    <Flame size={10} />
-                    <span>Hábitos</span>
-                  </button>
-                  <button
-                    onClick={() => setToDoCategoryFilter('CYCLES')}
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-xl whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 ${
-                      toDoCategoryFilter === 'CYCLES'
-                        ? 'bg-amber-600 text-white shadow-2xs'
-                        : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-400 hover:bg-slate-200'
-                    }`}
-                  >
-                    <Hourglass size={10} />
-                    <span>Ciclos{stats.expiringCyclesCount > 0 ? ` (${stats.expiringCyclesCount})` : ''}</span>
-                  </button>
-                </div>
-
-                {/* Lista de Tareas con Check Circular Inconfundible y Agendado con 1 Clic */}
-                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-                  {toDoFilteredTasks.length === 0 ? (
-                    <div className="py-8 px-4 text-center rounded-2xl bg-slate-50 dark:bg-zinc-900/40 border border-slate-100 dark:border-zinc-800 text-slate-400 space-y-1.5">
-                      <CheckCircle2 size={24} className="mx-auto text-emerald-500 opacity-60" />
-                      <p className="text-xs font-bold text-slate-700 dark:text-zinc-300">¡Todo al día!</p>
-                      <p className="text-[10px]">No hay tareas pendientes en este filtro.</p>
-                    </div>
-                  ) : (
-                    toDoFilteredTasks.map((task) => (
-                      <div
-                        key={task.id}
-                        className={`p-2.5 rounded-2xl border transition-all flex items-start justify-between gap-2.5 group ${
-                          task.completed
-                            ? 'bg-slate-50/60 dark:bg-zinc-900/30 border-slate-200/50 dark:border-zinc-800/40 opacity-60'
-                            : 'bg-white dark:bg-zinc-900 border-slate-200/80 dark:border-zinc-800 shadow-2xs hover:border-indigo-400'
-                        }`}
-                      >
-                        {/* Checkbox Circular con Contraste Nítido y Microinteracción */}
-                        <div className="flex items-start gap-2.5 min-w-0 flex-1">
-                          <button
-                            type="button"
-                            onClick={() => handleToggleTask(task.id)}
-                            className={`w-5 h-5 rounded-full mt-0.5 shrink-0 flex items-center justify-center transition-all duration-200 cursor-pointer ${
-                              task.completed
-                                ? 'bg-emerald-500 text-white scale-105 shadow-xs ring-2 ring-emerald-400/50'
-                                : 'border-2 border-slate-300 dark:border-zinc-500 bg-white dark:bg-zinc-800 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:scale-105'
-                            }`}
-                            title={task.completed ? "Desmarcar" : "Completar"}
-                          >
-                            {task.completed ? (
-                              <AnimatePresence>
-                                <motion.div
-                                  initial={{ scale: 0, rotate: -45 }}
-                                  animate={{ scale: 1, rotate: 0 }}
-                                  exit={{ scale: 0, rotate: 45 }}
-                                  transition={{ type: 'spring', stiffness: 600, damping: 25 }}
-                                >
-                                  <Check size={11} className="stroke-[3]" />
-                                </motion.div>
-                              </AnimatePresence>
-                            ) : (
-                              <Check size={9} className="opacity-0 group-hover:opacity-40 text-emerald-600 transition-opacity" />
-                            )}
-                          </button>
-
-                          <div className="min-w-0 flex-1">
-                            <h4 className={`text-xs font-bold font-montserrat leading-snug break-words transition-all duration-300 ${
-                              task.completed 
-                                ? 'line-through text-slate-400 dark:text-zinc-500 decoration-emerald-500/70 decoration-2' 
-                                : 'text-slate-800 dark:text-zinc-200'
-                            }`}>
-                              {task.title}
-                            </h4>
-
-                            <div className="flex flex-wrap items-center gap-1.5 mt-1">
-                              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-1 ${
-                                task.priority === 'HIGH'
-                                  ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/50 dark:border-rose-900/40'
-                                  : task.priority === 'MEDIUM'
-                                    ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 border border-amber-200/50 dark:border-amber-900/40'
-                                    : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400'
-                              }`}>
-                                <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: task.priority === 'HIGH' ? '#e11d48' : task.priority === 'MEDIUM' ? '#d97706' : '#10b981' }} />
-                                <span>{task.priority === 'HIGH' ? 'Alta' : task.priority === 'MEDIUM' ? 'Media' : 'Baja'}</span>
-                              </span>
-
-                              {task.category === 'CYCLE_RENEWAL' && (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
-                                  ⏳ Ciclo
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Acciones de la Tarea: Agendar al Calendario o Borrar */}
-                        <div className="flex items-center gap-1 shrink-0">
-                          {!task.completed && (
-                            <button
-                              type="button"
-                              onClick={() => handleScheduleTaskToCalendar(task)}
-                              className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 transition-colors cursor-pointer"
-                              title="Fijar en el calendario con 1 clic"
-                            >
-                              <CalendarIcon size={12} />
-                            </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => handleDeleteTask(task.id)}
-                            className="p-1.5 rounded-lg text-slate-300 hover:text-rose-500 dark:text-zinc-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
-                            title="Eliminar tarea"
-                          >
-                            <Trash2 size={12} />
-                          </button>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
 
           </div>
 
