@@ -150,6 +150,22 @@ export const ProfessionalAgenda: React.FC = () => {
   const [quickTodoInput, setQuickTodoInput] = useState('');
   const [quickTodoPriority, setQuickTodoPriority] = useState<CoachTask['priority']>('MEDIUM');
 
+  // Pedagogía visual sutil y descartable (alivio cognitivo)
+  const [showQuickTip, setShowQuickTip] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('habits_agenda_quicktip_dismissed') !== 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const handleDismissQuickTip = () => {
+    setShowQuickTip(false);
+    try {
+      localStorage.setItem('habits_agenda_quicktip_dismissed', 'true');
+    } catch {}
+  };
+
   // 4. Drag-to-Select ("Pintar Días y Horas Corrido como Google Calendar")
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState<{ dayIndex: number; timeIndex: number } | null>(null);
@@ -629,26 +645,41 @@ export const ProfessionalAgenda: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col space-y-5 font-lato max-w-7xl mx-auto p-3 md:p-6">
       
-      {/* 🌟 1. CABECERA LIMPIA & PEDAGÓGICA */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between bg-white dark:bg-[#0a0d16] p-5 md:p-6 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-xs">
+      {/* 🌟 1. CABECERA ELEGANTE & MINIMALISTA */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between bg-white dark:bg-[#0a0d16] p-4 md:p-5 rounded-3xl border border-slate-200/80 dark:border-zinc-800 shadow-xs">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-400 font-mono">
-              TU CENTRO DE TIEMPO & GESTIÓN
-            </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          </div>
-          <h1 className="text-2xl md:text-3xl font-black font-montserrat tracking-tight text-slate-900 dark:text-white">
-            Tu Agenda Semanal
+          <h1 className="text-xl md:text-2xl font-black font-montserrat tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+            <span>Agenda Semanal</span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
           </h1>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-1 max-w-xl">
-            Todo organizado en un solo lugar: entrenamientos, mediciones, servicios personalizados y tareas del día.
+          <p className="text-xs text-slate-400 dark:text-zinc-400 mt-0.5">
+            Planifica tus entrenamientos, citas y tareas de la semana.
           </p>
         </div>
 
-        {/* Acciones Rápidas Simétricas */}
-        <div className="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-          {/* Botón Principal: Agendar Turno */}
+        {/* Acciones Principales */}
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => setIsCycleConfigModalOpen(true)}
+            className="p-2 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 hover:bg-amber-100 transition-all cursor-pointer shrink-0"
+            title="Avisos de fin de ciclo"
+          >
+            <BellRing size={15} />
+          </button>
+
+          <button
+            onClick={() => setIsToDoOpen(prev => !prev)}
+            className={`py-2 px-3.5 rounded-2xl border text-xs font-bold font-montserrat flex items-center justify-center gap-2 transition-all shadow-2xs active:scale-95 cursor-pointer ${
+              isToDoOpen
+                ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
+                : 'bg-slate-50 dark:bg-zinc-800/80 text-slate-700 dark:text-zinc-200 border-slate-200 dark:border-zinc-700 hover:bg-slate-100'
+            }`}
+            title="Abrir o cerrar panel de tareas"
+          >
+            <ListTodo size={14} className="shrink-0" />
+            <span>Tareas ({stats.pendingTasksCount})</span>
+          </button>
+
           <button
             onClick={() => {
               setNewApt({
@@ -665,61 +696,53 @@ export const ProfessionalAgenda: React.FC = () => {
               setIsCreatingCustomService(false);
               setIsAppointmentModalOpen(true);
             }}
-            className="py-2.5 px-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-black font-montserrat flex items-center justify-center gap-2 shadow-sm transition-all active:scale-95 cursor-pointer"
+            className="flex-1 sm:flex-initial py-2 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-black font-montserrat flex items-center justify-center gap-1.5 shadow-sm transition-all active:scale-95 cursor-pointer"
           >
             <Plus size={15} />
-            <span>Agendar Turno</span>
+            <span>Agendar Cita</span>
           </button>
-
-          {/* Fila secundaria simétrica en móvil */}
-          <div className="grid grid-cols-3 sm:flex items-center gap-2">
-            <button
-              onClick={() => setIsCycleConfigModalOpen(true)}
-              className="py-2 px-3 rounded-2xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 text-[11px] font-bold font-montserrat flex items-center justify-center gap-1.5 transition-all shadow-2xs hover:bg-amber-100 dark:hover:bg-amber-900 active:scale-95 truncate cursor-pointer"
-              title="Configurar recordatorios de fin de mesociclo"
-            >
-              <BellRing size={13} className="text-amber-500 shrink-0" />
-              <span className="truncate">Avisos Ciclo</span>
-            </button>
-
-            <button
-              onClick={() => setIsTaskModalOpen(true)}
-              className="py-2 px-3 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-[11px] font-bold font-montserrat flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-95 truncate cursor-pointer"
-            >
-              <CheckSquare size={13} className="text-emerald-500 shrink-0" />
-              <span className="truncate">+ Tarea</span>
-            </button>
-
-            <button
-              onClick={() => setIsToDoOpen(prev => !prev)}
-              className={`py-2 px-3 rounded-2xl border text-[11px] font-bold font-montserrat flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-95 truncate cursor-pointer ${
-                isToDoOpen
-                  ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                  : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100'
-              }`}
-              title="Abrir o cerrar panel lateral de To Do"
-            >
-              <ListTodo size={13} className="shrink-0" />
-              <span className="truncate">To Do ({stats.pendingTasksCount})</span>
-            </button>
-          </div>
         </div>
       </div>
 
-      {/* 🌟 2. TARJETAS DE RESUMEN (PEDAGOGÍA VISUAL SIMÉTRICA) */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+      {/* 🌟 2. BANNER DE PEDAGOGÍA VISUAL SUTIL & DESCARTABLE (ONBOARDING) */}
+      <AnimatePresence>
+        {showQuickTip && (
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, height: 0 }}
+            className="p-3.5 rounded-2xl bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-transparent border border-indigo-200/80 dark:border-indigo-900/50 flex items-center justify-between gap-3 text-xs"
+          >
+            <div className="flex items-center gap-2 text-slate-700 dark:text-zinc-200">
+              <Sparkles size={16} className="text-indigo-500 shrink-0" />
+              <span>
+                <b>Planificación ágil:</b> Arrastrá el mouse sobre los días para agendar en bloque. Cada tarea completada suena para celebrar tu avance.
+              </span>
+            </div>
+            <button
+              onClick={handleDismissQuickTip}
+              className="px-2.5 py-1 rounded-xl text-[11px] font-bold text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors shrink-0 cursor-pointer"
+            >
+              Entendido ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 🌟 3. RESUMEN COMPACTO & SERENO */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
         {/* Card 1: Turnos Hoy */}
         <div 
           onClick={() => setActiveTab('SCHEDULE')}
-          className="h-full min-h-[76px] p-3.5 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-indigo-400 transition-all active:scale-98"
+          className="p-3 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-indigo-400 transition-all active:scale-98"
         >
-          <div className="w-10 h-10 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
-            <CalendarDays size={18} />
+          <div className="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold shrink-0">
+            <CalendarDays size={15} />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Turnos de Hoy</span>
-            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
-              {stats.todayAptsCount} {stats.todayAptsCount === 1 ? 'Cita' : 'Citas'}
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Citas Hoy</span>
+            <span className="text-sm font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.todayAptsCount}
             </span>
           </div>
         </div>
@@ -730,15 +753,15 @@ export const ProfessionalAgenda: React.FC = () => {
             setActiveTab('TASKS');
             setTaskFilter('CYCLE');
           }}
-          className="h-full min-h-[76px] p-3.5 rounded-2xl bg-amber-50/50 dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/60 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-amber-400 transition-all active:scale-98"
+          className="p-3 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-amber-400 transition-all active:scale-98"
         >
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
-            <Hourglass size={18} className={stats.expiringCyclesCount > 0 ? "animate-pulse" : ""} />
+          <div className="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold shrink-0">
+            <Hourglass size={15} className={stats.expiringCyclesCount > 0 ? "animate-pulse" : ""} />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider block truncate">Por Vencer</span>
-            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
-              {stats.expiringCyclesCount} {stats.expiringCyclesCount === 1 ? 'Ciclo' : 'Ciclos'}
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Por Vencer</span>
+            <span className="text-sm font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.expiringCyclesCount}
             </span>
           </div>
         </div>
@@ -749,97 +772,107 @@ export const ProfessionalAgenda: React.FC = () => {
             setActiveTab('TASKS');
             setTaskFilter('ALL');
           }}
-          className="h-full min-h-[76px] p-3.5 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-blue-400 transition-all active:scale-98"
+          className="p-3 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3 cursor-pointer hover:border-blue-400 transition-all active:scale-98"
         >
-          <div className="w-10 h-10 rounded-2xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
-            <ListTodo size={18} />
+          <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold shrink-0">
+            <ListTodo size={15} />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Por Hacer</span>
-            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
-              {stats.pendingTasksCount} {stats.pendingTasksCount === 1 ? 'Tarea' : 'Tareas'}
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Pendientes</span>
+            <span className="text-sm font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.pendingTasksCount}
             </span>
           </div>
         </div>
 
         {/* Card 4: Tareas Listas */}
-        <div className="h-full min-h-[76px] p-3.5 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0">
-            <CheckCircle2 size={18} />
+        <div className="p-3 rounded-2xl bg-white dark:bg-[#0a0d16] border border-slate-200/80 dark:border-zinc-800 shadow-2xs flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold shrink-0">
+            <CheckCircle2 size={15} />
           </div>
           <div className="min-w-0 flex-1">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Tareas Listas</span>
-            <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-montserrat truncate block">
-              {stats.completedTasksCount} {stats.completedTasksCount === 1 ? 'Hecha' : 'Hechas'}
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block truncate">Completadas</span>
+            <span className="text-sm font-black text-slate-900 dark:text-white font-montserrat truncate block">
+              {stats.completedTasksCount}
             </span>
           </div>
         </div>
       </div>
 
-      {/* 🌟 3. SWITCH DE VISTA: 3 PESTAÑAS SIMPLES */}
-      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-white dark:bg-[#0a0d16] p-2.5 rounded-2xl border border-slate-200/80 dark:border-zinc-800">
+      {/* 🌟 4. PESTAÑAS SIMPLES & DIRECTAS */}
+      <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-white dark:bg-[#0a0d16] p-2 rounded-2xl border border-slate-200/80 dark:border-zinc-800">
         
         {/* Pestañas Principales */}
-        <div className="flex flex-wrap bg-slate-100 dark:bg-zinc-900 p-1 rounded-xl border border-slate-200/80 dark:border-zinc-800 gap-1">
+        <div className="flex bg-slate-100 dark:bg-zinc-900 p-1 rounded-xl border border-slate-200/80 dark:border-zinc-800 gap-1">
           <button
             onClick={() => setActiveTab('CALENDAR')}
-            className={`py-1.5 px-3.5 rounded-lg text-xs font-bold font-montserrat transition-all flex items-center gap-1.5 ${
+            className={`py-1.5 px-3.5 rounded-lg text-xs font-bold font-montserrat transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'CALENDAR'
                 ? 'bg-white dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 shadow-xs'
                 : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <CalendarIcon size={13} />
-            <span>Calendario Semanal (Libre / Ocupado)</span>
+            <span>Semana</span>
           </button>
 
           <button
             onClick={() => setActiveTab('TASKS')}
-            className={`py-1.5 px-3.5 rounded-lg text-xs font-bold font-montserrat transition-all flex items-center gap-1.5 ${
+            className={`py-1.5 px-3.5 rounded-lg text-xs font-bold font-montserrat transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'TASKS'
                 ? 'bg-white dark:bg-zinc-800 text-emerald-600 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <ListTodo size={13} />
-            <span>Avisos de Ciclo & Tareas ({stats.pendingTasksCount})</span>
+            <span>Tareas</span>
+            {stats.pendingTasksCount > 0 && (
+              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                {stats.pendingTasksCount}
+              </span>
+            )}
           </button>
 
           <button
             onClick={() => setActiveTab('SCHEDULE')}
-            className={`py-1.5 px-3.5 rounded-lg text-xs font-bold font-montserrat transition-all flex items-center gap-1.5 ${
+            className={`py-1.5 px-3.5 rounded-lg text-xs font-bold font-montserrat transition-all flex items-center gap-1.5 cursor-pointer ${
               activeTab === 'SCHEDULE'
                 ? 'bg-white dark:bg-zinc-800 text-sky-600 dark:text-sky-400 shadow-xs'
                 : 'text-slate-500 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-white'
             }`}
           >
             <Clock size={13} />
-            <span>Lista de Turnos de Hoy ({appointments.length})</span>
+            <span>Hoy</span>
+            {stats.todayAptsCount > 0 && (
+              <span className="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300">
+                {stats.todayAptsCount}
+              </span>
+            )}
           </button>
         </div>
 
         {/* Guía Visual Rápida */}
         <div className="flex items-center gap-3 text-xs px-2">
-          <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+          <span className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400 font-medium">
+            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>Libre</span>
           </span>
-          <span className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-bold">
-            <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
-            <span>Turno Ocupado</span>
+          <span className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400 font-medium">
+            <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+            <span>Ocupado</span>
           </span>
         </div>
       </div>
 
-      {/* 🌟 4. CONTENIDO SEGÚN LA PESTAÑA SELECCIONADA */}
+      {/* 🌟 5. CONTENIDO SEGÚN LA PESTAÑA SELECCIONADA */}
       {activeTab === 'CALENDAR' ? (
         /* ═══════════════════════════════════════════════════════════════
            PESTAÑA 1: CALENDARIO SEMANAL VISUAL (LIBRE / OCUPADO) + TO DO
            ═══════════════════════════════════════════════════════════════ */
         <div className="space-y-4">
           
-          {/* Barra de navegación de la semana con controles ágiles */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-white dark:bg-[#0a0d16] p-3 md:p-3.5 rounded-2xl border border-slate-200/80 dark:border-zinc-800 shadow-2xs">
+          {/* Barra de navegación de la semana */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between bg-white dark:bg-[#0a0d16] p-3 rounded-2xl border border-slate-200/80 dark:border-zinc-800 shadow-2xs">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               {/* Botones de navegación de semana */}
               <div className="flex bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-xl p-0.5">
@@ -873,7 +906,7 @@ export const ProfessionalAgenda: React.FC = () => {
 
               {/* Etiqueta de la Semana */}
               <div className="flex items-center gap-2">
-                <h2 className="text-sm md:text-base font-black font-montserrat text-slate-900 dark:text-white">
+                <h2 className="text-sm font-black font-montserrat text-slate-900 dark:text-white">
                   Semana: {WEEK_DAYS[0]?.name} {WEEK_DAYS[0]?.dateStr} — {WEEK_DAYS[6]?.name} {WEEK_DAYS[6]?.dateStr}
                 </h2>
                 {weekOffset !== 0 && (
@@ -884,8 +917,8 @@ export const ProfessionalAgenda: React.FC = () => {
               </div>
             </div>
 
-            {/* Acciones de Navegación: Replicar Semana & Toggle To Do */}
-            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+            {/* Acciones de Navegación */}
+            <div className="flex items-center gap-2">
               <button
                 onClick={handleReplicateWeek}
                 className="py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-slate-700 dark:text-zinc-200 text-xs font-bold font-montserrat flex items-center gap-1.5 border border-slate-200 dark:border-zinc-700 shadow-2xs transition-all active:scale-95 cursor-pointer"
@@ -894,32 +927,7 @@ export const ProfessionalAgenda: React.FC = () => {
                 <Repeat size={13} className="text-indigo-600 dark:text-indigo-400" />
                 <span>Replicar Semana</span>
               </button>
-
-              <button
-                onClick={() => setIsToDoOpen(prev => !prev)}
-                className={`py-1.5 px-3 rounded-xl text-xs font-bold font-montserrat flex items-center gap-1.5 border transition-all active:scale-95 cursor-pointer ${
-                  isToDoOpen
-                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-xs'
-                    : 'bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-300 border-slate-200 dark:border-zinc-700 hover:bg-slate-50'
-                }`}
-                title="Alternar panel Microsoft To Do"
-              >
-                <ListTodo size={13} />
-                <span>{isToDoOpen ? 'Ocultar To Do' : 'Ver To Do'}</span>
-              </button>
             </div>
-          </div>
-
-          {/* Guía Pedagógica de Drag-to-Select */}
-          <div className="flex items-center justify-between text-xs px-2 py-1 bg-slate-50/50 dark:bg-zinc-900/30 rounded-xl border border-dashed border-slate-200 dark:border-zinc-800">
-            <div className="flex items-center gap-1.5 text-slate-500 dark:text-zinc-400">
-              <Sparkles size={13} className="text-indigo-500 shrink-0" />
-              <span className="hidden sm:inline"><b>Tip de Productividad:</b> Haz clic y <b>arrastra el mouse</b> sobre varios días/horas corrido para agendar o bloquear en lote.</span>
-              <span className="sm:hidden"><b>Tip:</b> Arrastra el mouse para agendar días corridos.</span>
-            </div>
-            <span className="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 font-bold shrink-0">
-              Google Calendar Style ⚡
-            </span>
           </div>
 
           {/* CONTENEDOR FLEX: CALENDARIO + PANEL MICROSOFT TO DO */}
